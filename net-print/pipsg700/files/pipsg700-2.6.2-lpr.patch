@@ -1,0 +1,80 @@
+diff -ur pipsg700-2.6.2/Makefile.in pipsg700-2.6.2-gentoo/Makefile.in
+--- pipsg700-2.6.2/Makefile.in	Wed Mar 30 11:00:37 2005
++++ pipsg700-2.6.2-gentoo/Makefile.in	Sat Nov  5 22:38:00 2005
+@@ -116,7 +116,7 @@
+ prefix = @prefix@
+ sysconfdir = @sysconfdir@
+ 
+-SUBDIRS = libltdl src dtrfilter ekpd ekpnavi ekpstm 	freset intl layout_script lib po ppd doc pixmaps
++SUBDIRS = libltdl src dtrfilter ekpd ekpnavi ekpstm 	freset intl layout_script lib po doc pixmaps
+ 
+ 
+ EXTRA_DIST = COPYING.KOWA COPYING.LIB COPYING.KOWA.ja
+diff -ur pipsg700-2.6.2/configure pipsg700-2.6.2-gentoo/configure
+--- pipsg700-2.6.2/configure	Wed Mar 30 11:00:00 2005
++++ pipsg700-2.6.2-gentoo/configure	Wed Nov  9 10:45:40 2005
+@@ -7477,7 +7477,8 @@
+ else
+    { { echo "$as_me:$LINENO: error: *** 'cups-config' missing, please install CUPS or fix your \$PATH ***" >&5
+ echo "$as_me: error: *** 'cups-config' missing, please install CUPS or fix your \$PATH ***" >&2;}
+-   { (exit 1); exit 1; }; }
++#   { (exit 1); exit 1; }; }
++}
+ fi
+ 
+ 
+diff -ur pipsg700-2.6.2/ekpd/cbtd_datatrans.c pipsg700-2.6.2-gentoo/ekpd/cbtd_datatrans.c
+--- pipsg700-2.6.2/ekpd/cbtd_datatrans.c	Thu Oct 28 19:57:42 2004
++++ pipsg700-2.6.2-gentoo/ekpd/cbtd_datatrans.c	Thu Nov 17 20:27:39 2005
+@@ -40,6 +40,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <grp.h>
+ #include "cbtd.h"
+ #include "libcbt.h"
+ #include "cbtd_thread.h"
+@@ -200,6 +201,9 @@
+ 
+ 	if (mkfifo (path, 0666))
+ 		return -1;
++
++	chmod (path, 0660);
++	chown (path, 0, getgrnam("lp")->gr_gid);
+ 
+ 	if (is_sysflags (p_info, ST_JOB_CANCEL | ST_JOB_CANCEL_NO_D4))
+ 	{
+diff -ur pipsg700-2.6.2/src/Makefile.in pipsg700-2.6.2-gentoo/src/Makefile.in
+--- pipsg700-2.6.2/src/Makefile.in	Wed Mar 30 11:00:37 2005
++++ pipsg700-2.6.2-gentoo/src/Makefile.in	Wed Nov  9 10:48:03 2005
+@@ -172,8 +172,7 @@
+ bin_PROGRAMS =  pipsg700$(EXEEXT)
+ cupsbackend_PROGRAMS =  ekplp$(EXEEXT)
+ cupsfilter_PROGRAMS =  rastertopips$(EXEEXT) pipstoprinter$(EXEEXT)
+-PROGRAMS =  $(bin_PROGRAMS) $(cupsbackend_PROGRAMS) \
+-$(cupsfilter_PROGRAMS)
++PROGRAMS =  $(bin_PROGRAMS)
+ 
+ pipsg700_OBJECTS =  ekpcom.$(OBJEXT) gLoad.$(OBJEXT) getstat.$(OBJEXT) \
+ inkbox.$(OBJEXT) paper.$(OBJEXT) paramConf.$(OBJEXT) pfatt.$(OBJEXT) \
+@@ -207,8 +206,8 @@
+ 
+ TAR = gtar
+ GZIP_ENV = --best
+-SOURCES = $(libcutils_la_SOURCES) $(pipsg700_SOURCES) $(ekplp_SOURCES) $(rastertopips_SOURCES) $(pipstoprinter_SOURCES)
+-OBJECTS = $(libcutils_la_OBJECTS) $(pipsg700_OBJECTS) $(ekplp_OBJECTS) $(rastertopips_OBJECTS) $(pipstoprinter_OBJECTS)
++SOURCES = $(libcutils_la_SOURCES) $(pipsg700_SOURCES)
++OBJECTS = $(libcutils_la_OBJECTS) $(pipsg700_OBJECTS)
+ 
+ all: all-redirect
+ .SUFFIXES:
+@@ -476,8 +475,7 @@
+ install-exec-am: install-binPROGRAMS
+ install-exec: install-exec-am
+ 
+-install-data-am: install-cupsbackendPROGRAMS install-cupsfilterPROGRAMS \
+-		install-pkgdataSCRIPTS
++install-data-am: install-pkgdataSCRIPTS
+ 	@$(NORMAL_INSTALL)
+ 	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
+ install-data: install-data-am

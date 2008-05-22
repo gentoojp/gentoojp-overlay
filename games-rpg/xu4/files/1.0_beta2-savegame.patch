@@ -1,0 +1,104 @@
+Only in src: Makefile.gengorou
+Only in src: debug
+Common subdirectories: ../u4-orig/src/lzw and src/lzw
+Common subdirectories: ../u4-orig/src/macosx and src/macosx
+diff -u ../u4-orig/src/savegame.cpp src/savegame.cpp
+--- ../u4-orig/src/savegame.cpp	2005-03-03 06:16:39.757538256 +0900
++++ src/savegame.cpp	2005-03-03 06:21:59.998854176 +0900
+@@ -15,20 +15,18 @@
+ string partySavFilename() {
+     string fname;
+ 
+-#if defined(MACOSX)
+     char *home;
+ 
+     home = getenv("HOME");
+     if (home && home[0]) {
+         fname += home;
++#if defined(MACOSX)
+         fname += MACOSX_USER_FILES_PATH;
+-        fname += "/";
++#endif
++        fname += "/.u4/";
+         fname += PARTY_SAV_BASE_FILENAME;
+     } else
+         fname = PARTY_SAV_BASE_FILENAME;
+-#else
+-    fname = PARTY_SAV_BASE_FILENAME;
+-#endif
+     
+     return fname;
+ }
+@@ -36,20 +34,18 @@
+ string monstersSavFilename(const char *base) {
+     string fname;
+     
+-#if defined(MACOSX)
+     char *home;
+ 
+     home = getenv("HOME");
+     if (home && home[0]) {
+         fname += home;
++#if defined(MACOSX)
+         fname += MACOSX_USER_FILES_PATH;
+-        fname += "/";
++#endif
++        fname += "/.u4/";
+         fname += base;
+     } else
+         fname = base;
+-#else
+-    fname = base;
+-#endif
+     
+     return fname;
+ }
+diff -u ../u4-orig/src/settings.cpp src/settings.cpp
+--- ../u4-orig/src/settings.cpp	2005-03-03 06:16:39.759537952 +0900
++++ src/settings.cpp	2005-03-03 07:39:39.641480824 +0900
+@@ -22,11 +22,7 @@
+ #if defined(_WIN32) || defined(__CYGWIN__)
+ #define SETTINGS_BASE_FILENAME "xu4.cfg"
+ #else
+-#if defined(MACOSX)
+ #define SETTINGS_BASE_FILENAME "xu4rc"
+-#else
+-#define SETTINGS_BASE_FILENAME ".xu4rc"
+-#endif
+ #endif
+ 
+ bool SettingsData::operator==(const SettingsData &s) const {    
+@@ -63,7 +59,7 @@
+ #if defined(MACOSX)
+         filename += MACOSX_USER_FILES_PATH;
+ #endif
+-        filename += "/";
++        filename += "/.u4/";
+     }
+ 
+     filename += SETTINGS_BASE_FILENAME;    
+diff -u ../u4-orig/src/u4.cpp src/u4.cpp
+--- ../u4-orig/src/u4.cpp	2005-03-03 06:16:39.758538104 +0900
++++ src/u4.cpp	2005-03-03 06:37:19.057136080 +0900
+@@ -28,6 +28,8 @@
+ #include "sound.h"
+ #include "tileset.h"
+ #include "utils.h"
++#include <dirent.h>
++#include <sys/stat.h>
+ 
+ #if defined(MACOSX)
+ #include "macosx/osxinit.h"
+@@ -48,6 +50,11 @@
+     osxInit(argv[0]);
+ #endif
+ 
++		if (getenv("HOME")) {
++			chdir(getenv("HOME"));
++			mkdir(".u4", 0777);
++		}
++
+     Debug::initGlobal("debug/global.txt");
+ 
+     for (i = 1; i < (unsigned int)argc; i++) {
+Common subdirectories: ../u4-orig/src/util and src/util

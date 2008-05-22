@@ -1,0 +1,34 @@
+Index: leif/sch_le_sun/configure.in
+===================================================================
+--- leif/sch_le_sun/configure.in	(revision 2478)
++++ leif/sch_le_sun/configure.in	(working copy)
+@@ -20,11 +20,7 @@
+ AC_SUBST(LE_NAME)
+ AC_DEFINE_UNQUOTED(LE_NAME, "$LE_NAME", [Define the name of language engine])
+ 
+-if test "x${prefix}" = "xNONE"; then
+-  im_libdir=/usr/lib/iiim
+-else
+-  im_libdir=${prefix}/lib/iiim
+-fi
++im_libdir=${libdir}/iiim
+ 
+ im_leifdir=$im_libdir/le/$LE_NAME
+ im_localedir=$im_libdir/le/$LE_NAME
+Index: leif/tch_le_sun/configure.in
+===================================================================
+--- leif/tch_le_sun/configure.in	(revision 2478)
++++ leif/tch_le_sun/configure.in	(working copy)
+@@ -41,11 +41,7 @@
+ AC_SUBST(LE_NAME)
+ AC_DEFINE_UNQUOTED(LE_NAME, "$LE_NAME", [Define the name of language engine])
+ 
+-if test "x${prefix}" = "xNONE"; then
+-  im_libdir=/usr/lib/iiim
+-else
+-  im_libdir=${prefix}/lib/iiim
+-fi
++im_libdir=${libdir}/iiim
+ 
+ im_leifdir=$im_libdir/le/$LE_NAME
+ im_localedir=$im_libdir/le/$LE_NAME

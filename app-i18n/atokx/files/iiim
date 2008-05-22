@@ -1,0 +1,18 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header:$
+
+start() {
+	ebegin "Starting iiim"
+	start-stop-daemon -b --start --quiet --exec /usr/lib/im/htt -- -port 9010 -syslog -message_locale C
+	eend $?
+
+}
+
+stop() {
+	ebegin "Stopping iiim"
+	start-stop-daemon --stop --quiet --exec /usr/lib/im/htt
+	eend $?
+}
+

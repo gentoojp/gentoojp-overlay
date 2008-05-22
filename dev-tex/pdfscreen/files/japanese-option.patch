@@ -1,0 +1,21 @@
+--- pdfscreen.sty.orig	2000-07-10 21:03:14.000000000 +0900
++++ pdfscreen.sty	2005-11-25 23:35:56.000000000 +0900
+@@ -297,6 +297,18 @@
+   \panelpagename{P\`agina}
+   \panelofname{de}
+   }
++\DeclareOption{japanese}{%
++  \paneltitlepagename{表紙}
++  \panlabstractname{概要}
++  \panelcontentsname{目次}
++  \panelfullscreenname{全画面}
++  \panelhomepagename{ホーム}
++  \panelgobackname{戻る}
++  \panelclosename{閉じる}
++  \panelquitname{終了}
++  \panelpagename{ページ}
++  \panelofname{／}
++  }
+ \DeclareOption{american}{\ExecuteOptions{english}}
+ \DeclareOption{austrian}{\PDFSCR@langwarn{austrian}\ExecuteOptions{english}}
+ \DeclareOption{brazil}{\ExecuteOptions{portuges}}

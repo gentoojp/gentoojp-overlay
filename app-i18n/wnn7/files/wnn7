@@ -1,0 +1,17 @@
+#!/sbin/runscript
+#
+depend() {
+        need net
+}
+
+start() {
+        ebegin "Starting Wnn7 jserver"
+        /usr/sbin/jserver > /dev/null
+        eend $? "Failed to start Wnn7 jserver"
+}
+
+stop() {
+        ebegin "Stopping Wnn7 jserver"
+        killall /usr/sbin/jserver
+        eend $? "Failed to stop Wnn7 jserver"
+}

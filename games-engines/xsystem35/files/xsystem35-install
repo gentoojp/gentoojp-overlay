@@ -1,0 +1,3 @@
+#!/bin/sh
+[ -f ~/.xsys35rc ] || cp /usr/share/games/xsystem35/xsys35rc.sample ~/.xsys35rc
+/usr/share/games/xsystem35/instgame

@@ -1,0 +1,44 @@
+diff -ur samba-2.2.8a-ja-1.1.orig/source/po/Makefile.in.in samba-2.2.8a-ja-1.1/source/po/Makefile.in.in
+--- samba-2.2.8a-ja-1.1.orig/source/po/Makefile.in.in	2001-12-04 11:14:01.000000000 +0900
++++ samba-2.2.8a-ja-1.1/source/po/Makefile.in.in	2003-12-08 04:47:00.000000000 +0900
+@@ -19,8 +19,8 @@
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+ datadir = $(prefix)/@DATADIRNAME@
+-localedir = $(datadir)/locale
+-gnulocaledir = $(prefix)/share/locale
++localedir = $(DATADIR)/locale
++gnulocaledir = $(DATADIR)/locale
+ gettextsrcdir = $(prefix)/share/gettext/po
+ subdir = po
+ 
+diff -ur samba-2.2.8a-ja-1.1.orig/source/script/installbin.sh samba-2.2.8a-ja-1.1/source/script/installbin.sh
+--- samba-2.2.8a-ja-1.1.orig/source/script/installbin.sh	2001-10-09 14:22:31.000000000 +0900
++++ samba-2.2.8a-ja-1.1/source/script/installbin.sh	2003-12-08 04:17:14.000000000 +0900
+@@ -33,9 +33,9 @@
+  chmod $INSTALLPERMS $BINDIR/$p2
+ 
+  # this is a special case, mount needs this in a specific location
+- if [ $p2 = smbmount ]; then
+-   ln -sf $BINDIR/$p2 /sbin/mount.smbfs
+- fi
++ #if [ $p2 = smbmount ]; then
++ #  ln -sf $BINDIR/$p2 /sbin/mount.smbfs
++ #fi
+ done
+ 
+ 
+diff -ur samba-2.2.8a-ja-1.1.orig/source/web/po/Makefile.in.in samba-2.2.8a-ja-1.1/source/web/po/Makefile.in.in
+--- samba-2.2.8a-ja-1.1.orig/source/web/po/Makefile.in.in	2001-12-03 20:32:30.000000000 +0900
++++ samba-2.2.8a-ja-1.1/source/web/po/Makefile.in.in	2003-12-08 04:46:37.000000000 +0900
+@@ -19,8 +19,8 @@
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+ datadir = $(prefix)/@DATADIRNAME@
+-localedir = $(datadir)/locale
+-gnulocaledir = $(prefix)/share/locale
++localedir = $(DATADIR)/locale
++gnulocaledir = $(DATADIR)/locale
+ gettextsrcdir = $(prefix)/share/gettext/po
+ subdir = web/po
+ 

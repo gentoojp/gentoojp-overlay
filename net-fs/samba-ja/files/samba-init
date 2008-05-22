@@ -1,0 +1,38 @@
+#!/sbin/runscript
+# Copyright 1999-2003 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License, v2 or later
+# $Header: /home/cvsroot/gentoo-x86/net-fs/samba/files/samba-init,v 1.3 2003/02/14 23:00:14 vapier Exp $
+
+opts="${opts} reload"
+
+depend() {
+	need net
+	use cupsd
+}
+
+start() {
+	ebegin "Starting samba"
+	start-stop-daemon --start --quiet --exec /usr/sbin/smbd
+	result=$?
+	start-stop-daemon --start --quiet --exec /usr/sbin/nmbd
+	result=$(( $result + $? ))
+	eend $result
+}
+
+stop() {
+	ebegin "Stopping samba"
+	start-stop-daemon --stop --quiet --pidfile /var/run/samba/smbd.pid
+	result=$?
+	start-stop-daemon --stop --quiet --pidfile /var/run/samba/nmbd.pid
+	result=$(( $result + $? ))
+	eend $result
+}
+
+reload() {
+	ebegin "Reloading samba"
+	killall -HUP smbd &>/dev/null
+	result=$?
+	killall -HUP nmbd &>/dev/null
+	result=$(( $result + $? ))
+	eend $result
+}

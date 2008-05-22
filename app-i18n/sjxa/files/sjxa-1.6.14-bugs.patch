@@ -1,0 +1,117 @@
+diff -ur sjxa-1.6.14/Imakefile sjxa-1.6.14-gentoo/Imakefile
+--- sjxa-1.6.14/Imakefile	Tue Sep 15 15:34:34 1998
++++ sjxa-1.6.14-gentoo/Imakefile	Sun Jan  1 21:09:08 2006
+@@ -70,7 +70,8 @@
+        SJ3LIBOBJ = Sj3lib.o
+ #endif
+ #ifdef Sj3LibDir
+-      SJ3LIB_DIR = Concat(-L,Sj3LibDir)
++      SJ3LIB_DIR = Sj3LibDir
++   SJ3LIB_LDFLAG = -L$(SJ3LIB_DIR)
+ #endif
+ #if UseXIMCP
+        USE_XIMCP = -DUSE_XIMCP
+@@ -114,7 +115,7 @@
+ 
+         DEFINES = $(PROTOCOL_DEFINES) $(HEADER_DEFINES)
+        INCLUDES = -I. -I$(LIBSRC) -I$(TOOLKITSRC) -I$(AWIDGETSRC)
+-  LOCAL_LDFLAGS = $(SJ3LIB_DIR) -LXmw
++  LOCAL_LDFLAGS = $(SJ3LIB_LDFLAG) -LXmw
+         DEPLIBS = Xmw/libXmw.a XawClientDepLibs
+ LOCAL_LIBRARIES = $(XPG4LIB) $(SJ3LIB) -lXmw XawClientLibs
+       MANSUFFIX = 1
+diff -ur sjxa-1.6.14/Ximcp.c sjxa-1.6.14-gentoo/Ximcp.c
+--- sjxa-1.6.14/Ximcp.c	Thu Mar 21 16:48:48 1996
++++ sjxa-1.6.14-gentoo/Ximcp.c	Sun Jan  1 21:03:28 2006
+@@ -628,8 +628,8 @@
+     CARD		 data;
+ #endif
+ {
+-    XimcpInputMethod	*xim;
+-    XimcpInputContext	*xic;
++    XimcpInputMethod	*xim1, *xim2;
++    XimcpInputContext	*xic1, *xic2;
+ 
+     XimSendClientMessage( display, xc, XIM_DISCONNECT_REPLY, 0, NULL );
+ 
+@@ -640,10 +640,15 @@
+     if( xc->next )
+ 	xc->next->previous = xc->previous;
+ 
+-    for( xim = xc->xim; xim != NULL; xim = xim->next ) {
+-	for( xic = xim->xic; xic != NULL; xic = xic->next )
+-	    destroy_ic( xic );
+-	free( xim );
++    for( xim1 = xc->xim; xim1 != NULL; ) {
++	for( xic1 = xim1->xic; xic1 != NULL; ) {
++	    xic2 = xic1->next;
++	    destroy_ic( xic1 );
++	    xic1 = xic2;
++	}
++	xim2 = xim1->next;
++	free( xim1 );
++	xim1 = xim2;
+     }
+     XDestroyWindow( display, xc->ims_window );
+     free( (char *)xc );
+@@ -811,7 +816,7 @@
+ #endif
+ {
+     XimcpInputMethod	*xim;
+-    XimcpInputContext	*xic;
++    XimcpInputContext	*xic1, *xic2;
+     CARD16		 reply[1];
+ 
+     if( (xim = imid2xim( display, xc, swap16(data.s[2]), True )) == NULL )
+@@ -824,8 +829,11 @@
+ 	xc->xim = xim->next;
+     if( xim->next )
+ 	xim->next->previous = xim->previous;
+-    for( xic = xim->xic; xic != NULL; xic = xic->next )
+-	destroy_ic( xic );
++    for( xic1 = xim->xic; xic1 != NULL; ) {
++	xic2 = xic1->next;
++	destroy_ic( xic1 );
++	xic1 = xic2;
++    }
+     free( (char *)xim );
+ }
+ 
+@@ -2608,11 +2616,11 @@
+ 
+     XSelectInput( event->display, window, StructureNotifyMask );
+ 
++    xc->previous = NULL;
+     xc->next = connection;
++    if( connection != NULL )
++	connection->previous = xc;
+     connection = xc;
+-    if( xc->next != NULL )
+-	xc->next->previous = xc;
+-    xc->previous = NULL;
+ 
+     ev.type = ClientMessage;
+     ev.window = window;
+@@ -3035,8 +3043,9 @@
+ 		    xc->previous->next = xc->next;
+ 		    xc->next->previous = xc->previous;
+ 		    xc->next = connection;
+-		    xc->previous = NULL;
++		    connection->previous = xc;
+ 		    connection = xc;
++		    xc->previous = NULL;
+ 		}
+ 		event->xclient.window = XtWindow(TopLevel);
+ 		return( True );
+diff -ur sjxa-1.6.14/resource/eucJP.ad sjxa-1.6.14-gentoo/resource/eucJP.ad
+--- sjxa-1.6.14/resource/eucJP.ad	Mon Jan 22 19:12:12 1996
++++ sjxa-1.6.14-gentoo/resource/eucJP.ad	Sun Jan  1 21:11:02 2006
+@@ -44,7 +44,7 @@
+ !*kanaMode:				True
+ *wrapToSelect:				3
+ *initialMode:				ZenkakuHiragana
+-*defaultCode:				sjis
++*defaultCode:				euc
+ 
+ Sjxa.XmwPreedit.borderWidth:		0
+ 

@@ -1,0 +1,23 @@
+diff -urN Xev111.ORIG/Imakefile Xev111/Imakefile
+--- Xev111.ORIG/Imakefile	1997-03-17 21:32:22.000000000 +0900
++++ Xev111/Imakefile	2004-01-05 12:57:11.000000000 +0900
+@@ -14,8 +14,8 @@
+ # UNION : Set 1 if you have Intel CPU or so.
+ # If you don't know whether you have Intel CPU or not, 
+ # compile union_check.c and run.
+-UNION = 0
+-#UNION = 1 
++#UNION = 0
++UNION = 1 
+ 
+ #BIN DIR
+ BINDIR = /usr/local/bin
+@@ -39,6 +39,8 @@
+ 
+ OBJS = $(SRCS:.c=.o) 
+ 
++all:: xbat
++
+ xbat: $(OBJS) $(DEPLIBS)
+ 	$(RM) $@
+ 	$(CC) -o $@ $(OBJS) $(LDOPTIONS) $(LOCAL_LIBRARIES) $(LDLIBS) $(EXTRA_LOAD_FLAGS)

@@ -1,0 +1,38 @@
+#!/sbin/runscript
+
+PIDFILE=/var/run/rpasswdd.pid
+RPASSWDD_OPTS="-4"
+
+depend() {
+	need net
+}
+
+checkconfig() {
+	if [ ! -f /etc/rpasswdd.pem ] ; then
+		eerror "No certificate found"
+		return 1
+	fi
+}
+
+start() {
+	checkconfig || return 1
+	ebegin "Starting rpasswd daemon"
+	env -i PATH=$PATH /sbin/start-stop-daemon --quiet \
+		--start --startas /usr/sbin/rpasswdd \
+		--pidfile ${PIDFILE} -- ${RPASSWDD_OPTS}
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping rpasswd daemon"
+	env -i PATH=$PATH /sbin/start-stop-daemon -o --quiet \
+		--stop --pidfile ${PIDFILE}
+	eend $?
+}
+
+reload() {
+	ebegin "Restarting rpasswd daemon"
+	stop
+	start
+	eend $?
+}

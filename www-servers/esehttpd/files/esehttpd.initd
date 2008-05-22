@@ -1,0 +1,70 @@
+#!/sbin/runscript
+# Copyright 1999-2002 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+opts="${opts} reload"
+ESEHTTPD="/usr/sbin/esehttpd"
+
+depend() {
+	need net
+}
+
+checkconfig() {
+	if [ -z "${CONFIGFILE}" ]; then
+		eerror "set \$CONFIGFILE to specify configuration file in /etc/conf.d/esehttpd"
+		return 1
+	fi
+
+	if [ -f "${CONFIGFILE}" ]; then
+		${ESEHTTPD} -t -f "${CONFIGFILE}" >& /dev/null
+		if [ ! $? -eq 0 ]; then
+			eerror "It seems that \"${CONFIGFILE}\" has a syntax error"
+			${ESEHTTPD} -t -f "${CONFIGFILE}"
+			return 1
+		fi
+	else
+		eerror "config file \"${CONFIGFILE}\" is missing."
+		return 1
+	fi
+
+	#FIXME: workaround to prevent initscript from being mislead into setting wrong status.
+	local port
+	local command
+	port=$(grep -i -E '^[[:space:]]*Port[[:space:]]+[0-9]+' "${CONFIGFILE}" |gawk '{ print $2 }')
+	command=$(fuser -v -n tcp ${port} |gawk "/^${port}\/tcp/ { print \$5 }")
+	if [ -n "${command}" -a "${command}" != "esehttpd" ]; then
+		eerror "Port ${port}/tcp is already used by ${command}."
+		return 1
+	fi
+
+	return 0
+}
+
+start() {
+	checkconfig || return 1
+	ebegin "Starting esehttpd"
+	start-stop-daemon --start --quiet --exec ${ESEHTTPD} -- -f "${CONFIGFILE}" ${ESEHTTPD_OPTS}
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping esehttpd"
+	start-stop-daemon --stop --quiet --signal TERM --exec ${ESEHTTPD} >& /dev/null
+	eend $?
+}
+
+reload() {
+	checkconfig || return 1
+	if [ -z "$(pidof ${ESEHTTPD})" ]; then
+		svc_start
+	else
+		start-stop-daemon --stop --quiet --signal HUP --exec ${ESEHTTPD}
+		ebegin "Restarting esehttpd gracefully"
+		while [ -n "$(pidof ${ESEHTTPD})" ]; do
+			sleep 0.1s
+		done
+		start-stop-daemon --start --quiet --exec ${ESEHTTPD} -- -f "${CONFIGFILE}" ${ESEHTTPD_OPTS}
+		eend $?
+	fi
+}

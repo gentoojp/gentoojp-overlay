@@ -1,0 +1,38 @@
+
+;;; site-lisp configuration for sdic
+
+(autoload 'sdic-describe-word "sdic" "Look up a english word." t nil)
+(global-set-key "\C-cw" 'sdic-describe-word)
+(autoload 'sdic-describe-word-at-point "sdic" "Look up a english word at point." t nil)
+(global-set-key "\C-cW" 'sdic-describe-word-at-point)
+
+(setq sdic-eiwa-dictionary-list nil
+      sdic-waei-dictionary-list nil)
+
+;; support suffix array dictionary with sary
+;; borrowed from http://blog.2310.net/contents/individual/000055.php
+(when @USE_SARY@
+  (eval-after-load "sdic"
+    '(progn
+       (setq sdicf-array-command "/usr/bin/sary")
+       (fset 'sdicf-array-init 'sdicf-common-init)
+       (fset 'sdicf-array-quit 'sdicf-array-quit)
+       (fset 'sdicf-array-search
+             (lambda (sdic pattern &optional case regexp)
+               (sdicf-array-init sdic)
+               (if regexp
+                   (signal 'sdicf-invalid-method '(regexp))
+                 (save-excursion
+                   (set-buffer (sdicf-get-buffer sdic))
+                   (delete-region (point-min) (point-max))
+                   (apply 'sdicf-call-process
+                         sdicf-array-command
+                         (sdicf-get-coding-system sdic)
+                         nil t nil
+                         (if case
+                             (list "-i" pattern (sdicf-get-filename sdic))
+                           (list pattern (sdicf-get-filename sdic))))
+                   (goto-char (point-min))
+                   (let (entries)
+                     (while (not (eobp)) (sdicf-search-internal))
+                     (nreverse entries)))))))))

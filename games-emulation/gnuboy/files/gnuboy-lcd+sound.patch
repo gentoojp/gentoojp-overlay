@@ -1,0 +1,382 @@
+diff -ub gnuboy-1.0.3.orig/emu.c gnuboy-1.0.3/emu.c
+--- gnuboy-1.0.3.orig/emu.c	2001-12-08 09:07:46.000000000 +0900
++++ gnuboy-1.0.3/emu.c	2005-12-24 17:21:43.000000000 +0900
+@@ -8,6 +8,8 @@
+ #include "mem.h"
+ #include "lcd.h"
+ #include "rc.h"
++#include "fb.h"
++#include "pcm.h"
+ 
+ 
+ static int framelen = 16743;
+@@ -79,12 +81,10 @@
+ 		vid_end();
+ 		rtc_tick();
+ 		sound_mix();
+-		if (!pcm_submit())
+-		{
+-			delay = framelen - sys_elapsed(timer);
++		delay = pcm_submit() ? 0 : framelen - sys_elapsed(timer);
++		/* printf("%d\n", delay); */
+ 			sys_sleep(delay);
+ 			sys_elapsed(timer);
+-		}
+ 		doevents();
+ 		vid_begin();
+ 		if (framecount) { if (!--framecount) die("finished\n"); }
+@@ -97,14 +97,26 @@
+ 	}
+ }
+ 
++void emu_run_frame(int skip)
++{
++	fb.enabled = skip;
+ 
++	cpu_emulate(2280);
++	while (R_LY > 0 && R_LY < 144)
++		emu_step();
+ 
++	vid_end();
++	rtc_tick();
++	sound_mix();
++	pcm_submit();
++	/* printf("%d\n", delay); */
++	doevents();
++	vid_begin();
+ 
++	if (!(R_LCDC & 0x80))
++		cpu_emulate(32832);
+ 
+-
+-
+-
+-
+-
+-
++	while (R_LY > 0) /* wait for next frame */
++		emu_step();
++}
+ 
+共通の下位ディレクトリー: gnuboy-1.0.3.orig/etcとgnuboy-1.0.3/etc
+diff -ub gnuboy-1.0.3.orig/hw.c gnuboy-1.0.3/hw.c
+--- gnuboy-1.0.3.orig/hw.c	2001-04-03 02:36:21.000000000 +0900
++++ gnuboy-1.0.3/hw.c	2005-12-24 17:20:53.000000000 +0900
+@@ -141,6 +141,22 @@
+ {
+ 	if (hw.pad & k)
+ 		return;
++	/* Siren2 Fix */
++	switch(k)
++	{
++		case PAD_UP:
++			hw.pad &= 0xff-PAD_DOWN;
++			break;
++		case PAD_DOWN:
++			hw.pad &= 0xff-PAD_UP;
++			break;
++		case PAD_LEFT:
++			hw.pad &= 0xff-PAD_RIGHT;
++			break;
++		case PAD_RIGHT:
++			hw.pad &= 0xff-PAD_LEFT;
++			break;
++	}
+ 	hw.pad |= k;
+ 	pad_refresh();
+ }
+diff -ub gnuboy-1.0.3.orig/lcd.c gnuboy-1.0.3/lcd.c
+--- gnuboy-1.0.3.orig/lcd.c	2001-12-08 02:39:35.000000000 +0900
++++ gnuboy-1.0.3/lcd.c	2005-12-24 19:49:09.000000000 +0900
+@@ -40,29 +40,26 @@
+ #define WT (scan.wt)
+ #define WV (scan.wv)
+ 
++#define WC (scan.wc)
++
+ byte patpix[4096][8][8];
+ byte patdirty[1024];
+ byte anydirty;
+ 
+-static int scale = 1;
+-static int density = 0;
++static int scale = 2;
++static int density = 2;
+ 
+ static int rgb332;
+ 
+-static int sprsort = 1;
++static int sprsort;
+ static int sprdebug;
+ 
+-#define DEF_PAL { 0x98d0e0, 0x68a0b0, 0x60707C, 0x2C3C3C }
++/*#define DEF_PAL { 0x98d0e0, 0x68a0b0, 0x60707C, 0x2C3C3C }
++  #define DEF_PAL { 0x78f0f0, 0x58b8b8, 0x487878, 0x184848 }*/
++#define DEF_PAL { 0xf0f0f0, 0xb8b8b8, 0x787878, 0x181818 }
+ 
+ static int dmg_pal[4][4] = { DEF_PAL, DEF_PAL, DEF_PAL, DEF_PAL };
+ 
+-static int usefilter, filterdmg;
+-static int filter[3][4] = {
+-	{ 195,  25,   0,  35 },
+-	{  25, 170,  25,  35 },
+-	{  25,  60, 125,  40 }
+-};
+-
+ rcvar_t lcd_exports[] =
+ {
+ 	RCV_INT("scale", &scale),
+@@ -74,11 +71,6 @@
+ 	RCV_VECTOR("dmg_obp1", dmg_pal[3], 4),
+ 	RCV_BOOL("sprsort", &sprsort),
+ 	RCV_BOOL("sprdebug", &sprdebug),
+-	RCV_BOOL("colorfilter", &usefilter),
+-	RCV_BOOL("filterdmg", &filterdmg),
+-	RCV_VECTOR("red", filter[0], 4),
+-	RCV_VECTOR("green", filter[1], 4),
+-	RCV_VECTOR("blue", filter[2], 4),
+ 	RCV_END
+ };
+ 
+@@ -284,9 +276,10 @@
+ 	src = patpix[*tile][WV];
+ 	while (cnt--)
+ 		*(dest++) = *(src++);
++	WC++;
+ }
+ 
+-static void blendcpy(byte *dest, byte *src, byte b, int cnt)
++void blendcpy(byte *dest, byte *src, byte b, int cnt)
+ {
+ 	while (cnt--) *(dest++) = *(src++) | b;
+ }
+@@ -402,6 +395,8 @@
+ 	}
+ 	src = patpix[*(tile++)][WV];
+ 	blendcpy(dest, src, *(tile++), cnt);
++
++	WC++;
+ }
+ 
+ static void recolor(byte *buf, byte fill, int cnt)
+@@ -433,9 +428,8 @@
+ {
+ 	int i, j;
+ 	struct obj *o;
+-	struct vissprite ts[10];
++	struct vissprite ts;
+ 	int v, pat;
+-	int l, x;
+ 
+ 	NS = 0;
+ 	if (!(R_LCDC & 0x02)) return;
+@@ -476,23 +470,18 @@
+ 		if (++NS == 10) break;
+ 	}
+ 	if (!sprsort || hw.cgb) return;
+-	/* not quite optimal but it finally works! */
+ 	for (i = 0; i < NS; i++)
+ 	{
+-		l = 0;
+-		x = VS[0].x;
+-		for (j = 1; j < NS; j++)
++		for (j = i + 1; j < NS; j++)
+ 		{
+-			if (VS[j].x < x)
++			if (VS[i].x > VS[j].x)
+ 			{
+-				l = j;
+-				x = VS[j].x;
++				ts = VS[i];
++				VS[i] = VS[j];
++				VS[j] = ts;
+ 			}
+ 		}
+-		ts[i] = VS[l];
+-		VS[l].x = 160;
+ 	}
+-	memcpy(VS, ts, sizeof VS);
+ }
+ 
+ void spr_scan()
+@@ -511,8 +500,8 @@
+ 	for (; ns; ns--, vs--)
+ 	{
+ 		x = vs->x;
+-		if (x >= 160) continue;
+-		if (x <= -8) continue;
++		if (x > 160) continue;
++		if (x < -7) continue;
+ 		if (x < 0)
+ 		{
+ 			src = vs->buf - x;
+@@ -548,7 +537,6 @@
+ 			}
+ 		}
+ 		else while (i--) if (src[i]) dest[i] = pal|src[i];
+-		/* else while (i--) if (src[i]) dest[i] = 31 + ns; */
+ 	}
+ 	if (sprdebug) for (i = 0; i < NS; i++) BUF[i<<1] = 36;
+ }
+@@ -595,8 +583,9 @@
+ 	WX = R_WX - 7;
+ 	if (WY>L || WY<0 || WY>143 || WX<-7 || WX>159 || !(R_LCDC&0x20))
+ 		WX = 160;
+-	WT = (L - WY) >> 3;
+-	WV = (L - WY) & 7;
++	if(R_LY == 0) WC = 0;
++	WT = WC >> 3;
++	WV = WC & 7;
+ 
+ 	spr_enum();
+ 
+@@ -721,7 +710,7 @@
+ 
+ static void updatepalette(int i)
+ {
+-	int c, r, g, b, y, u, v, rr, gg;
++	int c, r, g, b, y, u, v;
+ 
+ 	c = (lcd.pal[i<<1] | ((int)lcd.pal[(i<<1)|1] << 8)) & 0x7FFF;
+ 	r = (c & 0x001F) << 3;
+@@ -731,15 +720,6 @@
+ 	g |= (g >> 5);
+ 	b |= (b >> 5);
+ 
+-	if (usefilter && (filterdmg || hw.cgb))
+-	{
+-		rr = ((r * filter[0][0] + g * filter[0][1] + b * filter[0][2]) >> 8) + filter[0][3];
+-		gg = ((r * filter[1][0] + g * filter[1][1] + b * filter[1][2]) >> 8) + filter[1][3];
+-		b = ((r * filter[2][0] + g * filter[2][1] + b * filter[2][2]) >> 8) + filter[2][3];
+-		r = rr;
+-		g = gg;
+-	}
+-	
+ 	if (fb.yuv)
+ 	{
+ 		y = (((r *  263) + (g * 516) + (b * 100)) >> 10) + 16;
+@@ -801,7 +781,6 @@
+ 
+ 	if (hw.cgb) return;
+ 
+-	/* if (mapnum >= 2) d = 0xe4; */
+ 	for (j = 0; j < 8; j += 2)
+ 	{
+ 		c = cmap[(d >> j) & 3];
+@@ -815,7 +794,7 @@
+ 	}
+ }
+ 
+-void vram_write(int a, byte b)
++void vram_write(addr a, byte b)
+ {
+ 	lcd.vbank[R_VBK&1][a] = b;
+ 	if (a >= 0x1800) return;
+diff -ub gnuboy-1.0.3.orig/lcd.h gnuboy-1.0.3/lcd.h
+--- gnuboy-1.0.3.orig/lcd.h	2001-09-23 03:03:20.000000000 +0900
++++ gnuboy-1.0.3/lcd.h	2005-12-24 17:23:54.000000000 +0900
+@@ -22,7 +22,8 @@
+ 	un32 pal4[64];
+ 	byte pri[256];
+ 	struct vissprite vs[16];
+-	int ns, l, x, y, s, t, u, v, wx, wy, wt, wv;
++	int ns, l, x, y, s, t, u, v, wx, wy, wt, wv, wc;
++	/* wc = Window count */
+ };
+ 
+ struct obj
+diff -ub gnuboy-1.0.3.orig/lcdc.c gnuboy-1.0.3/lcdc.c
+--- gnuboy-1.0.3.orig/lcdc.c	2001-09-19 11:48:08.000000000 +0900
++++ gnuboy-1.0.3/lcdc.c	2005-12-24 17:22:01.000000000 +0900
+@@ -26,7 +26,8 @@
+ 	static const int condbits[4] = { 0x08, 0x30, 0x20, 0x00 };
+ 	int flag = 0;
+ 
+-	if ((R_LY < 0x91) && (R_LY == R_LYC))
++/*	if ((R_LY < 0x91) && (R_LY == R_LYC))	*/
++	if ((R_LY == R_LYC))
+ 	{
+ 		R_STAT |= 0x04;
+ 		if (R_STAT & 0x40) flag = IF_STAT;
+diff -ub gnuboy-1.0.3.orig/sound.c gnuboy-1.0.3/sound.c
+--- gnuboy-1.0.3.orig/sound.c	2001-12-08 09:26:10.000000000 +0900
++++ gnuboy-1.0.3/sound.c	2005-12-24 17:21:24.000000000 +0900
+@@ -21,10 +21,10 @@
+ 
+ const static byte cgbwave[16] =
+ {
+-	0x00, 0xff, 0x00, 0xff,
+-	0x00, 0xff, 0x00, 0xff,
+-	0x00, 0xff, 0x00, 0xff,
+-	0x00, 0xff, 0x00, 0xff,
++	0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff,
++	0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00
+ };
+ 
+ const static byte sqwave[4][8] =
+@@ -100,13 +100,13 @@
+ 	S1.envol = R_NR12 >> 4;
+ 	S1.endir = (R_NR12>>3) & 1;
+ 	S1.endir |= S1.endir - 1;
+-	S1.enlen = (R_NR12 & 7) << 15;
++	S1.enlen = (R_NR12 & 3) << 15;
+ 	s1_freq();
+ 	S2.len = (64-(R_NR21&63)) << 13;
+ 	S2.envol = R_NR22 >> 4;
+ 	S2.endir = (R_NR22>>3) & 1;
+ 	S2.endir |= S2.endir - 1;
+-	S2.enlen = (R_NR22 & 7) << 15;
++	S2.enlen = (R_NR22 & 3) << 15;
+ 	s2_freq();
+ 	S3.len = (256-R_NR31) << 20;
+ 	s3_freq();
+@@ -114,7 +114,7 @@
+ 	S4.envol = R_NR42 >> 4;
+ 	S4.endir = (R_NR42>>3) & 1;
+ 	S4.endir |= S4.endir - 1;
+-	S4.enlen = (R_NR42 & 7) << 15;
++	S4.enlen = (R_NR42 & 3) << 15;
+ 	s4_freq();
+ }
+ 
+@@ -298,8 +298,8 @@
+ 	S1.endir = (R_NR12>>3) & 1;
+ 	S1.endir |= S1.endir - 1;
+ 	S1.enlen = (R_NR12 & 7) << 15;
+-	if (!S1.on) S1.pos = 0;
+ 	S1.on = 1;
++	S1.pos = 0;
+ 	S1.cnt = 0;
+ 	S1.encnt = 0;
+ }
+@@ -310,8 +310,8 @@
+ 	S2.endir = (R_NR22>>3) & 1;
+ 	S2.endir |= S2.endir - 1;
+ 	S2.enlen = (R_NR22 & 7) << 15;
+-	if (!S2.on) S2.pos = 0;
+ 	S2.on = 1;
++	S2.pos = 0;
+ 	S2.cnt = 0;
+ 	S2.encnt = 0;
+ }
+@@ -319,7 +319,7 @@
+ void s3_init()
+ {
+ 	int i;
+-	if (!S3.on) S3.pos = 0;
++	S3.pos = 0;
+ 	S3.cnt = 0;
+ 	S3.on = R_NR30 >> 7;
+ 	if (S3.on) for (i = 0; i < 16; i++)
+@@ -405,7 +405,8 @@
+ 		break;
+ 	case RI_NR30:
+ 		R_NR30 = b;
+-		if (!(b & 128)) S3.on = 0;
++/*	if (!(b & 128)) S3.on = 0;	*/
++		S3.on = (b & 128)>>7;
+ 		break;
+ 	case RI_NR31:
+ 		R_NR31 = b;

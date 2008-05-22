@@ -1,0 +1,63 @@
+--- gnuboy-1.0.3.orig/loader.c	2001-12-06 14:51:21.000000000 +0900
++++ gnuboy-1.0.3/loader.c	2005-12-26 22:13:59.000000000 +0900
+@@ -137,14 +137,20 @@
+ static byte *decompress(byte *data, int *len)
+ {
+ 	unsigned long pos = 0;
+-	if (data[0] != 0x1f || data[1] != 0x8b)
+-		return data;
+-	inf_buf = 0;
+-	inf_pos = inf_len = 0;
+-	if (unzip(data, &pos, inflate_callback) < 0)
+-		return data;
+-	*len = inf_pos;
+-	return inf_buf;
++	inf_buf = 0; inf_pos = inf_len = 0;
++	if (data[0] == 0x1f || data[1] == 0x8b){ /* .gz */
++		if (ungzip(data, &pos, inflate_callback) < 0)
++			return data;
++		*len = inf_pos;return inf_buf;
++	}
++	if (data[0] == 0x50 || data[1] == 0x4b){ /* .zip */
++		/*fprintf(stderr,".zip format not supported"); 
++			exit(1);*/
++		if (unzip(data, &pos, inflate_callback) < 0)
++			return data;
++		*len = inf_pos;return inf_buf;
++	}
++	return data;
+ }
+ 
+ 
+--- gnuboy-1.0.3.orig/inflate.c	2001-09-30 05:34:09.000000000 +0900
++++ gnuboy-1.0.3/inflate.c	2006-01-22 14:47:36.000000000 +0900
+@@ -457,7 +457,7 @@
+ }
+ 
+ int
+-unzip (const unsigned char *data, long *p,
++ungzip (const unsigned char *data, long *p,
+        void (* callback) (unsigned char d))
+      /* Uncompress gzipped data.  data is a pointer to the data, p is
+       * a pointer to a long that is initialized to 0 (unless for some
+@@ -510,3 +510,20 @@
+    * them. */
+ }
+ 
++int
++unzip (const unsigned char *data, long *p,
++       void (* callback) (unsigned char d))
++{
++  int size_fnam_extra;
++  if ( read_bits (data, p, 8) != 0x50 
++       || read_bits (data, p, 8) != 0x4b )
++    {
++      return -1;
++    }
++  read_bits(data, p, (12+4+4+4)*8);
++  size_fnam_extra  = read_bits(data, p, 16);
++  size_fnam_extra += read_bits(data, p, 16);
++  read_bits (data, p, size_fnam_extra*8 );
++
++  return inflate (data, p, callback);
++}

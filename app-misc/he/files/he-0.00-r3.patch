@@ -1,0 +1,55 @@
+--- he.c.orig	2005-10-15 20:54:41.851409000 +0900
++++ he.c	2005-10-15 20:55:16.099193000 +0900
+@@ -2,12 +2,12 @@
+ #include "SDL.h"
+ 
+ /*
+- * ƒRƒ“ƒpƒCƒ‹•û–@
++ * ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ–¹æ³•
+  * gcc he.c -o he_sdl -s `sdl-config --libs --cflags`
+  *
+- * g‚¢•û
+- * ƒXƒy[ƒXF‚Ö‚¥`
+- * ESC ƒL[FƒŠƒZƒbƒg
++ * ä½¿ã„æ–¹
++ * ã‚¹ãƒšãƒ¼ã‚¹ï¼šã¸ã‡ã€œ
++ * ESC ã‚­ãƒ¼ï¼šãƒªã‚»ãƒƒãƒˆ
+ */
+ 
+ typedef struct {
+@@ -30,7 +30,7 @@
+ audio_t audio;
+ 
+ 
+-/* ƒTƒEƒ“ƒhƒf[ƒ^‚Ì“Ç‚İ‚İ */
++/* ã‚µã‚¦ãƒ³ãƒ‰ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ */
+ audio_t LoadAudio(const char *filename) {
+   audio_t a;
+ 
+@@ -81,7 +81,7 @@
+   SDL_AudioSpec audio_device;
+   SDL_AudioSpec audio_device_setting;
+ 
+-  /* ƒI[ƒfƒBƒIƒfƒoƒCƒX‚Ì€”õ */
++  /* ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒ‡ãƒã‚¤ã‚¹ã®æº–å‚™ */
+   audio_device_setting.freq= 44100;
+   audio_device_setting.format= AUDIO_S16LSB;
+   audio_device_setting.samples= 4096;
+@@ -134,7 +134,7 @@
+   audio= LoadAudio("he.wav");
+   SetupAudioDevice(&audio);
+ 
+-  SDL_WM_SetCaption("‚Ö‚¥` for SDL", "‚Ö‚¥` for SDL");
++  SDL_WM_SetCaption("ã¸ã‡ã€œ for SDL", "ã¸ã‡ã€œ for SDL");
+   icon= SDL_LoadBMP("he_icon.bmp");
+   SDL_WM_SetIcon(icon, NULL);
+   SDL_FreeSurface(icon);
+@@ -219,6 +219,8 @@
+     default:
+       break;
+     }
++
++    SDL_Delay(16);
+   }
+   return 1;
+ }

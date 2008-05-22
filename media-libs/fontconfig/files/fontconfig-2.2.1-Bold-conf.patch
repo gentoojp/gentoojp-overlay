@@ -1,0 +1,24 @@
+--- fontconfig-2.2.1-orig/fonts.conf.in	Thu Apr 17 07:04:42 2003
++++ fontconfig-2.2.1/fonts.conf.in	Mon Sep 22 13:52:49 2003
+@@ -334,6 +334,21 @@
+ 	</match>
+ 
+ 	<config>
++<!-- 
++ Artificial bold for fonts without an bold version
++ -->
++	<match target="font">
++		<test name="weight" compare="less_eq">
++			<const>medium</const>
++		</test>
++		<test target="pattern" name="weight" compare="more">
++			<const>medium</const>
++		</test>
++		<edit name="weight" mode="assign">
++			<const>bold</const>
++		</edit>
++	</match>
++
+ <!--
+   These are the default Unicode chars that are expected to be blank
+   in fonts.  All other blank chars are assumed to be broken and

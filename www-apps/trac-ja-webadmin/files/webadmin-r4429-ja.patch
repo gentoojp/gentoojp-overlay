@@ -1,0 +1,716 @@
+diff -ur webadmin-orig/basics.py webadmin/basics.py
+--- webadmin-orig/basics.py	2006-01-10 23:04:39.021413000 +0900
++++ webadmin/basics.py	2007-02-06 16:40:19.384222000 +0900
+@@ -26,7 +26,7 @@
+ 
+     def get_admin_pages(self, req):
+         if req.perm.has_permission('TRAC_ADMIN'):
+-            yield ('general', 'General', 'basic', 'Basic Settings')
++            yield ('general', '一般', 'basic', '基本設定')
+ 
+     def process_admin_request(self, req, cat, page, path_info):
+         if req.method == "POST":
+diff -ur webadmin-orig/htdocs/css/admin.css webadmin/htdocs/css/admin.css
+--- webadmin-orig/htdocs/css/admin.css	2006-04-18 07:47:23.058604000 +0900
++++ webadmin/htdocs/css/admin.css	2007-02-06 16:40:41.916438000 +0900
+@@ -28,6 +28,7 @@
+ 
+ table.listing { clear: none; width: 64% }
+ table.listing .sel, table.listing .default { text-align: center; width: 1% }
++table.listing th { white-space: nowrap }
+ 
+ /* Plugins panel */
+ form#addplug { width: 35% }
+diff -ur webadmin-orig/logging.py webadmin/logging.py
+--- webadmin-orig/logging.py	2006-01-10 23:04:39.021413000 +0900
++++ webadmin/logging.py	2007-02-06 16:40:19.386125000 +0900
+@@ -28,7 +28,7 @@
+ 
+     def get_admin_pages(self, req):
+         if req.perm.has_permission('TRAC_ADMIN'):
+-            yield ('general', 'General', 'logging', 'Logging')
++            yield ('general', '一般', 'logging', 'ログ')
+ 
+     def process_admin_request(self, req, cat, page, path_info):
+         log_type = self.config.get('logging', 'log_type')
+diff -ur webadmin-orig/perm.py webadmin/perm.py
+--- webadmin-orig/perm.py	2006-01-10 23:04:39.021413000 +0900
++++ webadmin/perm.py	2007-02-06 16:40:19.387309000 +0900
+@@ -28,7 +28,7 @@
+     # IAdminPageProvider
+     def get_admin_pages(self, req):
+         if req.perm.has_permission('TRAC_ADMIN'):
+-            yield ('general', 'General', 'perm', 'Permissions')
++            yield ('general', '一般', 'perm', 'パーミッション')
+ 
+     def process_admin_request(self, req, cat, page, path_info):
+         perm = PermissionSystem(self.env)
+diff -ur webadmin-orig/plugin.py webadmin/plugin.py
+--- webadmin-orig/plugin.py	2006-04-11 20:29:43.093314000 +0900
++++ webadmin/plugin.py	2007-02-06 16:40:19.389858000 +0900
+@@ -54,7 +54,7 @@
+ 
+     def get_admin_pages(self, req):
+         if req.perm.has_permission('TRAC_ADMIN'):
+-            yield ('general', 'General', 'plugin', 'Plugins')
++            yield ('general', '一般', 'plugin', 'プラグイン')
+ 
+     def process_admin_request(self, req, cat, page, _):
+         req.perm.assert_permission('TRAC_ADMIN')
+diff -ur webadmin-orig/templates/admin.cs webadmin/templates/admin.cs
+--- webadmin-orig/templates/admin.cs	2006-07-31 06:20:23.354418000 +0900
++++ webadmin/templates/admin.cs	2007-02-06 16:40:19.391467000 +0900
+@@ -5,7 +5,7 @@
+ 
+ <div id="content" class="admin">
+ 
+- <h1>Administration</h1>
++ <h1>管理</h1>
+ 
+  <div class="tabs"><?cs set:cur_cat_id = '' ?><ul><?cs
+   each:page = admin.pages ?><?cs
+diff -ur webadmin-orig/templates/admin_basics.cs webadmin/templates/admin_basics.cs
+--- webadmin-orig/templates/admin_basics.cs	2006-11-07 03:35:28.015559000 +0900
++++ webadmin/templates/admin_basics.cs	2007-02-06 16:40:19.393007000 +0900
+@@ -1,10 +1,10 @@
+-<h2>Basic Settings</h2>
++<h2>基本設定</h2>
+ 
+ <form class="mod" id="modbasic" method="post">
+  <fieldset>
+-  <legend>Project</legend>
++  <legend>プロジェクト</legend>
+   <div class="field">
+-   <label>Name:<br />
++   <label>プロジェクト名称:<br />
+     <input type="text" name="name" value="<?cs var:admin.project.name ?>" />
+    </label>
+   </div>
+@@ -15,13 +15,13 @@
+    </label>
+   </div>
+   <div class="field">
+-   <label>Description:<br />
++   <label>プロジェクトの説明:<br />
+     <textarea name="description" rows="3" cols="80"><?cs
+       var:admin.project.description ?></textarea>
+    </label>
+   </div>
+  </fieldset>
+  <div class="buttons">
+-  <input type="submit" value="Apply changes">
++  <input type="submit" value="更新">
+  </div>
+ </form>
+diff -ur webadmin-orig/templates/admin_component.cs webadmin/templates/admin_component.cs
+--- webadmin-orig/templates/admin_component.cs	2006-09-23 02:07:13.625310000 +0900
++++ webadmin/templates/admin_component.cs	2007-02-06 16:45:21.525114000 +0900
+@@ -1,15 +1,15 @@
+-<h2>Manage Components</h2><?cs
++<h2>コンポーネントの管理</h2><?cs
+ 
+ if admin.component.name ?>
+  <form class="mod" id="modcomp" method="post">
+   <fieldset>
+-   <legend>Modify Component:</legend>
++   <legend>コンポーネントの編集</legend>
+    <div class="field">
+-    <label>Name:<br /><input type="text" name="name" value="<?cs
++    <label>コンポーネント名称:<br /><input type="text" name="name" value="<?cs
+       var:admin.component.name ?>"></label>
+    </div>
+    <div class="field">
+-    <label>Owner:<br /><?cs
++    <label>オーナー:<br /><?cs
+      if:len(admin.owners) ?><?cs
+       call:hdf_select(admin.owners, "owner", admin.component.owner, 0) ?><?cs
+      else ?><input type="text" name="owner" value="<?cs
+@@ -18,8 +18,8 @@
+    </div>
+    <div class="field">
+     <fieldset class="iefix">
+-     <label for="description">Description (you may use <a tabindex="42" href="<?cs
+-       var:trac.href.wiki ?>/WikiFormatting">WikiFormatting</a> here):</label>
++     <label for="description">コンポーネントの説明 (<a tabindex="42" href="<?cs
++       var:trac.href.wiki ?>/WikiFormatting">WikiFormatting</a> を使用できます):</label>
+      <p><textarea id="description" name="description" class="wikitext" rows="6" cols="60"><?cs
+        var:admin.component.description ?></textarea></p>
+     </fieldset>
+@@ -27,8 +27,8 @@
+    <script type="text/javascript" src="<?cs
+      var:chrome.href ?>/common/js/wikitoolbar.js"></script>
+    <div class="buttons">
+-    <input type="submit" name="cancel" value="Cancel" />
+-    <input type="submit" name="save" value="Save" />
++    <input type="submit" name="cancel" value="取り消し" />
++    <input type="submit" name="save" value="保存" />
+    </div>
+   </fieldset>
+  </form><?cs
+@@ -36,19 +36,19 @@
+ else ?>
+  <form class="addnew" id="addcomp" method="post">
+   <fieldset>
+-   <legend>Add Component:</legend>
++   <legend>コンポーネントの追加:</legend>
+    <div class="field">
+-    <label>Name:<br /><input type="text" name="name" /></label>
++    <label>コンポーネント名称:<br /><input type="text" name="name" /></label>
+    </div>
+    <div class="field">
+-    <label>Owner:<br /><?cs
++    <label>オーナー:<br /><?cs
+      if:len(admin.owners) ?><?cs
+       call:hdf_select(admin.owners, "owner", "", 0) ?><?cs
+      else ?><input type="text" name="owner" /><?cs
+      /if ?></label>
+    </div>
+    <div class="buttons">
+-    <input type="submit" name="add" value="Add">
++    <input type="submit" name="add" value="追加">
+    </div>
+   </fieldset>
+  </form><?cs
+@@ -56,8 +56,8 @@
+  if:len(admin.components) ?><form method="POST">
+   <table class="listing" id="complist">
+    <thead>
+-    <tr><th class="sel">&nbsp;</th><th>Name</th>
+-    <th>Owner</th><th>Default</th></tr>
++    <tr><th class="sel">&nbsp;</th><th>名前</th>
++    <th>オーナー</th><th>デフォルト</th></tr>
+    </thead><?cs
+    each:comp = admin.components ?>
+     <tr>
+@@ -73,8 +73,8 @@
+    /each ?>
+   </table>
+   <div class="buttons">
+-   <input type="submit" name="remove" value="Remove selected items" />
+-   <input type="submit" name="apply" value="Apply changes" />
++   <input type="submit" name="remove" value="選択した項目を削除" />
++   <input type="submit" name="apply" value="更新" />
+   </div>
+   <p class="help">You can remove all items from this list to completely hide
+   this field from the user interface.</p>
+diff -ur webadmin-orig/templates/admin_enum.cs webadmin/templates/admin_enum.cs
+--- webadmin-orig/templates/admin_enum.cs	2006-11-12 03:41:01.402426000 +0900
++++ webadmin/templates/admin_enum.cs	2007-02-06 16:45:36.519140000 +0900
+@@ -1,16 +1,16 @@
+-<h2>Manage <?cs var:admin.enum.label_plural ?></h2><?cs
++<h2><?cs var:admin.enum.label_plural ?>の管理</h2><?cs
+ 
+ if:admin.enum.name ?>
+  <form class="mod" id="modenum" method="post">
+   <fieldset>
+-   <legend>Modify <?cs var:admin.enum.label_singular ?></legend>
++   <legend><?cs var:admin.enum.label_singular ?>の編集</legend>
+    <div class="field">
+-    <label>Name: <input type="text" name="name"value="<?cs
++    <label><?cs var:admin.enum.label_singular ?>名称: <input type="text" name="name" value="<?cs
+       var:admin.enum.name ?>" /></label>
+    </div>
+    <div class="buttons">
+-    <input type="submit" name="cancel" value="Cancel">
+-    <input type="submit" name="save" value="Save">
++    <input type="submit" name="cancel" value="取り消し">
++    <input type="submit" name="save" value="保存">
+    </div>
+   </fieldset>
+  </form><?cs
+@@ -19,12 +19,12 @@
+ 
+  <form class="addnew" id="addenum" method="post">
+   <fieldset>
+-   <legend>Add <?cs var:admin.enum.label_singular ?></legend>
++   <legend><?cs var:admin.enum.label_singular ?>の追加</legend>
+    <div class="field">
+-    <label>Name:<input type="text" name="name" id="name"></label>
++    <label>名前:<input type="text" name="name" id="name"></label>
+    </div>
+    <div class="buttons">
+-    <input type="submit" name="add" value="Add">
++    <input type="submit" name="add" value="追加">
+    </div>
+   </fieldset>
+  </form><?cs
+@@ -32,8 +32,8 @@
+  if:len(admin.enums) ?><form method="POST">
+   <table class="listing" id="enumlist">
+    <thead>
+-    <tr><th class="sel">&nbsp;</th><th>Name</th>
+-    <th>Default</th><th>Order</th></tr>
++    <tr><th class="sel">&nbsp;</th><th>名称</th>
++    <th>デフォルト</th><th>順序</th></tr>
+    </thead><tbody><?cs
+    each:enum = admin.enums ?>
+     <tr>
+@@ -52,8 +52,8 @@
+    /each ?></tbody>
+   </table>
+   <div class="buttons">
+-   <input type="submit" name="remove" value="Remove selected items" />
+-   <input type="submit" name="apply" value="Apply changes" />
++   <input type="submit" name="remove" value="選択した項目を削除" />
++   <input type="submit" name="apply" value="更新" />
+   </div>
+   <p class="help">You can remove all items from this list to completely hide
+   this field from the user interface.</p>
+diff -ur webadmin-orig/templates/admin_log.cs webadmin/templates/admin_log.cs
+--- webadmin-orig/templates/admin_log.cs	2006-12-09 08:24:44.839744000 +0900
++++ webadmin/templates/admin_log.cs	2007-02-06 16:40:19.398996000 +0900
+@@ -1,8 +1,8 @@
+-<h2>Logging Configuration</h2>
++<h2>ログの設定</h2>
+ 
+ <form class="mod" id="modlog" method="post">
+  <div class="field">
+-  <label>Type:<br />
++  <label>分類:<br />
+    <select id="log_type" name="log_type"><?cs
+     each:type = admin.log.types ?><option value="<?cs var:type.name ?>"<?cs
+      if:type.selected ?> selected="selected"<?cs /if ?><?cs
+@@ -12,7 +12,7 @@
+   </label>
+  </div>
+  <div class="field">
+-  <label>Log level:<br />
++  <label>ログレベル:<br />
+    <select id="log_level" name="log_level"><?cs
+     each:level = admin.log.levels ?><option<?cs
+      if:level == admin.log.level ?> selected="selected"<?cs /if?>><?cs
+@@ -21,7 +21,7 @@
+   </label>
+  </div>
+  <div class="field">
+-  <label>Log file:<br />
++  <label>ログファイル:<br />
+    <input type="text" id="log_file" name="log_file" size="48" value="<?cs
+      var:admin.log.file ?>"/>
+   </label>
+@@ -40,7 +40,7 @@
+    addEvent(log_type, "change", enableLevelAndFile);
+  </script>
+  <div class="buttons">
+-  <input type="submit" value="Apply changes">
++  <input type="submit" value="変更">
+  </div>
+  <p class="help">You may need to restart the server for these changes to take
+  effect.</p>
+diff -ur webadmin-orig/templates/admin_milestone.cs webadmin/templates/admin_milestone.cs
+--- webadmin-orig/templates/admin_milestone.cs	2006-11-12 03:41:01.402426000 +0900
++++ webadmin/templates/admin_milestone.cs	2007-02-06 16:46:05.233262000 +0900
+@@ -1,26 +1,26 @@
+-<h2>Manage Milestones</h2><?cs
++<h2>マイルストーンの管理</h2><?cs
+ 
+ if:admin.milestone.name ?>
+  <form class="mod" id="modmil" method="post">
+   <fieldset>
+-   <legend>Modify Milestone:</legend>
++   <legend>マイルストーンの編集:</legend>
+    <div class="field">
+-    <label>Name:<br /> <input type="text" name="name"value="<?cs
++    <label>マイルストーン名称:<br /> <input type="text" name="name" value="<?cs
+       var:admin.milestone.name ?>" /></label>
+    </div>
+    <div class="field">
+-    <label>Due:<br />
++    <label>完了期限:<br />
+      <input type="text" id="duedate" name="duedate" size="<?cs
+        var:len(admin.date_hint) ?>" value="<?cs
+        var:admin.milestone.duedate ?>" title="Format: <?cs var:admin.date_hint ?>" />
+-     <em>Format: <?cs var:admin.date_hint ?></em>
++     <em>日付フォーマット: <?cs var:admin.date_hint ?></em>
+     </label>
+    </div>
+    <div class="field">
+     <label>
+      <input type="checkbox" id="completed" name="completed"<?cs
+        if:admin.milestone.completed ?> checked="checked"<?cs /if ?> />
+-     Completed:<br />
++     完了にする:<br />
+     </label>
+     <label>
+      <input type="text" id="completeddate" name="completeddate" size="<?cs
+@@ -29,7 +29,7 @@
+         var:admin.datetime_now ?><?cs
+        /alt ?>" title="Format: <?cs
+        var:admin.datetime_hint ?>" />
+-     <em>Format: <?cs var:admin.datetime_hint ?></em>
++     <em>日付フォーマット: <?cs var:admin.datetime_hint ?></em>
+     </label>
+     <script type="text/javascript">
+       var completed = document.getElementById("completed");
+@@ -42,8 +42,8 @@
+    </div>
+    <div class="field">
+     <fieldset class="iefix">
+-     <label for="description">Description (you may use <a tabindex="42" href="<?cs
+-       var:trac.href.wiki ?>/WikiFormatting">WikiFormatting</a> here):</label>
++     <label for="description">マイルストーンについての説明 (<a tabindex="42" href="<?cs
++       var:trac.href.wiki ?>/WikiFormatting">WikiFormatting</a> を使用できます):</label>
+      <p><textarea id="description" name="description" class="wikitext" rows="6" cols="60"><?cs
+        var:admin.milestone.description ?></textarea></p>
+     </fieldset>
+@@ -51,8 +51,8 @@
+    <script type="text/javascript" src="<?cs
+      var:chrome.href ?>/common/js/wikitoolbar.js"></script>
+    <div class="buttons">
+-    <input type="submit" name="cancel" value="Cancel">
+-    <input type="submit" name="save" value="Save">
++    <input type="submit" name="cancel" value="取り消し">
++    <input type="submit" name="save" value="保存">
+    </div>
+   </fieldset>
+  </form><?cs
+@@ -61,20 +61,20 @@
+ 
+  <form class="addnew" id="addmil" method="post">
+   <fieldset>
+-   <legend>Add Milestone:</legend>
++   <legend>マイルストーンの追加:</legend>
+    <div class="field">
+     <label>Name:<br /><input type="text" name="name" id="name" /></label>
+    </div>
+    <div class="field">
+     <label>
+-     Due:<br />
++     完了期限:<br />
+      <input type="text" name="duedate"
+        title="Format: <?cs var:admin.date_hint ?>" /><br />
+-     <em>Format: <?cs var:admin.date_hint ?></em>
++     <em>日付フォーマット: <?cs var:admin.date_hint ?></em>
+     </label>
+    </div>
+    <div class="buttons">
+-    <input type="submit" name="add" value="Add" />
++    <input type="submit" name="add" value="追加" />
+    </div>
+   </fieldset>
+  </form><?cs
+@@ -82,8 +82,8 @@
+  if:len(admin.milestones) ?><form method="POST">
+   <table class="listing" id="millist">
+    <thead>
+-    <tr><th class="sel">&nbsp;</th><th>Name</th>
+-    <th>Time</th><th>Default</th></tr>
++    <tr><th class="sel">&nbsp;</th><th>マイルストーン名称</th>
++    <th>完了期限</th><th>デフォルト</th></tr>
+    </thead><tbody><?cs
+    each:milestone = admin.milestones ?>
+    <tr>
+@@ -97,8 +97,8 @@
+    /each ?></tbody>
+   </table>
+   <div class="buttons">
+-   <input type="submit" name="remove" value="Remove selected items" />
+-   <input type="submit" name="apply" value="Apply changes" />
++   <input type="submit" name="remove" value="選択した項目を削除" />
++   <input type="submit" name="apply" value="更新" />
+   </div>
+   <p class="help">You can remove all items from this list to completely hide
+   this field from the user interface.</p>
+diff -ur webadmin-orig/templates/admin_perm.cs webadmin/templates/admin_perm.cs
+--- webadmin-orig/templates/admin_perm.cs	2005-08-18 06:36:25.292831000 +0900
++++ webadmin/templates/admin_perm.cs	2007-02-06 16:40:19.402847000 +0900
+@@ -1,34 +1,34 @@
+-<h2>Manage Permissions</h2>
++<h2>パーミッションの管理</h2>
+ 
+ <form id="addperm" class="addnew" method="post">
+  <fieldset>
+-  <legend>Grant Permission:</legend>
++  <legend>パーミッションを追加する:</legend>
+   <div class="field">
+-   <label>Subject: <input type="text" name="subject" /></label>
++   <label>ユーザ: <input type="text" name="subject" /></label>
+   </div>
+   <div class="field">
+-   <label>Action: <?cs call:hdf_select(admin.actions, "action", "", 0) ?></label>
++   <label>権限: <?cs call:hdf_select(admin.actions, "action", "", 0) ?></label>
+   </div>
+   <p class="help">Grant permission for an action to a subject, which can be
+   either a user or a group.</p>
+   <div class="buttons">
+-   <input type="submit" name="add" value=" Add ">
++   <input type="submit" name="add" value="追加">
+   </div>
+  </fieldset>
+ </form>
+ 
+ <form id="addsubj" class="addnew" method="post">
+  <fieldset>
+-  <legend>Add Subject to Group:</legend>
++  <legend>ユーザをグループに追加:</legend>
+   <div class="field">
+-   <label>Subject: <input type="text" name="subject" /></label>
++   <label>ユーザ: <input type="text" name="subject" /></label>
+   </div>
+   <div class="field">
+-   <label>Group: <input type="text" name="group" /></label>
++   <label>グループ: <input type="text" name="group" /></label>
+   </div>
+   <p class="help">Add a user or group to an existing permission group.</p>
+   <div class="buttons">
+-   <input type="submit" name="add" value=" Add ">
++   <input type="submit" name="add" value="追加">
+   </div>
+  </fieldset>
+ </form>
+@@ -36,7 +36,7 @@
+ <form method="post">
+  <table class="listing" id="permlist">
+   <thead>
+-   <tr><th class="sel">&nbsp;</th><th>Subject</th><th>Action</th></tr>
++   <tr><th class="sel">&nbsp;</th><th>ユーザ</th><th>権限</th></tr>
+   </thead><tbody><?cs
+   each:perm = admin.perms ?>
+    <tr>
+@@ -47,6 +47,6 @@
+   /each ?></tbody>
+  </table>
+  <div class="buttons">
+-  <input type="submit" name="remove" value="Remove selected items" />
++  <input type="submit" name="remove" value="選択した項目を削除" />
+  </div>
+ </form>
+diff -ur webadmin-orig/templates/admin_plugin.cs webadmin/templates/admin_plugin.cs
+--- webadmin-orig/templates/admin_plugin.cs	2006-04-11 20:29:43.093314000 +0900
++++ webadmin/templates/admin_plugin.cs	2007-02-06 16:40:19.405173000 +0900
+@@ -1,10 +1,10 @@
+-<h2>Manage Plugins</h2>
++<h2>プラグインの管理</h2>
+ 
+ <form id="addplug" class="addnew" method="post" enctype="multipart/form-data">
+  <fieldset>
+-  <legend>Install Plugin:</legend>
++  <legend>プラグインのインストール:</legend>
+   <div class="field">
+-   <label>File: <input type="file" name="egg_file"<?cs
++   <label>ファイル: <input type="file" name="egg_file"<?cs
+      if:admin.readonly ?> disabled="disabled"<?cs /if ?> /></label>
+   </div>
+   <p class="help"><?cs
+@@ -14,7 +14,7 @@
+     Upload a plugin packaged as Python egg.<?cs
+    /if ?></p>
+   <div class="buttons">
+-   <input type="submit" name="install" value="Install"<?cs
++   <input type="submit" name="install" value="インストール"<?cs
+      if:admin.readonly ?> disabled="disabled"<?cs /if ?> />
+   </div>
+  </fieldset>
+@@ -28,14 +28,14 @@
+  <div class="uninstall buttons">
+   <input type="hidden" name="plugin_filename" value="<?cs
+     var:plugin.plugin_filename ?>" />
+-  <input type="submit" name="uninstall" value="Uninstall"<?cs
++  <input type="submit" name="uninstall" value="アンインストール"<?cs
+    if:plugin.readonly ?> disabled="disabled"<?cs /if ?> />
+  </div>
+  <p class="summary"><?cs var:plugin.info.summary ?></p><?cs
+  if:plugin.info.home_page || plugin.info.author || plugin.info.author_email ?>
+   <dl class="info"><?cs
+    if:plugin.info.author || plugin.info.author_email ?>
+-    <dt>Author:</dt>
++    <dt>作者:</dt>
+     <dd><?cs
+     if:plugin.info.author_email ?><a href="mailto:<?cs
+      var:plugin.info.author_email ?>"><?cs alt:plugin.info.author ?><?cs
+@@ -44,17 +44,17 @@
+     /if ?></dd><?cs
+    /if ?><?cs
+    if:plugin.info.home_page ?>
+-    <dt>Home page:</dt>
++    <dt>ホームページ:</dt>
+     <dd><a onclick="window.open(this.href); return false" href="<?cs
+       var:plugin.info.home_page ?>"><?cs var:plugin.info.home_page ?></a></dt><?cs
+    /if ?><?cs
+    if:plugin.info.license ?>
+-    <dt>License:</dt>
++    <dt>ライセンス:</dt>
+     <dd><?cs var:plugin.info.license ?></dd><?cs
+    /if ?>
+   </dl><?cs
+  /if ?><table class="listing"><thead>
+-   <tr><th>Component</th><th class="sel">Enabled</th></tr>
++   <tr><th>コンポーネント</th><th class="sel">有効</th></tr>
+   </thead><tbody><?cs
+   each:component = plugin.components ?><tr>
+    <td class="name" title="<?cs var:component.description ?>"><?cs
+@@ -73,7 +73,7 @@
+  </table>
+  <div class="update buttons">
+   <input type="hidden" name="plugin" value="<?cs var:name(plugin) ?>" />
+-  <input type="submit" name="update" value="Apply changes" />
++  <input type="submit" name="update" value="更新" />
+  </div></div><script type="text/javascript">
+    enableFolding("no<?cs var:name(plugin) ?>");
+  </script></form><?cs
+diff -ur webadmin-orig/templates/admin_version.cs webadmin/templates/admin_version.cs
+--- webadmin-orig/templates/admin_version.cs	2006-11-12 03:41:01.402426000 +0900
++++ webadmin/templates/admin_version.cs	2007-02-06 16:46:25.656830000 +0900
+@@ -1,25 +1,25 @@
+-<h2>Manage Versions</h2><?cs
++<h2>バージョンの管理</h2><?cs
+ 
+ if:admin.version.name ?>
+  <form class="mod" id="modver" method="post">
+   <fieldset>
+-   <legend>Modify Version:</legend>
++   <legend>バージョンの編集:</legend>
+    <div class="field">
+-    <label>Name:<br /> <input type="text" name="name"value="<?cs
++    <label>バージョン名称:<br /> <input type="text" name="name" value="<?cs
+       var:admin.version.name ?>" /></label>
+    </div>
+    <div class="field">
+-    <label>Time:<br />
++    <label>完了期限:<br />
+      <input type="text" name="time" size="<?cs
+        var:len(admin.date_hint) ?>" value="<?cs
+        var:admin.version.time ?>" title="Format: <?cs var:admin.date_hint ?>" />
+-     <em>Format: <?cs var:admin.date_hint ?></em>
++     <em>日付フォーマット: <?cs var:admin.date_hint ?></em>
+     </label>
+    </div>
+    <div class="field">
+     <fieldset class="iefix">
+-     <label for="description">Description (you may use <a tabindex="42" href="<?cs
+-       var:trac.href.wiki ?>/WikiFormatting">WikiFormatting</a> here):</label>
++     <label for="description">バージョンについての説明 (<a tabindex="42" href="<?cs
++       var:trac.href.wiki ?>/WikiFormatting">WikiFormatting</a> を使用できます):</label>
+      <p><textarea id="description" name="description" class="wikitext" rows="6" cols="60"><?cs
+        var:admin.version.description ?></textarea></p>
+     </fieldset>
+@@ -27,8 +27,8 @@
+    <script type="text/javascript" src="<?cs
+      var:chrome.href ?>/common/js/wikitoolbar.js"></script>
+    <div class="buttons">
+-    <input type="submit" name="cancel" value="Cancel">
+-    <input type="submit" name="save" value="Save">
++    <input type="submit" name="cancel" value="取り消し">
++    <input type="submit" name="save" value="保存">
+    </div>
+   </fieldset>
+  </form><?cs
+@@ -37,20 +37,20 @@
+ 
+  <form class="addnew" id="addver" method="post">
+   <fieldset>
+-   <legend>Add Version:</legend>
++   <legend>バージョンの追加:</legend>
+    <div class="field">
+-    <label>Name:<br /><input type="text" name="name" id="name" /></label>
++    <label>バージョン名称:<br /><input type="text" name="name" id="name" /></label>
+    </div>
+    <div class="field">
+     <label>
+-     Time:<br />
++     完了期限:<br />
+      <input type="text" name="time"
+        title="Format: <?cs var:admin.date_hint ?>" /><br />
+-     <em>Format: <?cs var:admin.date_hint ?></em>
++     <em>日付フォーマット: <?cs var:admin.date_hint ?></em>
+     </label>
+    </div>
+    <div class="buttons">
+-    <input type="submit" name="add" value="Add" />
++    <input type="submit" name="add" value="追加" />
+    </div>
+   </fieldset>
+  </form><?cs
+@@ -58,8 +58,8 @@
+  if:len(admin.versions) ?><form method="POST">
+   <table class="listing" id="verlist">
+    <thead>
+-    <tr><th class="sel">&nbsp;</th><th>Name</th>
+-    <th>Time</th><th>Default</th></tr>
++    <tr><th class="sel">&nbsp;</th><th>名称</th>
++    <th>完了期限</th><th>デフォルト</th></tr>
+    </thead><tbody><?cs
+    each:ver = admin.versions ?>
+    <tr>
+@@ -73,8 +73,8 @@
+    /each ?></tbody>
+   </table>
+   <div class="buttons">
+-   <input type="submit" name="remove" value="Remove selected items" />
+-   <input type="submit" name="apply" value="Apply changes" />
++   <input type="submit" name="remove" value="選択した項目を削除" />
++   <input type="submit" name="apply" value="更新" />
+   </div>
+   <p class="help">You can remove all items from this list to completely hide
+   this field from the user interface.</p>
+diff -ur webadmin-orig/ticket.py webadmin/ticket.py
+--- webadmin-orig/ticket.py	2006-09-13 14:29:05.874120000 +0900
++++ webadmin/ticket.py	2007-02-06 16:40:19.409481000 +0900
+@@ -31,7 +31,7 @@
+ 
+     def get_admin_pages(self, req):
+         if req.perm.has_permission('TICKET_ADMIN'):
+-            yield ('ticket', 'Ticket System', 'components', 'Components')
++            yield ('ticket', 'チケット', 'components', 'コンポーネント')
+ 
+     def process_admin_request(self, req, cat, page, component):
+         req.perm.assert_permission('TICKET_ADMIN')
+@@ -114,7 +114,7 @@
+ 
+     def get_admin_pages(self, req):
+         if req.perm.has_permission('TICKET_ADMIN'):
+-            yield ('ticket', 'Ticket System', 'milestones', 'Milestones')
++            yield ('ticket', 'チケット', 'milestones', 'マイルストーン')
+ 
+     def process_admin_request(self, req, cat, page, milestone):
+         req.perm.assert_permission('TICKET_ADMIN')
+@@ -209,7 +209,7 @@
+ 
+     def get_admin_pages(self, req):
+         if req.perm.has_permission('TICKET_ADMIN'):
+-            yield ('ticket', 'Ticket System', 'versions', 'Versions')
++            yield ('ticket', 'チケット', 'versions', 'バージョン')
+ 
+     def process_admin_request(self, req, cat, page, version):
+         req.perm.assert_permission('TICKET_ADMIN')
+@@ -293,7 +293,7 @@
+ 
+     def get_admin_pages(self, req):
+         if req.perm.has_permission('TICKET_ADMIN'):
+-            yield ('ticket', 'Ticket System', self._type, self._label[1])
++            yield ('ticket', 'チケット', self._type, self._label[1])
+ 
+     def process_admin_request(self, req, cat, page, path_info):
+         req.perm.assert_permission('TICKET_ADMIN')
+@@ -381,16 +381,16 @@
+ class PriorityAdminPage(AbstractEnumAdminPage):
+     _type = 'priority'
+     _enum_cls = ticket.Priority
+-    _label = ('Priority', 'Priorities')
++    _label = ('優先度', '優先度')
+ 
+ 
+ class SeverityAdminPage(AbstractEnumAdminPage):
+     _type = 'severity'
+     _enum_cls = ticket.Severity
+-    _label = ('Severity', 'Severities')
++    _label = ('重要度', '重要度')
+ 
+ 
+ class TicketTypeAdminPage(AbstractEnumAdminPage):
+     _type = 'type'
+     _enum_cls = ticket.Type
+-    _label = ('Ticket Type', 'Ticket Types')
++    _label = ('分類', '分類')
+diff -ur webadmin-orig/web_ui.py webadmin/web_ui.py
+--- webadmin-orig/web_ui.py	2006-06-07 18:24:02.168903000 +0900
++++ webadmin/web_ui.py	2007-02-06 16:40:19.411564000 +0900
+@@ -65,7 +65,7 @@
+            admin page is available."""
+         pages, providers = self._get_pages(req)
+         if pages:
+-            yield 'mainnav', 'admin', Markup('<a href="%s">Admin</a>',
++            yield 'mainnav', 'admin', Markup(u'<a href="%s">管理</a>',
+                                              self.env.href.admin())
+ 
+     # IRequestHandler methods

@@ -1,0 +1,21 @@
+diff -ur qt-x11-free-3.3.0.orig/src/kernel/qapplication_x11.cpp qt-x11-free-3.3.0/src/kernel/qapplication_x11.cpp
+--- qt-x11-free-3.3.0.orig/src/kernel/qapplication_x11.cpp	Mon Feb 24 17:30:07 2003
++++ qt-x11-free-3.3.0/src/kernel/qapplication_x11.cpp	Thu Mar 13 20:51:08 2003
+@@ -3173,7 +3173,7 @@
+ 		if ( inPopupMode() ) // no focus widget, see if we have a popup
+ 		    keywidget = (QETWidget*) activePopupWidget();
+ 		else if ( widget )
+-		    keywidget = (QETWidget*)widget->topLevelWidget();
++		    keywidget = widget->focusWidget()?(QETWidget*)widget->focusWidget():widget;
+ 	    }
+ 	}
+     }
+@@ -3204,7 +3204,7 @@
+ 		    if ( inPopupMode() ) // no focus widget, see if we have a popup
+ 		        keywidget = (QETWidget*) activePopupWidget();
+ 		    else if ( widget )
+-		        keywidget = (QETWidget*)widget->topLevelWidget();
++		        keywidget = widget->focusWidget()?(QETWidget*)widget->focusWidget():widget;
+ 	        }
+ 	    }
+         }

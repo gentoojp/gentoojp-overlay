@@ -1,0 +1,30 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+opts="${opts} reload"
+
+depend() {
+	use net
+}
+
+start() {
+	ebegin "Starting EBNETD"
+	start-stop-daemon --start --quiet --exec /usr/sbin/ebnetd
+	result=$?
+	eend $result
+}
+
+stop() {
+	ebegin "Stopping EBNETD"
+	start-stop-daemon --start --quiet --exec /usr/sbin/ebncontrol terminate
+	result=$?
+	eend $result
+}
+
+reload() {
+	ebegin "Reloading EBNETD"
+	start-stop-daemon --start --quiet --exec /usr/sbin/ebncontrol restart
+	eend $result
+}

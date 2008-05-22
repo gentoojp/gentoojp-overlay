@@ -1,0 +1,66 @@
+diff -Naur pylibpcap-0.4/pcap.py pylibpcap-0.4-python2.4/pcap.py
+--- pylibpcap-0.4/pcap.py	2002-06-14 16:32:59.000000000 +0900
++++ pylibpcap-0.4-python2.4/pcap.py	2005-10-18 03:05:51.000000000 +0900
+@@ -32,23 +32,23 @@
+         self.thisown = 1
+         import sys
+         if sys.version[0]=='2':
+-          self.setfilter.__setattr__('__doc__',pcapc.pcapObject_setfilter.__doc__)
+-          self.loop.__setattr__('__doc__',pcapc.pcapObject_loop.__doc__)
+-          self.major_version.__setattr__('__doc__',pcapc.pcapObject_major_version.__doc__)
+-          self.minor_version.__setattr__('__doc__',pcapc.pcapObject_minor_version.__doc__)
+-          self.open_dead.__setattr__('__doc__',pcapc.pcapObject_open_dead.__doc__)
+-          self.is_swapped.__setattr__('__doc__',pcapc.pcapObject_is_swapped.__doc__)
+-          self.dump_open.__setattr__('__doc__',pcapc.pcapObject_dump_open.__doc__)
+-          self.setnonblock.__setattr__('__doc__',pcapc.pcapObject_setnonblock.__doc__)
+-          self.dispatch.__setattr__('__doc__',pcapc.pcapObject_dispatch.__doc__)
+-          self.open_live.__setattr__('__doc__',pcapc.pcapObject_open_live.__doc__)
+-          self.getnonblock.__setattr__('__doc__',pcapc.pcapObject_getnonblock.__doc__)
+-          self.snapshot.__setattr__('__doc__',pcapc.pcapObject_snapshot.__doc__)
+-          self.open_offline.__setattr__('__doc__',pcapc.pcapObject_open_offline.__doc__)
+-          self.next.__setattr__('__doc__',pcapc.pcapObject_next.__doc__)
+-          self.stats.__setattr__('__doc__',pcapc.pcapObject_stats.__doc__)
+-          self.fileno.__setattr__('__doc__',pcapc.pcapObject_fileno.__doc__)
+-          self.datalink.__setattr__('__doc__',pcapc.pcapObject_datalink.__doc__)
++          self.setfilter.__dict__['__doc__'] = pcapc.pcapObject_setfilter.__doc__
++          self.loop.__dict__['__doc__'] = pcapc.pcapObject_loop.__doc__
++          self.major_version.__dict__['__doc__'] = pcapc.pcapObject_major_version.__doc__
++          self.minor_version.__dict__['__doc__'] = pcapc.pcapObject_minor_version.__doc__
++          self.open_dead.__dict__['__doc__'] = pcapc.pcapObject_open_dead.__doc__
++          self.is_swapped.__dict__['__doc__'] = pcapc.pcapObject_is_swapped.__doc__
++          self.dump_open.__dict__['__doc__'] = pcapc.pcapObject_dump_open.__doc__
++          self.setnonblock.__dict__['__doc__'] = pcapc.pcapObject_setnonblock.__doc__
++          self.dispatch.__dict__['__doc__'] = pcapc.pcapObject_dispatch.__doc__
++          self.open_live.__dict__['__doc__'] = pcapc.pcapObject_open_live.__doc__
++          self.getnonblock.__dict__['__doc__'] = pcapc.pcapObject_getnonblock.__doc__
++          self.snapshot.__dict__['__doc__'] = pcapc.pcapObject_snapshot.__doc__
++          self.open_offline.__dict__['__doc__'] = pcapc.pcapObject_open_offline.__doc__
++          self.next.__dict__['__doc__'] = pcapc.pcapObject_next.__doc__
++          self.stats.__dict__['__doc__'] = pcapc.pcapObject_stats.__doc__
++          self.fileno.__dict__['__doc__'] = pcapc.pcapObject_fileno.__doc__
++          self.datalink.__dict__['__doc__'] = pcapc.pcapObject_datalink.__doc__
+     def __del__(self, destroy= pcapc.delete_pcapObject):
+         if getattr(self,'thisown',0):
+             destroy(self)
+diff -Naur pylibpcap-0.4/setup.py pylibpcap-0.4-python2.4/setup.py
+--- pylibpcap-0.4/setup.py	2002-06-14 16:36:30.000000000 +0900
++++ pylibpcap-0.4-python2.4/setup.py	2005-10-18 02:29:38.000000000 +0900
+@@ -21,13 +21,17 @@
+ #    self.run_command('make_clean')
+ 
+ class pcap_build_ext(build_ext):
+-  def swig_sources(self, sources):
++  def swig_sources(self, sources, *args):
+   
+       """Walk the list of source files in 'sources', looking for SWIG
+       interface (.i) files.  Run SWIG on all that are found, and
+       return a modified 'sources' list with SWIG source files replaced
+       by the generated C (or C++) files.
+       """
++      try:
++          ext = args[0]
++      except IndexError:
++          pass
+   
+       new_sources = []
+       swig_sources = []

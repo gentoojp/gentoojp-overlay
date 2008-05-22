@@ -1,0 +1,13 @@
+--- tgif-lw-mc3.diff	2004-11-29 20:00:50.000000000 +0900
++++ tgif-lw-mc3.diff.new	2005-01-29 20:51:24.000000000 +0900
+@@ -367,9 +367,9 @@
+ +#else
+ +    TGIF_set_pointsize, TERM_CAN_MULTIPLOT, 0, 0, 0, TGIF_set_linewidth
+ +#endif
++ #ifdef PM3D
+  #ifdef USE_MOUSE
+      ,0, 0, 0, 0, 0 /* no mouse support for the tgif terminal */
+- #endif
+ @@ -1611,14 +1730,18 @@
+  " axes are not changed.",
+  "",

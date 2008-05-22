@@ -1,0 +1,5 @@
+#!/bin/sh
+/usr/bin/mpg123 $* &
+echo "$!,XXXXXXXXXXXXXXXXXXXXXXXXX"
+wait
+exit 0

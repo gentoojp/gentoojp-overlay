@@ -1,0 +1,48 @@
+diff -ur pipsg700-2.6.2/Makefile.in pipsg700-2.6.2-gentoo/Makefile.in
+--- pipsg700-2.6.2/Makefile.in	Wed Mar 30 11:00:37 2005
++++ pipsg700-2.6.2-gentoo/Makefile.in	Sat Nov  5 22:38:00 2005
+@@ -116,7 +116,7 @@
+ prefix = @prefix@
+ sysconfdir = @sysconfdir@
+ 
+-SUBDIRS = libltdl src dtrfilter ekpd ekpnavi ekpstm 	freset intl layout_script lib po ppd 	setup redhat doc pixmaps
++SUBDIRS = libltdl src dtrfilter ekpd ekpnavi ekpstm 	freset intl layout_script lib po ppd doc pixmaps
+ 
+ 
+ EXTRA_DIST = COPYING.KOWA COPYING.LIB COPYING.KOWA.ja
+diff -ur pipsg700-2.6.2/configure pipsg700-2.6.2-gentoo/configure
+--- pipsg700-2.6.2/configure	Wed Mar 30 11:00:00 2005
++++ pipsg700-2.6.2-gentoo/configure	Sat Nov  5 22:30:23 2005
+@@ -13052,7 +13052,7 @@
+       ac_prev=prefix ;;
+     -prefix=* | --prefix=* | --prefi=* | --pref=* | --pre=* | --pr=* | --p=*)
+       ;;
+-    *) ac_sub_configure_args="$ac_sub_configure_args $ac_arg" ;;
++    --*) ac_sub_configure_args="$ac_sub_configure_args $ac_arg" ;;
+     esac
+   done
+ 
+diff -ur pipsg700-2.6.2/dtrfilter/Makefile.in pipsg700-2.6.2-gentoo/dtrfilter/Makefile.in
+--- pipsg700-2.6.2/dtrfilter/Makefile.in	Wed Mar 30 11:00:37 2005
++++ pipsg700-2.6.2-gentoo/dtrfilter/Makefile.in	Sun Nov 13 17:24:01 2005
+@@ -121,7 +121,7 @@
+ dtrfilter_SOURCES =  	defs.h 	img.c img.h 	pfpng.c pfpng.h pfpng_ext.h 	main.c 	pips_def.h 	libdtr.h
+ 
+ 
+-dtrfilter_LDADD = -ldl -lm $(top_srcdir)/lib/libdtr.a
++dtrfilter_LDADD = -ldl -lm $(top_srcdir)/lib/libdtr.a -lstdc++-3-libc6.2-2-2.10.0
+ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+ CONFIG_HEADER = ../config.h
+ CONFIG_CLEAN_FILES = 
+diff -ur pipsg700-2.6.2/ekpd/Makefile.in pipsg700-2.6.2-gentoo/ekpd/Makefile.in
+--- pipsg700-2.6.2/ekpd/Makefile.in	Wed Mar 30 11:00:38 2005
++++ pipsg700-2.6.2-gentoo/ekpd/Makefile.in	Wed Nov  9 19:50:35 2005
+@@ -116,7 +116,7 @@
+ prefix = @prefix@
+ sysconfdir = @sysconfdir@
+ 
+-SUBDIRS = rc
++SUBDIRS =
+ pkglibexec_PROGRAMS = ekpd
+ sysconf_DATA = ekpdrc
+ 

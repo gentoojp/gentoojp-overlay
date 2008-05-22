@@ -1,0 +1,143 @@
+diff -ur unzip-5.50.orig/fileio.c unzip-5.50/fileio.c
+--- unzip-5.50.orig/fileio.c	2002-02-18 07:43:28.000000000 +0900
++++ unzip-5.50/fileio.c	2004-02-15 14:07:12.000000000 +0900
+@@ -2053,9 +2053,14 @@
+                 /* translate the text coded in the entry's host-dependent
+                    "extended ASCII" charset into the compiler's (system's)
+                    internal text code page */
++#ifdef _MBCS
++	      if (G.pInfo->hostnum != UNIX_ )
++		sjis_to_locale(G.outbuf);
++#else
+                 Ext_ASCII_TO_Native((char *)G.outbuf, G.pInfo->hostnum,
+                                     G.pInfo->hostver, G.pInfo->HasUxAtt,
+                                     FALSE);
++#endif
+ #ifdef WINDLL
+                 /* translate to ANSI (RTL internal codepage may be OEM) */
+                 INTERN_TO_ISO((char *)G.outbuf, (char *)G.outbuf);
+@@ -2067,7 +2072,12 @@
+ #endif /* WIN32 */
+ #endif /* ?WINDLL */
+             } else {
++#ifdef _MBCS
++	      if (G.pInfo->hostnum != UNIX_ )
++		sjis_to_locale(G.outbuf);
++#else
+                 A_TO_N(G.outbuf);   /* translate string to native */
++#endif
+             }
+ 
+ #ifdef WINDLL
+@@ -2133,10 +2143,15 @@
+             return PK_EOF;
+         G.filename[length] = '\0';      /* terminate w/zero:  ASCIIZ */
+ 
++#ifdef _MBCS
++	if (G.pInfo->hostnum != UNIX_ )
++	  sjis_to_locale(G.filename);
++#else
+         /* translate the Zip entry filename coded in host-dependent "extended
+            ASCII" into the compiler's (system's) internal text code page */
+         Ext_ASCII_TO_Native(G.filename, G.pInfo->hostnum, G.pInfo->hostver,
+                             G.pInfo->HasUxAtt, (option == DS_FN_L));
++#endif
+ 
+         if (G.pInfo->lcflag)      /* replace with lowercase filename */
+             STRLOWER(G.filename, G.filename);
+@@ -2466,6 +2481,59 @@
+     return (char *)oldptr;
+ }
+ 
++void sjis_to_locale(char *ptr)
++{
++  char *buf, *bufp, *sjisp;
++  size_t len, size, left;
++  static iconv_t cd;
++  static int mode = -1;
++
++  if (mode == 0) return;
++
++  if (mode == -1) {
++    const char *ctype;
++    size_t len;
++    ctype = setlocale(LC_CTYPE, "");
++    len = strlen(ctype);
++    if (len < 5) {
++      mode = 0;
++      return;
++    }
++    else if (strncmp(ctype+len-5, "eucJP", 5) == 0) {
++      mode = 1;
++      cd = iconv_open("EUC-JP", "Shift_JIS");
++    }
++    else if (strncmp(ctype+len-5, "UTF-8", 5) == 0) {
++      mode = 2;
++      cd = iconv_open("UTF-8", "Shift_JIS");
++    }
++    else {
++      mode = 0;
++      return;
++    }
++  }
++
++  len = strlen(ptr);
++  size = len * 6;
++  buf = malloc(size);
++  left = size;
++
++  sjisp = ptr;
++  bufp = buf;
++  iconv(cd, &sjisp, &len, &bufp, &left);
++  len = size - left;
++  memcpy(ptr, buf, len);
++  ptr[len] = '\0';
++  free(buf);
++}
++
++int uzmblen(ZCONST unsigned char *ptr) {
++  int i;
++  i = mblen((const char*) ptr, MB_CUR_MAX);
++  if (i >= 0) return i;
++  /* fprintf(stderr, " uzmblen: multi byte strings error (%02x)\n", *ptr); */
++  return 1;
++}
+ 
+ #ifdef NEED_UZMBSCHR
+ /***********************/
+diff -ur unzip-5.50.orig/unix/unix.c unzip-5.50/unix/unix.c
+--- unzip-5.50.orig/unix/unix.c	2004-02-15 04:00:14.000000000 +0900
++++ unzip-5.50/unix/unix.c	2004-02-15 04:34:37.000000000 +0900
+@@ -177,7 +177,7 @@
+         }
+ 
+         /* break the wildspec into a directory part and a wildcard filename */
+-        if ((G.wildname = (ZCONST char *)strrchr(wildspec, '/')) == NULL) {
++        if ((G.wildname = (ZCONST char *)MBSRCHR(wildspec, '/')) == NULL) {
+             G.dirname = ".";
+             G.dirnamelen = 1;
+             G.have_dirname = FALSE;
+@@ -457,7 +457,7 @@
+     *pathcomp = '\0';           /* initialize translation buffer */
+     pp = pathcomp;              /* point to translation buffer */
+     if (uO.jflag)               /* junking directories */
+-        cp = (char *)strrchr(G.filename, '/');
++        cp = (char *)MBSRCHR(G.filename, '/');
+     if (cp == (char *)NULL)     /* no '/' or not junking dirs */
+         cp = G.filename;        /* point to internal zipfile-member pathname */
+     else
+diff -ur unzip-5.50.orig/unzpriv.h unzip-5.50/unzpriv.h
+--- unzip-5.50.orig/unzpriv.h	2002-02-18 02:01:48.000000000 +0900
++++ unzip-5.50/unzpriv.h	2004-02-15 14:05:18.000000000 +0900
+@@ -1077,7 +1077,10 @@
+    /* Multi Byte Character Set */
+ #  define ___MBS_TMP_DEF  char *___tmp_ptr;
+ #  define ___TMP_PTR      ___tmp_ptr
+-#  define CLEN(ptr) mblen((ZCONST char *)(ptr), MB_CUR_MAX)
++/* #  define CLEN(ptr) mblen((ZCONST char *)(ptr), MB_CUR_MAX) */
++#  define CLEN(ptr) uzmblen((ZCONST unsigned char *)(ptr))
++#  include <iconv.h>
++   void sjis_to_locale(char *ptr);
+ #  ifndef PREINCSTR
+ #    define PREINCSTR(ptr) (ptr += CLEN(ptr))
+ #  endif

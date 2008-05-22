@@ -1,0 +1,12 @@
+diff -ur pipsg700-2.6.2/configure pipsg700-2.6.2-gentoo/configure
+--- pipsg700-2.6.2/configure	Wed Mar 30 11:00:00 2005
++++ pipsg700-2.6.2-gentoo/configure	Wed Nov  9 10:45:40 2005
+@@ -7467,7 +7467,7 @@
+ echo "${ECHO_T}no" >&6
+ fi
+ 
+-if test $have_cups_config = yes; then
++if test "$have_cups_config" = "yes"; then
+    CUPS_CFLAGS=`cups-config --cflags`
+    CUPS_LDFLAGS=`cups-config --ldflags`
+    CUPS_LIBS=`cups-config --libs | sed -e 's,-lssl,,;s,-lcrypto,,;s,-lcrypt,,'`

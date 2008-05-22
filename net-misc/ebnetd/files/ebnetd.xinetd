@@ -1,0 +1,12 @@
+# default: off
+# description: The ebnet server
+service ebnet
+{
+	socket_type     = stream
+	wait            = no
+	user            = root
+	server          = /sbin/ebnetd
+	server_args     = --inetd
+	log_on_failure  += USERID
+	disable         = yes
+}

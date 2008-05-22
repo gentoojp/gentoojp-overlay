@@ -1,0 +1,19 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header:
+
+[ -z "${PIDFILE}" ] && PIDFILE=/var/run/ekpd.pid
+
+start() {
+	ebegin "Starting ekpd"
+	LD_ASSUME_KERNEL=2.4.1 start-stop-daemon --quiet \
+		--start --exec /usr/local/EPKowa/printer/ekpd >/dev/null 2>&1
+	eend $? "Failed to start ekpd"
+}
+
+stop() {
+	ebegin "Stopping ekpd"
+	start-stop-daemon --quiet --stop --name ekpd
+	eend $? "Failed to stop ekpd"
+}

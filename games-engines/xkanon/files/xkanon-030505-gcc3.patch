@@ -1,0 +1,24 @@
+--- image_di_seldraw.h  23 Oct 2002 15:48:12 -0000      1.2
++++ image_di_seldraw.h  24 Sep 2003 13:00:48 -0000
+@@ -174,16 +174,16 @@
+ */
+
+ #define RegisterSelMacro(sel_id, sel_list, is_mask) \
+-       /* RegisterSel を初期化関数に登録 */ \
+-       static void init_func ## sel_id(void) { \
+-               RegisterSel(Int2Type<sel_id>(), sel_list (), is_mask () ); \
+-       } \
+-       static Init init ## sel_id(10, init_func ## sel_id); \
+        /* SelDraw の特殊化 */ \
+        template<int Bpp, int IsMask> struct SelDraw<sel_id, Bpp, IsMask> : SelDrawBase, Drawer< Int2Type<Bpp> > { \
+                SelDraw(int s) : SelDrawBase(s, Bpp, IsMask) {} \
+                int Exec(DI_Image& dest, DI_Image& src, char* mask, SEL_STRUCT* sel, int count); \
+        }; \
++       /* RegisterSel を初期化関数に登録 */ \
++       static void init_func ## sel_id(void) { \
++               RegisterSel(Int2Type<sel_id>(), sel_list (), is_mask () ); \
++       } \
++       static Init init ## sel_id(10, init_func ## sel_id); \
+        template <int Bpp, int IsMask> int SelDraw<sel_id, Bpp, IsMask> \
+
+ #endif /* __KANON_DI_IMAGE_SELDRAW_H__ */

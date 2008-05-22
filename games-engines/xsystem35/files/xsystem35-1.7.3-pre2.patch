@@ -1,0 +1,10 @@
+--- src/xsystem35.h	2004-03-24 05:39:52.570556318 +0900
++++ src/xsystem35.h	2004-03-24 03:15:46.048405904 +0900
+@@ -69,7 +69,7 @@
+ /* system35 画面デフォルト */
+ #define SYS35_DEFAULT_WIDTH 640
+-#define SYS35_DEFAULT_HEIGHT 480
++#define SYS35_DEFAULT_HEIGHT 400
+ #define SYS35_DEFAULT_DEPTH 8
+ 
+ #endif /* !__XSYSTEM35__ */

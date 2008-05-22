@@ -1,0 +1,18 @@
+#!/sbin/runscript
+# Distributed under the terms of the GNU General Public License v2
+
+depend() {
+	after logger
+}
+
+start() {
+	ebegin "Starting sj3serv"
+        start-stop-daemon --start --quiet --exec /usr/bin/sj3serv >/dev/null 2>&1
+	eend $? "Failed to start sj3"
+}
+
+stop() {
+	ebegin "Stopping sj3serv"
+        start-stop-daemon --stop --quiet --name sj3serv >/dev/null 2>&1
+	eend $? "Failed to stop sj3"
+}

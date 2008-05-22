@@ -1,0 +1,11 @@
+--- imewrapper.c.orig	2000-08-03 23:40:10.000000000 +0900
++++ imewrapper.c	2004-01-12 15:44:47.000000000 +0900
+@@ -722,7 +722,7 @@
+   cannaheader_t *header = (cannaheader_t *)cbuf->buf;
+ 
+   header->datalen = LSBMSB16(2);
+-  header->err.e16 = 0;
++  header->err.e16 = LSBMSB16(-2);
+   
+   return 1;
+ }

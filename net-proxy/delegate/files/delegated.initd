@@ -1,0 +1,36 @@
+#!/sbin/runscript
+# Copyright 1999-2005 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+depend(){
+	need net
+}
+
+initial(){
+	OPTS=''
+	[ ${PORT} ] &&		OPTS="${OPTS} -P${PORT}"
+	[ ${CACHE} ] &&		OPTS="${OPTS} CACHE=${CACHE}"
+	[ ${PERMIT} ] &&	OPTS="${OPTS} PERMIT=${PERMIT}"
+	[ ${SERVER} ] &&	OPTS="${OPTS} SERVER=${SERVER}"
+	[ ${RESOLV} ] &&	OPTS="${OPTS} RESOLV=${RESOLV}"
+	[ ${CHARCODE} ] &&	OPTS="${OPTS} CHARCODE=${CHARCODE}"
+	[ ${RELAY} ] &&		OPTS="${OPTS} RELAY=${RELAY}"
+	[ ${FTOCL} ] &&		OPTS="${OPTS} FTOCL=${FTOCL}"
+	[ ${OTHER_OPT} ] && OPTS="${OPTS} ${OTHER_OPT}"
+}
+
+start(){
+	initial
+	ebegin "Starting delegated"
+	/usr/sbin/delegated	${OPTS} \
+		>/dev/null 2>&1
+	eend $? "Failed to start delegated"
+}
+
+stop(){
+	initial
+	ebegin "Stopping delegated"
+	/usr/sbin/delegated	-P${PORT} -Fkill \
+		>/dev/null 2>&1
+	eend $? "Failed to stop delegated"
+}

@@ -1,0 +1,12 @@
+--- partimage-0.6.4.org/src/client/imagefile.cpp.orig	2004-05-27 13:50:49.339714328 +0900
++++ partimage-0.6.4/src/client/imagefile.cpp	2004-05-27 14:29:17.146567192 +0900
+@@ -1005,6 +1005,9 @@
+ 	}
+       else
+ 	{
++          if (m_options.bBatchMode == true)
++	      THROW(ERR_CANCELED);
++
+           SNPRINTF(szMess,i18n("Can't read the following volume file:\n%s\n%s"),
+ 	          get_szImageFilename(),
+ 		  i18n("Enter another full path (directory & name)"));

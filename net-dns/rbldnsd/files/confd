@@ -1,0 +1,34 @@
+#
+# options for rbldnsd
+#
+# for initial testing, copy example zone file to /var/db/rbldnsd
+#
+# cp /usr/share/doc/rbldnsd-version/example.gz /var/db/rbldnsd
+# gunzip /var/db/rbldnsd/example.gz
+#
+# NOTE: make sure nothing listens on 127.0.0.1:53
+#
+# comment out the following lines.
+#
+# OPTIONS="-q -r /var/db/rbldnsd -b 127.0.0.1 \
+#	-u rbldns -p /var/run/rbldnsd.pid \
+#	rbl.example.com:ip4set:example"
+#
+# start rbldnsd by executing:
+#
+# # /etc/init.d/rbldnsd start
+#
+# check if it works by executing:
+#
+# dig @localhost 1.0.0.127.rbl.example.com. any
+# - or -
+# host -a 1.0.0.127.rbl.example.com. localhost
+#
+# the result should include something like
+#
+# ANSWER SECTION:
+# 1.0.0.127.rbl.example.com. 2100 IN      A       127.0.0.2
+# 1.0.0.127.rbl.example.com. 2100 IN      TXT     "spam received, see http://rbl.example.com/lookup?127.0.0.1"
+#
+# if id doesn't work, try removing '-q' from 'OPTIONS', then see
+# what is going on.

@@ -1,0 +1,18 @@
+#!/sbin/runscript
+#
+depend() {
+        need net
+}
+start() {
+        ebegin "Starting dpkeyserv"
+        /usr/sbin/dpkeyserv 2>&1 > /tmp/dpkeyserv.log
+	einfo `cat /tmp/dpkeyserv.log`
+	rm /tmp/dpkeyserv.log
+        eend $? "Failed to start dpkeyserv"
+}
+
+stop() {
+        ebegin "Stopping dpkeyserv"
+        killall dpkeyserv
+        eend $? "Failed to stop dpkeyserv"
+}

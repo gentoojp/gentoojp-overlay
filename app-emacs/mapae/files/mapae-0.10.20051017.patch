@@ -1,0 +1,42 @@
+diff -urN mapae-0-10-20051017/mapae.el mapae-0-10-20051017-gentoo/mapae.el
+--- mapae-0-10-20051017/mapae.el	2005-10-17 23:19:09.000000000 +0900
++++ mapae-0-10-20051017-gentoo/mapae.el	2006-01-03 13:32:46.000000000 +0900
+@@ -22,7 +22,7 @@
+   :group 'mapae
+   :type 'file)
+ 
+-(defcustom mapae-command ""
++(defcustom mapae-command "/usr/share/emacs/site-lisp/mapae/mapae.pl"
+   "mapae.pl command"
+   :group 'mapae
+   :type 'file)
+diff -urN mapae-0-10-20051017/mapae.pl mapae-0-10-20051017-gentoo/mapae.pl
+--- mapae-0-10-20051017/mapae.pl	2005-10-17 23:19:09.000000000 +0900
++++ mapae-0-10-20051017-gentoo/mapae.pl	2006-01-03 14:16:52.000000000 +0900
+@@ -140,11 +140,14 @@
+   _fault( -code=>1, -message=>join('',@_) );
+ }
+ 
+-open (CONFIG,File::Spec->catfile("$FindBin::Bin","mapae.ph"))
+-  || _fault qq(Cannot open "mapae.ph");
++
++my $homedir = $ENV{'HOME'}||$ENV{'LOGDIR'}||(getpwuid($~))[7]|| die "You're homeless!\n";
++my $dot_mapae_file = $homedir."/.mapae";
++open (CONFIG, $dot_mapae_file)
++    || _fault qq(Cannot open "$dot_mapae_file". Copy [/usr/share/doc/mapae-VERSION/mapae.ph] as [$dot_mapae_file], and set your information.);
+ eval join('',<CONFIG>);
+ close(CONFIG);
+-_fault( join(' ', "初期設定でエラー: ", split("\n",$@))) if ($@);
++_fault( join(' ', "$dot_mapae_file の初期設定でエラー: ", split("\n",$@))) if ($@);
+ 
+ my ($ELEMENTID, $ELEMENTTB, @ELEMENTORDER, %ELEMENTLABEL);
+ my $PUBLISH;
+@@ -344,7 +347,7 @@
+     $LOCAL_PREVIEW = 1;
+   }
+   if ( $COCOLOG_MODE && $CONVERTER ne 'Encode') {
+-    _fault "ココログ暫定対応モードは Perl5.8 以上でしか利用できません．通常モードを強制的に使用する場合は，mapae.ph で \"\$COCOLOG_MODE = 0;\" を指定してください．\n";
++    _fault "ココログ暫定対応モードは Perl5.8 以上でしか利用できません．通常モードを強制的に使用する場合は，$dot_mapae_file で \"\$COCOLOG_MODE = 0;\" を指定してください．\n";
+     exit(1);
+   }
+ }

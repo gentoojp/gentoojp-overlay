@@ -1,0 +1,13 @@
+# Copyright 1999-2005 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+STARTPORT='8081'
+CACHE='no'
+PERMIT="http:*:localhost" ## protoList:dstHostList:srcHostList
+SERVER='http'
+RESOLV='dns,nis,file'
+CHARCODE='EUC'
+RELAY='proxy,delegate'
+FTOCLS=`find /usr/share/delegate -name osaka*|sort`
+OTHER_OPT=''
+PORTCACHE='/usr/share/delegate/portcache'

@@ -1,0 +1,74 @@
+--- trr19/Makefile	1996-07-03 13:53:08.000000000 +0900
++++ trr19/Makefile.new	2004-01-26 22:37:47.000000000 +0900
+@@ -7,6 +7,11 @@
+ ##  You MUST edit the following lines
+ ##----------------------------------------------------------------------
+ 
++# ebuild uses.
++trrdir_gentoo = $(subst ${D},,$(trrdir))
++bindir_gentoo = $(subst ${D},,$(bindir))
++infodir_gentoo = $(subst ${D},,$(infodir))
++
+ # Your Full name or E-mail address
+ installer = trr-installer@where.you.are
+ 
+@@ -123,39 +128,39 @@
+ 	@echo "** TRR installation is almost completed."
+ 	@echo "**"
+ 	@echo "** Now edit \`CONTENTS' in the directory where you put"
+-	@echo "** TRR files ($(trrdir)/), and insert"
+-	@echo "** (autoload 'trr \"$(trrdir)/trr\" nil t)"
++	@echo "** TRR files ($(trrdir_gentoo)/), and insert"
++	@echo "** (autoload 'trr \"$(trrdir_gentoo)/trr\" nil t)"
+ 	@echo "** in your \`.emacs' or \`site-start.el' file."
+-	@echo "** then edit $(infodir)/dir to add TRR entry."
++	@echo "** then edit $(infodir_gentoo)/dir to add TRR entry."
+ 	@echo "**"
+ 	@echo "** You may want to add some texts to TRR text directory."
+-	@echo "** Put them into $(trrdir)/text and edit \`CONTENTS'"
++	@echo "** Put them into $(trrdir_gentoo)/text and edit \`CONTENTS'"
+ 	@echo
+ 
+ install-dir:
+ 	if [ ! -d $(bindir) ]; \
+ 	then rm -f $(bindir); \
+-	     mkdir $(bindir); \
++	     mkdir -p $(bindir); \
+ 	     chmod 755 $(bindir); \
+ 	fi
+ 	if [ ! -d $(trrdir) ]; \
+ 	then rm -f $(trrdir); \
+-	     mkdir $(trrdir); \
++	     mkdir -p $(trrdir); \
+ 	     chmod 755 $(trrdir); \
+ 	fi
+ 	if [ ! -d $(trrdir)/text ]; \
+ 	then rm -f $(trrdir)/text; \
+-	     mkdir $(trrdir)/text; \
++	     mkdir -p $(trrdir)/text; \
+ 	     chmod 755 $(trrdir)/text; \
+ 	fi
+ 	if [ ! -d $(trrdir)/record ]; \
+ 	then rm -f $(trrdir)/record; \
+-	     mkdir $(trrdir)/record; \
++	     mkdir -p $(trrdir)/record; \
+ 	     chmod 755 $(trrdir)/record; \
+ 	fi
+ 	if [ ! -d $(infodir) ]; \
+ 	then rm -f $(infodir); \
+-	     mkdir $(infodir); \
++	     mkdir -p $(infodir); \
+ 	     chmod 755 $(infodir); \
+ 	fi
+ 
+@@ -166,8 +171,8 @@
+ 
+ trr.el: trr.el.base
+ 	rm -f $@
+-	$(SED)  -e 's,TRRELCINSTALLDIR,$(trrdir),' \
+-		-e 's,TRRBININSTALLDIR,$(bindir),' \
++	$(SED)  -e 's,TRRELCINSTALLDIR,$(trrdir_gentoo),' \
++		-e 's,TRRBININSTALLDIR,$(bindir_gentoo),' \
+ 		-e 's,TRRINSTALLER,$(installer),' \
+ 		-e 's,TRRDEFAULTJAPANESE,$(japanese),' trr.el.base > $@
+ 

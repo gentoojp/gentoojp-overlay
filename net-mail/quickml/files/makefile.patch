@@ -1,0 +1,16 @@
+--- Makefile.in.org	2004-02-10 18:37:35.000000000 +0900
++++ Makefile.in	2004-05-30 19:38:44.000000000 +0900
+@@ -518,9 +518,10 @@
+ 		quickmlrc.sample.in > quickmlrc.sample
+ 
+ install-data-local:
+-	chown -R $(USER)  $(quickmlstatedir)
+-	chgrp -R $(GROUP) $(quickmlstatedir)
+-	chmod 750 $(quickmlstatedir)
++	mkdir -p $(DESTDIR)/$(quickmlstatedir)
++	chown -R $(USER) $(DESTDIR)/$(quickmlstatedir)
++	chgrp -R $(GROUP) $(DESTDIR)/$(quickmlstatedir)
++	chmod 750 $(DESTDIR)/$(quickmlstatedir)
+ 
+ quickml.ja.html: quickml.ja.rd
+ 	rd2 $(RDOPT) \

@@ -1,0 +1,9 @@
+#!/bin/sh
+case "$1" in
+	-h | --help ) echo "usage: he [options]" 
+		echo "options:"
+		echo "   -h or --help   print help"
+		echo "   -m or --moe    launch moe version" ;;
+	-m | --moe ) cd /usr/lib/heSDL ; ./moe_sdl ;;
+	* ) cd /usr/lib/heSDL ; ./he_sdl
+esac

@@ -1,0 +1,16 @@
+diff -urN sdic-2.1.3.orig/texi/sdic.texi sdic-2.1.3/texi/sdic.texi
+--- sdic-2.1.3.orig/texi/sdic.texi	2002-07-02 20:19:39.000000000 +0900
++++ sdic-2.1.3/texi/sdic.texi	2003-01-14 10:49:15.000000000 +0900
+@@ -4,6 +4,12 @@
+ @setfilename sdic.info
+ @settitle SDIC Reference Manual
+ @setchapternewpage odd
++@ifinfo
++@dircategory Miscellaneous
++@direntry
++* SDIC: (sdic).             Emacs-Lisp program to look dictionaries.
++@end direntry
++@end ifinfo
+ @c %**end of header
+ 
+ @ifinfo

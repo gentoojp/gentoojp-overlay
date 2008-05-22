@@ -1,0 +1,29 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+# $Header:
+
+depend () {
+	provide esecanna_im
+}
+
+
+start() {
+	ebegin "Starting vjed"
+	if [ -x /opt/vje30/bin/vjed ]
+	then
+		/opt/vje30/bin/vjed &
+	else
+		eend $? "Failed to start vjed"
+	fi
+}
+
+stop() {
+	if [ ! `killall vjed 2> /dev/null` ]
+	then
+		ebegin "Stopping vjed"
+	else
+		eend $? "Failed to stop vjed"
+	fi
+}
+

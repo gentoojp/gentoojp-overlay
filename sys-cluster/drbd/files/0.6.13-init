@@ -1,0 +1,45 @@
+#!/sbin/runscript
+                                                                                
+depend() {
+  need   net
+  before heartbeat
+  after  sshd           # In case there are sync problems
+}
+                                                                                
+start() {
+  ebegin "Starting drbd mirror driver"
+  RETVAL=0
+  for i in $DRBDDEV
+  do
+  	${DRBD} ${i} start
+	if [ $? -ne 0 ]
+	then 
+		RETVAL=1
+	fi
+  done
+  if [ $RETVAL -eq 1 ]
+  then
+  	eend 1 "Failed to start drbd on ${i}."
+  else
+  	eend 0
+  fi
+}
+                                                                                
+stop() {
+  ebegin "Stopping drbd mirror driver"
+  RETVAL=0
+  for i in $DRBDDEV
+  do
+  	${DRBD} ${i} stop
+	if [ $? -ne 0 ]
+	then 
+		RETVAL=1
+	fi
+  done
+  if [ $RETVAL -eq 1 ]
+  then
+  	eend 1 "Failed to stop drbd on ${i}."
+  else
+  	eend 0
+  fi
+}

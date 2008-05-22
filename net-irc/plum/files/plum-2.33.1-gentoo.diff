@@ -1,0 +1,15 @@
+diff -urN plum2.33.1.ORIG/plum plum2.33.1/plum
+--- plum2.33.1.ORIG/plum	1999-03-24 23:38:18.000000000 +0900
++++ plum2.33.1/plum	2003-07-09 03:19:09.000000000 +0900
+@@ -1092,7 +1092,10 @@
+     setsockopt($socket, $SOL_SOCKET, $SO_REUSEADDR, pack('l', 1));
+   }
+   $name = pack($SOCKADDR, $AF_INET, $port, unpack('N', $INADDR_ANY));
+-  bind($socket, $name) || return 0;
++  if (!bind($socket, $name)) {
++    close($socket);
++    return 0;
++  }
+   listen($socket, $count || $SOMAXCONN) || return 0;
+   $listenno = fileno($socket);
+   vec($'rin, $listenno, 1) = 1;

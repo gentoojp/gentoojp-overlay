@@ -1,0 +1,11 @@
+--- mp3taglib-0.6/extconf.rb	2003-08-27 20:02:53.000000000 +0900
++++ mp3taglib-0.6-gentoo/extconf.rb	2004-06-24 23:58:14.532923280 +0900
+@@ -11,7 +11,7 @@
+       "LDSHARED = g++ -shared"
+     else
+       if l=~/^LIBS/
+-	"LIBS = $(LIBRUBY_A) -lc -ldl -lcrypt -lm -lid3 -lz "
++	"LIBS = -lc -ldl -lcrypt -lm -lid3 -lz "
+       else
+ 	l
+       end

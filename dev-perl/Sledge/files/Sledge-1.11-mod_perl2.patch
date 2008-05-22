@@ -1,0 +1,98 @@
+diff -uNr Sledge-1.11.orig/lib/Sledge/Pages/Apache2.pm Sledge-1.11/lib/Sledge/Pages/Apache2.pm
+--- Sledge-1.11.orig/lib/Sledge/Pages/Apache2.pm	1970-01-01 09:00:00.000000000 +0900
++++ Sledge-1.11/lib/Sledge/Pages/Apache2.pm	2005-11-08 17:05:19.361808500 +0900
+@@ -0,0 +1,15 @@
++package Sledge::Pages::Apache2;
++
++use strict;
++use base qw(Sledge::Pages::Base);
++
++use Apache2::RequestUtil;
++use Sledge::Request::Apache2;
++
++sub create_request {
++    my($self, $r) = @_;
++    my $req = Sledge::Request::Apache2->new($r || Apache2::RequestUtil->request);
++    return $req;
++}
++
++1;
+diff -uNr Sledge-1.11.orig/lib/Sledge/Pages/Compat.pm Sledge-1.11/lib/Sledge/Pages/Compat.pm
+--- Sledge-1.11.orig/lib/Sledge/Pages/Compat.pm	2003-02-13 15:59:36.000000000 +0900
++++ Sledge-1.11/lib/Sledge/Pages/Compat.pm	2005-11-08 16:56:11.995600250 +0900
+@@ -9,7 +9,10 @@
+ use constant MOD_PERL => defined $ENV{MOD_PERL};
+ 
+ sub import {
+-    my $base = MOD_PERL ? 'Sledge::Pages::Apache' : 'Sledge::Pages::CGI';
++    my $base = MOD_PERL ? (
++        $ENV{MOD_PERL_API_VERSION} == 2 ? 'Sledge::Pages::Apache2'
++        : 'Sledge::Pages::Apache'
++    ) : 'Sledge::Pages::CGI';
+     eval qq{require $base};
+     {
+ 	my $pkg = caller;
+diff -uNr Sledge-1.11.orig/lib/Sledge/Request/Apache2.pm Sledge-1.11/lib/Sledge/Request/Apache2.pm
+--- Sledge-1.11.orig/lib/Sledge/Request/Apache2.pm	1970-01-01 09:00:00.000000000 +0900
++++ Sledge-1.11/lib/Sledge/Request/Apache2.pm	2005-11-09 00:15:00.435213500 +0900
+@@ -0,0 +1,60 @@
++package Sledge::Request::Apache2;
++
++use strict;
++use base qw(Class::Accessor);
++__PACKAGE__->mk_accessors(qw(request param_hash));
++
++use vars qw($AUTOLOAD);
++
++use Apache2::Request;
++use Apache2::Upload;
++
++sub new {
++    my($class, $r) = @_;
++
++    my $self = bless {
++        request     => Apache2::Request->new($r),
++        param_hash => {},
++    }, $class;
++
++    for my $key ($self->request->param) {
++        $self->param_hash->{$key} = [ $self->request->param($key) ];
++    }
++
++    $self;
++}
++
++sub header_out {
++    my($self, $key, $value) = @_;
++    $self->request->headers_out->add($key => $value);
++}
++
++sub header_in {
++    my($self, $key) = @_;
++    $self->request->headers_in->get($key);
++}
++
++sub send_http_header {
++    my $self = shift;
++    $self->request->content_type(@_);
++}
++
++sub param {
++    my($self, $key, @value) = @_;
++
++    if ($key) {
++        $self->param_hash->{$key} = ref($value[0]) eq 'ARRAY' ? [@value] : @value if @value;
++        return @{$self->param_hash->{$key}};
++    }
++    return keys %{$self->param_hash};
++}
++
++sub DESTROY { }
++
++sub AUTOLOAD {
++    my $self = shift;
++    (my $meth = $AUTOLOAD) =~ s/.*:://;
++    $self->request->$meth(@_);
++}
++
++1;

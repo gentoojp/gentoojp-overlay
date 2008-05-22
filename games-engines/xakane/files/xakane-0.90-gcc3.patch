@@ -1,0 +1,477 @@
+diff -Naur xakane-0.90/configure xakane-0.90-gcc3/configure
+--- xakane-0.90/configure	2002-04-14 02:30:57.000000000 +0900
++++ xakane-0.90-gcc3/configure	2004-03-02 00:26:46.921141461 +0900
+@@ -1506,9 +1506,9 @@
+   cat > conftest.$ac_ext <<EOF
+ #line 1508 "configure"
+ #include "confdefs.h"
+-#ifdef __cplusplus
++/*#ifdef __cplusplus
+ extern "C" void exit(int);
+-#endif
++#endif*/
+ 
+ #include <gtk--.h>
+ #include <stdio.h>
+@@ -1805,7 +1805,7 @@
+   if eval "test \"`echo '$''{'one_cv_data_dir'+set}'`\" = set"; then
+   echo $ac_n "(cached) $ac_c" 1>&6
+ else
+-   one_cv_data_dir=.xakake 
++   one_cv_data_dir=.xakane 
+ fi
+ 
+ else
+diff -Naur xakane-0.90/src/CommandLine.h xakane-0.90-gcc3/src/CommandLine.h
+--- xakane-0.90/src/CommandLine.h	2002-04-14 02:28:01.000000000 +0900
++++ xakane-0.90-gcc3/src/CommandLine.h	2004-03-02 00:26:12.407357648 +0900
+@@ -17,6 +17,8 @@
+ #include <map>
+ #include <vector>
+ 
++using namespace std;
++
+ class CommandLine {
+ public: // constructor/destructor
+   ~CommandLine();
+diff -Naur xakane-0.90/src/Counted.h xakane-0.90-gcc3/src/Counted.h
+--- xakane-0.90/src/Counted.h	2002-04-14 02:28:01.000000000 +0900
++++ xakane-0.90-gcc3/src/Counted.h	2004-03-02 00:26:12.408357584 +0900
+@@ -18,11 +18,12 @@
+ #ifndef COUNTED_HPP
+ #define COUNTED_HPP
+ 
++using namespace std;
++
+ template<class T> class Counted {
+ public:
+   // 例外発生用
+   class TooManyObjects {};
+-
+   static int Num() { return sNumObjs; }
+ 
+ protected:
+diff -Naur xakane-0.90/src/GtkWindowFullScreen.cpp xakane-0.90-gcc3/src/GtkWindowFullScreen.cpp
+--- xakane-0.90/src/GtkWindowFullScreen.cpp	2002-04-14 02:28:02.000000000 +0900
++++ xakane-0.90-gcc3/src/GtkWindowFullScreen.cpp	2004-03-02 00:26:12.409357520 +0900
+@@ -77,7 +77,7 @@
+ /*------------------------------------------------------------------------------
+   目的の解像度があるかどうかチェック
+ ------------------------------------------------------------------------------*/
+-XF86VidModeModeInfo* Gtk::WindowFullScreen::CheckModeLinesRes(const int w, const int h)
++XF86VidModeModeInfo* Gtk::WindowFullScreen::CheckModeLinesRes(int w, int h)
+ {
+ #if HAVE_LIBXXF86VM
+   for(int i = 0; i < mVidCount; ++i) {
+diff -Naur xakane-0.90/src/GtkWindowFullScreen.h xakane-0.90-gcc3/src/GtkWindowFullScreen.h
+--- xakane-0.90/src/GtkWindowFullScreen.h	2002-04-14 02:28:02.000000000 +0900
++++ xakane-0.90-gcc3/src/GtkWindowFullScreen.h	2004-03-02 00:26:12.410357456 +0900
+@@ -13,17 +13,18 @@
+ #ifndef GTKWINDOWFULLSCREEN_H
+ #define GTKWINDOWFULLSCREEN_H
+ 
++#include "../config.h"
+ #include <X11/Xlib.h>
+ #include <gtk--/window.h>
+ 
+-#ifdef HAVE_LIBXXF86VM 
++#ifdef HAVE_LIBXXF86VM
+ #include <X11/extensions/xf86vmode.h>
+ #define MINMAJOR 0
+ #define MINMINOR 5
+ #endif
+ 
+ // クラス(構造体)の先行宣言。これがあれば、WindowFullScreenクラスは定義できる
+-struct XF86VidModeModeInfo;
++//struct XF86VidModeModeInfo;
+ 
+ namespace Gtk {
+   class WindowFullScreen : public Gtk::Window {
+@@ -45,7 +46,7 @@
+     virtual gint focus_out_event_impl(GdkEventFocus* event);
+ 
+   private: // method
+-    XF86VidModeModeInfo* CheckModeLinesRes(const int w, const int h);
++    XF86VidModeModeInfo* CheckModeLinesRes(int w, int h);
+     void CheckScreenMode();
+     void RestoreMode();
+     void Enter();
+diff -Naur xakane-0.90/src/VnAnimation.h xakane-0.90-gcc3/src/VnAnimation.h
+--- xakane-0.90/src/VnAnimation.h	2002-04-14 02:28:03.000000000 +0900
++++ xakane-0.90-gcc3/src/VnAnimation.h	2004-03-02 00:26:12.411357391 +0900
+@@ -26,6 +26,8 @@
+ class VnTimer;
+ class VnRect;
+ 
++using namespace std;
++
+ namespace VnAnimationState {
+   class Base;
+   class Wait;
+diff -Naur xakane-0.90/src/VnClickableManager.h xakane-0.90-gcc3/src/VnClickableManager.h
+--- xakane-0.90/src/VnClickableManager.h	2002-04-14 02:28:04.000000000 +0900
++++ xakane-0.90-gcc3/src/VnClickableManager.h	2004-03-02 00:26:12.414357199 +0900
+@@ -14,6 +14,8 @@
+ 
+ #include <vector>
+ 
++using namespace std;
++
+ class VnDirector;
+ class VnChooseItem;
+ 
+diff -Naur xakane-0.90/src/VnDirector.h xakane-0.90-gcc3/src/VnDirector.h
+--- xakane-0.90/src/VnDirector.h	2002-04-14 02:28:04.000000000 +0900
++++ xakane-0.90-gcc3/src/VnDirector.h	2004-03-02 00:26:12.415357135 +0900
+@@ -15,6 +15,7 @@
+ 
+ #include <sys/types.h>
+ #include <string>
++using namespace std;
+ 
+ class VnImage;
+ class VnSprite;
+diff -Naur xakane-0.90/src/VnExtMusic.h xakane-0.90-gcc3/src/VnExtMusic.h
+--- xakane-0.90/src/VnExtMusic.h	2002-04-14 02:28:05.000000000 +0900
++++ xakane-0.90-gcc3/src/VnExtMusic.h	2004-03-02 00:26:12.416357070 +0900
+@@ -20,6 +20,8 @@
+ #include <map>
+ #include "VnMusic.h"
+ 
++using namespace std;
++
+ class VnExtMusic : public VnMusic {
+ public:
+   VnExtMusic(const char* filelist);
+diff -Naur xakane-0.90/src/VnFlagSet.h xakane-0.90-gcc3/src/VnFlagSet.h
+--- xakane-0.90/src/VnFlagSet.h	2002-04-14 02:28:06.000000000 +0900
++++ xakane-0.90-gcc3/src/VnFlagSet.h	2004-03-02 00:26:12.417357006 +0900
+@@ -15,6 +15,8 @@
+ #include <string>
+ #include <vector>
+ 
++using namespace std;
++
+ class VnFlagSet {
+ public:
+   VnFlagSet(const string& name, int size);
+diff -Naur xakane-0.90/src/VnFont.h xakane-0.90-gcc3/src/VnFont.h
+--- xakane-0.90/src/VnFont.h	2002-04-14 02:28:06.000000000 +0900
++++ xakane-0.90-gcc3/src/VnFont.h	2004-03-02 00:26:12.418356942 +0900
+@@ -17,6 +17,8 @@
+ #include <string>
+ #include <sys/types.h>
+ 
++using namespace std;
++
+ /* ==============================================================================
+    クラス定義
+ ============================================================================== */
+diff -Naur xakane-0.90/src/VnKconv.cpp xakane-0.90-gcc3/src/VnKconv.cpp
+--- xakane-0.90/src/VnKconv.cpp	2002-04-14 02:28:06.000000000 +0900
++++ xakane-0.90-gcc3/src/VnKconv.cpp	2004-03-02 00:26:12.419356878 +0900
+@@ -18,6 +18,7 @@
+ #include <string>
+ #include "VnKconv.h"
+ 
++using namespace std;
+ 
+ /* ================================================================
+    定数
+@@ -138,7 +139,7 @@
+   char ascii[digit + 1];
+ 
+   // 桁数制限対策
+-  number %= static_cast<int>(pow(10, digit + 1));
++  number %= static_cast<int>(pow((double)10, digit + 1));
+ 
+   sprintf(ascii, "%*d", digit, number);
+ 
+diff -Naur xakane-0.90/src/VnKconv.h xakane-0.90-gcc3/src/VnKconv.h
+--- xakane-0.90/src/VnKconv.h	2002-04-14 02:28:06.000000000 +0900
++++ xakane-0.90-gcc3/src/VnKconv.h	2004-03-02 00:26:12.420356814 +0900
+@@ -22,6 +22,8 @@
+ #include <string>
+ #include <sys/types.h>
+ 
++using namespace std;
++
+ class VnKconv {
+ public:
+   // 文字列の一文字(2バイト文字のみ)変換
+diff -Naur xakane-0.90/src/VnOneArchive.h xakane-0.90-gcc3/src/VnOneArchive.h
+--- xakane-0.90/src/VnOneArchive.h	2002-04-14 02:28:07.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneArchive.h	2004-03-02 00:26:12.421356749 +0900
+@@ -15,6 +15,8 @@
+ #include <string>
+ #include "VnArchive.h"
+ 
++using namespace std;
++
+ class VnOneArchive : public VnArchive {
+ public:
+   VnOneArchive();
+diff -Naur xakane-0.90/src/VnOneBackground.h xakane-0.90-gcc3/src/VnOneBackground.h
+--- xakane-0.90/src/VnOneBackground.h	2002-04-14 02:28:07.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneBackground.h	2004-03-02 00:26:12.422356685 +0900
+@@ -15,6 +15,8 @@
+ #include <string>
+ #include "VnSerialization.h"
+ 
++using namespace std;
++
+ class VnDirector;
+ class VnImage;
+ class VnRect;
+diff -Naur xakane-0.90/src/VnOneCharacterManager.h xakane-0.90-gcc3/src/VnOneCharacterManager.h
+--- xakane-0.90/src/VnOneCharacterManager.h	2002-04-14 02:28:07.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneCharacterManager.h	2004-03-02 00:26:12.423356621 +0900
+@@ -19,6 +19,7 @@
+ class VnDirector;
+ class VnRect;
+ 
++using namespace std;
+ 
+ /**
+  * クラス定義(個々のキャラクタ)
+diff -Naur xakane-0.90/src/VnOneDirector.h xakane-0.90-gcc3/src/VnOneDirector.h
+--- xakane-0.90/src/VnOneDirector.h	2002-04-14 02:28:08.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneDirector.h	2004-03-02 00:26:12.426356428 +0900
+@@ -15,6 +15,7 @@
+ #include <stack>
+ #include <vector>
+ #include <deque>
++using namespace std;
+ 
+ #include "VnDirector.h"
+ 
+diff -Naur xakane-0.90/src/VnOneFileMapping.cpp xakane-0.90-gcc3/src/VnOneFileMapping.cpp
+--- xakane-0.90/src/VnOneFileMapping.cpp	2002-04-14 02:28:08.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneFileMapping.cpp	2004-03-02 00:26:12.427356364 +0900
+@@ -36,7 +36,7 @@
+ {
+   for(int i = 0; sFileList[i] != 0; ++i) {
+     // thanks to ysonoda@ma2.seikyou.ne.jp
+-    if (!std::strcasecmp(name.c_str(), sFileList[i])) { return i; }
++    if (!strcasecmp(name.c_str(), sFileList[i])) { return i; }
+   }
+ 
+   // 見つからない
+diff -Naur xakane-0.90/src/VnOneFileMapping.h xakane-0.90-gcc3/src/VnOneFileMapping.h
+--- xakane-0.90/src/VnOneFileMapping.h	2002-04-14 02:28:09.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneFileMapping.h	2004-03-02 00:26:12.428356300 +0900
+@@ -14,6 +14,8 @@
+ 
+ #include <string>
+ 
++using namespace std;
++
+ namespace VnOneFile {
+   // 「ONE」のアーカイブファイルで使用されている名前と対応する数字とのmapping。
+   // 見つからない場合は-1を返す
+diff -Naur xakane-0.90/src/VnOneMenuBar.h xakane-0.90-gcc3/src/VnOneMenuBar.h
+--- xakane-0.90/src/VnOneMenuBar.h	2002-04-14 02:28:09.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneMenuBar.h	2004-03-02 00:26:12.429356236 +0900
+@@ -17,6 +17,8 @@
+ #include <gtk--/menubar.h>
+ #include <gtk--/menu.h>
+ 
++using namespace std;
++
+ class VnDirector;
+ class VnOneMenuBar;
+ 
+diff -Naur xakane-0.90/src/VnOneMessageCommand.cpp xakane-0.90-gcc3/src/VnOneMessageCommand.cpp
+--- xakane-0.90/src/VnOneMessageCommand.cpp	2002-04-14 02:28:09.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneMessageCommand.cpp	2004-03-02 00:26:12.430356172 +0900
+@@ -18,6 +18,9 @@
+ #include "VnOneMessageCommand.h"
+ #include "VnKconv.h"
+ #include "VnMessageWindow.h"
++#include <assert.h>
++
++using namespace std;
+ 
+ /** 
+  * コンストラクタ
+diff -Naur xakane-0.90/src/VnOneMessageWindow.cpp xakane-0.90-gcc3/src/VnOneMessageWindow.cpp
+--- xakane-0.90/src/VnOneMessageWindow.cpp	2002-04-14 02:28:10.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneMessageWindow.cpp	2004-03-02 00:26:12.431356107 +0900
+@@ -17,7 +17,9 @@
+ #include "VnOneMessageWindow.h"
+ #include "VnOneMessageCommand.h"
+ #include "VnFontWriter.h"
++#include <assert.h>
+ 
++using namespace std;
+ 
+ /**
+  * 定数
+diff -Naur xakane-0.90/src/VnOneProgressDataLoad.cpp xakane-0.90-gcc3/src/VnOneProgressDataLoad.cpp
+--- xakane-0.90/src/VnOneProgressDataLoad.cpp	2002-04-14 02:28:10.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneProgressDataLoad.cpp	2004-03-02 00:26:12.432356043 +0900
+@@ -13,10 +13,12 @@
+ #include <map>
+ #include <cstdio>
+ #include <cassert>
++#include <iostream>
+ #include "VnOneProgressDataLoad.h"
+ #include "VnFlagSet.h"
+ 
+ #include "VnOneProgressData.h"
++
+ using namespace VnOneProgressData;
+ 
+ /* ================================================================
+diff -Naur xakane-0.90/src/VnOneProgressDataLoad.h xakane-0.90-gcc3/src/VnOneProgressDataLoad.h
+--- xakane-0.90/src/VnOneProgressDataLoad.h	2002-04-14 02:28:11.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneProgressDataLoad.h	2004-03-02 00:26:12.433355979 +0900
+@@ -20,6 +20,8 @@
+ #include <map>
+ #include <sys/types.h>
+ 
++using namespace std;
++
+ class VnFlagSet;
+ 
+ class VnOneProgressDataLoad {
+diff -Naur xakane-0.90/src/VnOneProgressDataSave.cpp xakane-0.90-gcc3/src/VnOneProgressDataSave.cpp
+--- xakane-0.90/src/VnOneProgressDataSave.cpp	2002-04-14 02:28:11.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneProgressDataSave.cpp	2004-03-02 00:26:12.435355851 +0900
+@@ -106,7 +106,7 @@
+     // 今のデータを書いてから閉じる
+     DataSpec* spec = i->second;
+     spec->mStream.seekp(0, ios::beg);
+-    spec->mStream.write(spec->mpBuf, SAVEFILE_SIZE);
++    spec->mStream.write((char *)spec->mpBuf, SAVEFILE_SIZE);
+     spec->mStream.close();
+ 
+     // 今のデータをmapから削除
+diff -Naur xakane-0.90/src/VnOneProgressDataSave.h xakane-0.90-gcc3/src/VnOneProgressDataSave.h
+--- xakane-0.90/src/VnOneProgressDataSave.h	2002-04-14 02:28:11.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneProgressDataSave.h	2004-03-02 00:26:12.436355786 +0900
+@@ -20,6 +20,8 @@
+ #include <map>
+ #include <sys/types.h>
+ 
++using namespace std;
++
+ class VnFlagSet;
+ 
+ class VnOneProgressDataSave {
+diff -Naur xakane-0.90/src/VnOneSaveMenuItemFrame.h xakane-0.90-gcc3/src/VnOneSaveMenuItemFrame.h
+--- xakane-0.90/src/VnOneSaveMenuItemFrame.h	2002-04-14 02:28:11.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneSaveMenuItemFrame.h	2004-03-02 00:26:12.438355658 +0900
+@@ -16,6 +16,8 @@
+ #include <string>
+ #include "VnChooseItem.h"
+ 
++using namespace std;
++
+ class VnDirector;
+ 
+ class VnOneSaveMenuItemFrame : public VnChooseItem {
+diff -Naur xakane-0.90/src/VnOneScript.h xakane-0.90-gcc3/src/VnOneScript.h
+--- xakane-0.90/src/VnOneScript.h	2002-04-14 02:28:12.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneScript.h	2004-03-02 00:26:12.439355594 +0900
+@@ -18,6 +18,8 @@
+ #include <sys/types.h>
+ #include "VnCommand.h"
+ 
++using namespace std;
++
+ class VnDirector;
+ class VnOneProgressDataSave;
+ class VnOneProgressDataLoad;
+diff -Naur xakane-0.90/src/VnOneStateChoose.cpp xakane-0.90-gcc3/src/VnOneStateChoose.cpp
+--- xakane-0.90/src/VnOneStateChoose.cpp	2002-04-14 02:28:12.000000000 +0900
++++ xakane-0.90-gcc3/src/VnOneStateChoose.cpp	2004-03-02 00:26:12.440355529 +0900
+@@ -11,6 +11,7 @@
+ ================================================================ */
+ #include "xakane.h"
+ #include <iostream>
++#include <assert.h>
+ #include "VnOneStateChoose.h"
+ #include "VnDirector.h"
+ #include "VnOneChooseCommand.h"
+diff -Naur xakane-0.90/src/VnRect.h xakane-0.90-gcc3/src/VnRect.h
+--- xakane-0.90/src/VnRect.h	2002-04-14 02:28:15.000000000 +0900
++++ xakane-0.90-gcc3/src/VnRect.h	2004-03-02 00:26:12.441355465 +0900
+@@ -13,6 +13,7 @@
+ #define VNRECT_HPP
+ 
+ #include <iostream>
++using namespace std;
+ 
+ class VnRect {
+ public:
+diff -Naur xakane-0.90/src/VnSingleton.h xakane-0.90-gcc3/src/VnSingleton.h
+--- xakane-0.90/src/VnSingleton.h	2002-04-14 02:28:16.000000000 +0900
++++ xakane-0.90-gcc3/src/VnSingleton.h	2004-03-02 00:26:12.442355401 +0900
+@@ -23,7 +23,7 @@
+ 
+ #include "Counted.h"
+ 
+-template<class T, class C> class VnSingleton : private Counted<T> {
++template<class T, class C> class VnSingleton : protected Counted<T> {
+ public:
+   static T* Create(C& );
+   inline static T* Instance();
+diff -Naur xakane-0.90/src/VnTrueTypeFont.cpp xakane-0.90-gcc3/src/VnTrueTypeFont.cpp
+--- xakane-0.90/src/VnTrueTypeFont.cpp	2002-04-14 02:28:16.000000000 +0900
++++ xakane-0.90-gcc3/src/VnTrueTypeFont.cpp	2004-03-02 00:26:12.444355273 +0900
+@@ -18,8 +18,8 @@
+ #include "VnTrueTypeFont.h"
+ 
+ #if HAVE_LIBTTF
+-#include <freetype.h>
+-#include <ftxerr18.h>
++#include <freetype/freetype.h>
++#include <freetype/ftxerr18.h>
+ #endif
+ 
+ #include "chconv.h"
+@@ -108,7 +108,7 @@
+ /* ==============================================================================
+    Faceを開く
+ ============================================================================== */
+-bool TrueTypeFaceInfo::Open(const string& fontName, const int ttcId = 0)
++bool TrueTypeFaceInfo::Open(const string& fontName, const int ttcId)
+ {
+   TT_Error error;
+   // face
+diff -Naur xakane-0.90/src/VnTrueTypeFont.h xakane-0.90-gcc3/src/VnTrueTypeFont.h
+--- xakane-0.90/src/VnTrueTypeFont.h	2002-04-14 02:28:16.000000000 +0900
++++ xakane-0.90-gcc3/src/VnTrueTypeFont.h	2004-03-02 00:26:12.445355208 +0900
+@@ -17,6 +17,8 @@
+ #include "VnFont.h"
+ #include "Counted.h"
+ 
++using namespace std;
++
+ /* ==============================================================================
+    クラス, 構造体先行宣言
+ ============================================================================== */
+diff -Naur xakane-0.90/src/VnUserInput.cpp xakane-0.90-gcc3/src/VnUserInput.cpp
+--- xakane-0.90/src/VnUserInput.cpp	2002-04-14 02:28:17.000000000 +0900
++++ xakane-0.90-gcc3/src/VnUserInput.cpp	2004-03-02 00:26:12.445355208 +0900
+@@ -17,6 +17,8 @@
+ 
+ #include "VnUserInput.h"
+ 
++using namespace std;
++
+ /* ----------------------------------------------------------------
+    コンストラクタ
+ ---------------------------------------------------------------- */
+diff -Naur xakane-0.90/src/xakane.cpp xakane-0.90-gcc3/src/xakane.cpp
+--- xakane-0.90/src/xakane.cpp	2002-04-14 02:28:17.000000000 +0900
++++ xakane-0.90-gcc3/src/xakane.cpp	2004-03-02 00:26:12.447355080 +0900
+@@ -12,6 +12,7 @@
+ #include <gtk--/main.h>
+ #include <gdk--/main.h>
+ #include <cstring>
++#include <iostream>
+ // これって他のOSでは使えるのだろうか……
+ #include "unistd.h"
+ 

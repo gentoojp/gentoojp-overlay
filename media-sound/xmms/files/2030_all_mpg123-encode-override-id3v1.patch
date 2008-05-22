@@ -1,0 +1,208 @@
+diff -uprN xmms-1.2.10-patches-2.1.3-all_mpg123-id3convert-miss/Input/mpg123/configure.c xmms-1.2.10-patches-2.1.3-all_mpg123-encode-override-id3v1/Input/mpg123/configure.c
+--- xmms-1.2.10-patches-2.1.3-all_mpg123-id3convert-miss/Input/mpg123/configure.c	2004-10-26 10:05:19.000000000 +0900
++++ xmms-1.2.10-patches-2.1.3-all_mpg123-encode-override-id3v1/Input/mpg123/configure.c	2004-10-26 23:01:51.469173731 +0900
+@@ -27,7 +27,8 @@ static GtkWidget *streaming_cast_title, 
+ static GtkWidget *streaming_proxy_hbox, *streaming_proxy_auth_hbox, *streaming_save_dirbrowser;
+ static GtkWidget *streaming_save_hbox, *title_id3_box, *title_tag_desc;
+ static GtkWidget *title_override, *title_id3_entry, *title_id3v2_disable;
+-static GtkWidget *id3v2_encoding_override, *id3v2_encoding_box, *encoding_entry;
++static GtkWidget *id3v1_encoding_override, *id3v1_encoding_box, *id3v1_encoding_entry;
++static GtkWidget *id3v2_encoding_override, *id3v2_encoding_box, *id3v2_encoding_entry;
+ 
+ MPG123Config mpg123_cfg;
+ 
+@@ -106,8 +107,10 @@ static void mpg123_configurewin_ok(GtkWi
+ 	mpg123_cfg.disable_id3v2 = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(title_id3v2_disable));
+ 	g_free(mpg123_cfg.id3_format);
+ 	mpg123_cfg.id3_format = g_strdup(gtk_entry_get_text(GTK_ENTRY(title_id3_entry)));
++	mpg123_cfg.id3v1_encoding_override = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(id3v1_encoding_override));
++	mpg123_cfg.id3v1_default_encoding = g_strdup(gtk_entry_get_text(GTK_ENTRY(id3v1_encoding_entry)));
+ 	mpg123_cfg.id3v2_encoding_override = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(id3v2_encoding_override));
+-	mpg123_cfg.id3v2_default_encoding = g_strdup(gtk_entry_get_text(GTK_ENTRY(encoding_entry)));
++	mpg123_cfg.id3v2_default_encoding = g_strdup(gtk_entry_get_text(GTK_ENTRY(id3v2_encoding_entry)));
+ 
+ 	filename = g_strconcat(g_get_home_dir(), "/.xmms/config", NULL);
+ 	cfg = xmms_cfg_open_file(filename);
+@@ -137,6 +140,8 @@ static void mpg123_configurewin_ok(GtkWi
+ 	xmms_cfg_write_boolean(cfg, "MPG123", "title_override", mpg123_cfg.title_override);
+ 	xmms_cfg_write_boolean(cfg, "MPG123", "disable_id3v2", mpg123_cfg.disable_id3v2);
+ 	xmms_cfg_write_string(cfg, "MPG123", "id3_format", mpg123_cfg.id3_format);
++	xmms_cfg_write_boolean(cfg, "MPG123", "id3v1_encoding_override", mpg123_cfg.id3v1_encoding_override);
++	xmms_cfg_write_string(cfg, "MPG123", "id3v1_default_encoding", mpg123_cfg.id3v1_default_encoding);
+ 	xmms_cfg_write_boolean(cfg, "MPG123", "id3v2_encoding_override", mpg123_cfg.id3v2_encoding_override);
+ 	xmms_cfg_write_string(cfg, "MPG123", "id3v2_default_encoding", mpg123_cfg.id3v2_default_encoding);
+ 	xmms_cfg_write_int(cfg, "MPG123", "detect_by", mpg123_cfg.detect_by);
+@@ -217,6 +222,13 @@ static void title_override_cb(GtkWidget 
+ 	gtk_widget_set_sensitive(title_tag_desc, override);
+ }
+ 
++static void id3v1_encoding_override_cb(GtkWidget * w, gpointer data)
++{
++	gboolean override;
++	override = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(id3v1_encoding_override));
++	gtk_widget_set_sensitive(id3v1_encoding_box, override);
++}
++
+ static void id3v2_encoding_override_cb(GtkWidget * w, gpointer data)
+ {
+ 	gboolean override;
+@@ -242,7 +254,7 @@ void mpg123_configure(void)
+ 	GtkWidget *streaming_save_label, *streaming_save_browse;
+ 	GtkWidget *streaming_cast_frame, *streaming_cast_vbox;
+ 	GtkWidget *title_frame, *title_id3_vbox, *title_id3_label;
+-	GtkWidget *title_id3_label2;
++	GtkWidget *title_id3_label2, *title_id3_label3;
+ 	GtkWidget *bbox, *ok, *cancel;
+ 
+ 	char *temp;
+@@ -590,6 +602,22 @@ void mpg123_configure(void)
+ 	gtk_widget_set_sensitive(title_tag_desc, mpg123_cfg.title_override);
+ 	gtk_box_pack_start(GTK_BOX(title_id3_vbox), title_tag_desc, FALSE, FALSE, 0);
+ 
++	id3v1_encoding_override = gtk_check_button_new_with_label(_("Override default ID3V1 encoding"));
++	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(id3v1_encoding_override), mpg123_cfg.id3v1_encoding_override);
++	gtk_signal_connect(GTK_OBJECT(id3v1_encoding_override), "clicked", id3v1_encoding_override_cb, NULL);
++	gtk_box_pack_start(GTK_BOX(title_id3_vbox), id3v1_encoding_override, FALSE, FALSE, 0);
++
++	id3v1_encoding_box = gtk_hbox_new(FALSE, 5);
++	gtk_widget_set_sensitive(id3v1_encoding_box, mpg123_cfg.id3v1_encoding_override);
++	gtk_box_pack_start(GTK_BOX(title_id3_vbox), id3v1_encoding_box, FALSE, FALSE, 0);
++
++	title_id3_label2 = gtk_label_new(_("Encoding name:"));
++	gtk_box_pack_start(GTK_BOX(id3v1_encoding_box), title_id3_label2, FALSE, FALSE, 0);
++
++	id3v1_encoding_entry = gtk_entry_new();
++	gtk_entry_set_text(GTK_ENTRY(id3v1_encoding_entry), mpg123_cfg.id3v1_default_encoding);
++	gtk_box_pack_start(GTK_BOX(id3v1_encoding_box), id3v1_encoding_entry, TRUE, TRUE, 0);
++
+ 	id3v2_encoding_override = gtk_check_button_new_with_label(_("Override default ID3V2 encoding"));
+ 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(id3v2_encoding_override), mpg123_cfg.id3v2_encoding_override);
+ 	gtk_signal_connect(GTK_OBJECT(id3v2_encoding_override), "clicked", id3v2_encoding_override_cb, NULL);
+@@ -599,12 +627,12 @@ void mpg123_configure(void)
+ 	gtk_widget_set_sensitive(id3v2_encoding_box, mpg123_cfg.id3v2_encoding_override);
+ 	gtk_box_pack_start(GTK_BOX(title_id3_vbox), id3v2_encoding_box, FALSE, FALSE, 0);
+ 
+-	title_id3_label2 = gtk_label_new(_("Encoding name:"));
+-	gtk_box_pack_start(GTK_BOX(id3v2_encoding_box), title_id3_label2, FALSE, FALSE, 0);
++	title_id3_label3 = gtk_label_new(_("Encoding name:"));
++	gtk_box_pack_start(GTK_BOX(id3v2_encoding_box), title_id3_label3, FALSE, FALSE, 0);
+ 
+-	encoding_entry = gtk_entry_new();
+-	gtk_entry_set_text(GTK_ENTRY(encoding_entry), mpg123_cfg.id3v2_default_encoding);
+-	gtk_box_pack_start(GTK_BOX(id3v2_encoding_box), encoding_entry, TRUE, TRUE, 0);
++	id3v2_encoding_entry = gtk_entry_new();
++	gtk_entry_set_text(GTK_ENTRY(id3v2_encoding_entry), mpg123_cfg.id3v2_default_encoding);
++	gtk_box_pack_start(GTK_BOX(id3v2_encoding_box), id3v2_encoding_entry, TRUE, TRUE, 0);
+ 
+ 	gtk_notebook_append_page(GTK_NOTEBOOK(notebook), title_frame, gtk_label_new(_("Title")));
+ 
+diff -uprN xmms-1.2.10-patches-2.1.3-all_mpg123-id3convert-miss/Input/mpg123/fileinfo.c xmms-1.2.10-patches-2.1.3-all_mpg123-encode-override-id3v1/Input/mpg123/fileinfo.c
+--- xmms-1.2.10-patches-2.1.3-all_mpg123-id3convert-miss/Input/mpg123/fileinfo.c	2004-10-26 23:01:51.118225697 +0900
++++ xmms-1.2.10-patches-2.1.3-all_mpg123-encode-override-id3v1/Input/mpg123/fileinfo.c	2004-10-26 23:01:51.469173731 +0900
+@@ -27,6 +27,8 @@
+ #include <gdk/gdkkeysyms.h>
+ #include "mpg123.h"
+ 
++#include "libxmms/charset.h"
++
+ #define MAX_STR_LEN 100
+ #define MAX_ENTRY_LEN2 1023
+ 
+@@ -63,7 +65,11 @@ static void set_entry_tag_v1(GtkEntry * 
+ 	char *text, *tmp;
+ 
+ 	tmp = g_strchomp(g_strndup(tag, length));
+-	text = xmms_charset_from_latin1(tmp);
++	if (mpg123_cfg.id3v1_encoding_override)
++		text = xmms_charset_convert(tmp, length,
++			mpg123_cfg.id3v1_default_encoding, NULL);
++	else
++		text = xmms_charset_from_latin1(tmp);
+ 	gtk_entry_set_text(entry, text);
+ 	g_free(text);
+ 	g_free(tmp);
+@@ -71,12 +77,32 @@ static void set_entry_tag_v1(GtkEntry * 
+ 
+ static void get_entry_tag_v1(GtkEntry * entry, char * tag, int length)
+ {
+-	strncpy(tag, gtk_entry_get_text(entry), length);
++	if (!mpg123_cfg.id3v1_encoding_override) {
++		strncpy(tag, gtk_entry_get_text(entry), length);
++	} else {
++		char *tmp, *text;
++
++		tmp = gtk_entry_get_text(entry);
++		tmp = g_strndup(tmp, length);
++		if (strlen(tmp) > length)
++			g_message("xmms mpg123: Truncate to \"%s\"", tmp);
++		text = xmms_charset_convert(tmp, length,
++			NULL, mpg123_cfg.id3v1_default_encoding);
++		strncpy(tag, text, length);
++		g_free(text);
++		g_free(tmp);
++	}
+ }
+ 
+ void copy_entry_tag_v1(GtkEntry * src, GtkEntry * dest, int length)
+ {
+-	set_entry_tag_v1(dest, gtk_entry_get_text(src), length);
++	char *raw, *text;
++	raw = gtk_entry_get_text(src);
++	text = g_strchomp(g_strndup(raw, length));
++	if (strlen(raw) > length)
++		g_message("xmms mpg123: Truncate to \"%s\"", text);
++	gtk_entry_set_text(dest, text);
++	g_free(text);
+ 	return;
+ }
+ 
+diff -uprN xmms-1.2.10-patches-2.1.3-all_mpg123-id3convert-miss/Input/mpg123/mpg123.c xmms-1.2.10-patches-2.1.3-all_mpg123-encode-override-id3v1/Input/mpg123/mpg123.c
+--- xmms-1.2.10-patches-2.1.3-all_mpg123-id3convert-miss/Input/mpg123/mpg123.c	2004-10-26 23:01:50.048384000 +0900
++++ xmms-1.2.10-patches-2.1.3-all_mpg123-encode-override-id3v1/Input/mpg123/mpg123.c	2004-10-26 23:01:51.470173583 +0900
+@@ -174,6 +174,7 @@ static void init(void)
+ 	mpg123_cfg.use_udp_channel = FALSE;
+ 	mpg123_cfg.title_override = FALSE;
+ 	mpg123_cfg.disable_id3v2 = FALSE;
++	mpg123_cfg.id3v1_encoding_override = FALSE;
+ 	mpg123_cfg.id3v2_encoding_override = FALSE;
+ 	mpg123_cfg.detect_by = DETECT_EXTENSION;
+ 	mpg123_cfg.default_synth = SYNTH_AUTO;
+@@ -203,6 +204,9 @@ static void init(void)
+ 	xmms_cfg_read_boolean(cfg, "MPG123", "disable_id3v2", &mpg123_cfg.disable_id3v2);
+ 	if (!xmms_cfg_read_string(cfg, "MPG123", "id3_format", &mpg123_cfg.id3_format))
+ 		mpg123_cfg.id3_format = g_strdup("%p - %t");
++	xmms_cfg_read_boolean(cfg, "MPG123", "id3v1_encoding_override", &mpg123_cfg.id3v1_encoding_override);
++	if (!xmms_cfg_read_string(cfg, "MPG123", "id3v1_default_encoding", &mpg123_cfg.id3v1_default_encoding))
++		mpg123_cfg.id3v1_default_encoding = g_strdup("ISO-8859-1");
+ 	xmms_cfg_read_boolean(cfg, "MPG123", "id3v2_encoding_override", &mpg123_cfg.id3v2_encoding_override);
+ 	if (!xmms_cfg_read_string(cfg, "MPG123", "id3v2_default_encoding", &mpg123_cfg.id3v2_default_encoding))
+ 		mpg123_cfg.id3v2_default_encoding = g_strdup("ISO-8859-1");
+@@ -408,8 +412,14 @@ static gchar *extname(const char *filena
+ 
+ static char *convert_id3v1_field(const char *v1field, unsigned len)
+ {
+-	char *tmp = g_strndup(v1field, len);
+-	char *v2field = xmms_charset_from_latin1(g_strstrip(tmp));
++	char *tmp, *v2field;
++
++	tmp = g_strstrip(g_strndup(v1field, len));
++	if (mpg123_cfg.id3v1_encoding_override)
++		v2field = xmms_charset_convert(tmp, len,
++			mpg123_cfg.id3v1_default_encoding, NULL);
++	else
++		v2field = xmms_charset_from_latin1(tmp);
+ 	g_free(tmp);
+ 	return v2field;
+ }
+diff -uprN xmms-1.2.10-patches-2.1.3-all_mpg123-id3convert-miss/Input/mpg123/mpg123.h xmms-1.2.10-patches-2.1.3-all_mpg123-encode-override-id3v1/Input/mpg123/mpg123.h
+--- xmms-1.2.10-patches-2.1.3-all_mpg123-id3convert-miss/Input/mpg123/mpg123.h	2004-10-26 10:05:19.000000000 +0900
++++ xmms-1.2.10-patches-2.1.3-all_mpg123-encode-override-id3v1/Input/mpg123/mpg123.h	2004-10-26 23:01:51.471173435 +0900
+@@ -163,6 +163,8 @@ typedef struct
+ 	gboolean use_udp_channel;
+ 	gchar *id3_format;
+ 	gboolean title_override, disable_id3v2;
++	gboolean id3v1_encoding_override;
++	gchar *id3v1_default_encoding;
+ 	gboolean id3v2_encoding_override;
+ 	gchar *id3v2_default_encoding;
+ 	int detect_by;

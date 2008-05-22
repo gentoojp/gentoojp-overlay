@@ -1,0 +1,176 @@
+diff -uNr mt-daapd-0.2.1.1.orig/src/mp3-scanner.c mt-daapd-0.2.3/src/mp3-scanner.c
+--- mt-daapd-0.2.1.1.orig/src/mp3-scanner.c	2005-02-06 06:27:19.000000000 +0900
++++ mt-daapd-0.2.3/src/mp3-scanner.c	2005-07-03 20:06:30.000000000 +0900
+@@ -26,6 +26,19 @@
+  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#define USE_CP932
++
++#ifdef USE_CP932
++  #define UNKNOWN_STR    "UNKNOWN"
++  #ifndef FILESYSTEM_CES
++    #define FILESYSTEM_CES "CP932"
++/*
++    #define FILESYSTEM_CES "UTF-8"
++    #define FILESYSTEM_CES "EUC-JP"
++*/
++  #endif
++#endif
++
+ #ifdef HAVE_CONFIG_H
+ #  include "config.h"
+ #endif
+@@ -45,6 +58,10 @@
+ #include <sys/stat.h>
+ #include <dirent.h>      /* why here?  For osx 10.2, of course! */
+ 
++#ifdef USE_CP932
++ #include <iconv.h>
++#endif
++
+ #include "daapd.h"
+ #include "db-memory.h"
+ #include "err.h"
+@@ -739,6 +756,97 @@
+     return 0;
+ }
+ 
++#ifdef USE_CP932
++#define MAX_ICONV_BUF 1024
++
++typedef enum {
++  ICONV_OK,
++  ICONV_TRYNEXT,
++  ICONV_FATAL
++} iconv_result;
++
++static iconv_result do_convert(const char* to_ces, const char* from_ces, 
++			       char *inbuf,  size_t inbytesleft,
++			       char *outbuf_orig, size_t outbytesleft_orig) {
++  size_t rc;
++  iconv_result ret = ICONV_OK;
++
++  size_t outbytesleft = outbytesleft_orig - 1; 
++  char* outbuf = outbuf_orig;
++
++  iconv_t cd  = iconv_open(to_ces, from_ces);
++  if (cd == (iconv_t)-1) {
++    return ICONV_FATAL;
++  }
++  rc = iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
++  if (rc == (size_t)-1) {
++    if (errno == E2BIG) {
++      ret = ICONV_FATAL;
++    } else {
++      ret = ICONV_TRYNEXT;
++      memset(outbuf_orig, '\0', outbytesleft_orig);
++    }
++  }
++  iconv_close(cd);
++
++  return ret;
++}
++
++static unsigned char* get_utf8_text(const id3_ucs4_t* native_text) {
++  unsigned char* utf8_text = NULL;
++  char * in, * in8, * iconv_buf;
++  iconv_result rc;
++
++  in = (char*)id3_ucs4_latin1duplicate(native_text);
++  if (!in) {
++    goto out;
++  }
++
++  in8 = (char*)id3_ucs4_utf8duplicate(native_text);
++  if (!in8) {
++    free(in);
++    goto out;
++  }
++
++  iconv_buf = (char*)calloc(MAX_ICONV_BUF, sizeof(char));
++  if (!iconv_buf) {
++    free(in); free(in8);
++    goto out;
++  }
++
++  /* (1) try utf8 -> cp932 */
++  rc = do_convert("CP932", "UTF-8", in8, strlen(in8), iconv_buf, MAX_ICONV_BUF);
++  if (rc == ICONV_OK) {
++    utf8_text = in8;
++    free(iconv_buf);
++  } else if (rc == ICONV_TRYNEXT) {
++    /* (2) try cp932 -> utf8 */
++    rc = do_convert("UTF-8", "CP932", in, strlen(in), iconv_buf, MAX_ICONV_BUF);
++    if (rc == ICONV_OK) {
++      utf8_text = iconv_buf;
++    } else if (rc == ICONV_TRYNEXT) {
++      /* (3) try euc-jp -> utf8 */
++      rc = do_convert("UTF-8", "EUC-JP", in, strlen(in), iconv_buf, MAX_ICONV_BUF);
++      if (rc == ICONV_OK) {
++	utf8_text = iconv_buf;
++      } else if (rc == ICONV_TRYNEXT) {
++	/* utf-8 including non-japanese char? fallback. */
++	utf8_text = (char*)id3_ucs4_utf8duplicate(native_text);
++	free(iconv_buf);
++      }
++    }
++    free(in8);
++  }
++  free(in);
++
++ out:
++  if(!utf8_text) {
++    utf8_text = strdup(UNKNOWN_STR);
++  }
++
++  return utf8_text;
++}
++#endif
+ 
+ int scan_get_mp3tags(char *file, MP3FILE *pmp3) {
+     struct id3_file *pid3file;
+@@ -796,8 +904,12 @@
+ 
+ 	    if(native_text) {
+ 		have_utf8=1;
++#ifdef USE_CP932
++	        utf8_text = get_utf8_text(native_text);
++#else
+ 		utf8_text=id3_ucs4_utf8duplicate(native_text);
+-		MEMNOTIFY(utf8_text);
++#endif
++	        MEMNOTIFY(utf8_text);
+ 
+ 		if(!strcmp(pid3frame->id,"TIT2")) { /* Title */
+ 		    used=1;
+@@ -1762,8 +1874,28 @@
+ 	song->data_kind=0;
+     }
+ 
+-    if(!song->title)
++    if(!song->title) {
++#ifdef USE_CP932
++      if (!strcasecmp(FILESYSTEM_CES, "UTF-8")) {
+ 	song->title = strdup(song->fname);
++      } else {
++	char* iconv_buf = (char*)calloc(MAX_ICONV_BUF, sizeof(char));
++	if (iconv_buf) {
++	  iconv_result rc = do_convert("UTF-8", FILESYSTEM_CES, 
++				       song->fname, strlen(song->fname), 
++				       iconv_buf, MAX_ICONV_BUF);
++	  if(rc == ICONV_OK) {
++	    song->title = iconv_buf;
++	  } else {
++	    song->title = strdup(UNKNOWN_STR);
++	    free(iconv_buf);
++	  }
++	}
++      } // if utf-8
++#else
++      song->title = strdup(song->fname);
++#endif
++    }
+ 
+     /* Ogg used to be set as an item_kind of 4.  Dunno why */
+     song->item_kind = 2;

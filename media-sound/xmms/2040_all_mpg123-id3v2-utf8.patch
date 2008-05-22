@@ -1,0 +1,107 @@
+diff -uprN xmms-1.2.10-patches-2.1.3-all_mpg123-encode-override-id3v1/Input/mpg123/id3_frame_text.c xmms-1.2.10-patches-2.1.3-all_mpg123-id3v2-utf8/Input/mpg123/id3_frame_text.c
+--- xmms-1.2.10-patches-2.1.3-all_mpg123-encode-override-id3v1/Input/mpg123/id3_frame_text.c	2004-10-27 02:38:29.094559575 +0900
++++ xmms-1.2.10-patches-2.1.3-all_mpg123-id3v2-utf8/Input/mpg123/id3_frame_text.c	2004-10-27 03:09:18.389831988 +0900
+@@ -247,6 +247,9 @@ int id3_get_text_number(struct id3_frame
+  */
+ int id3_set_text(struct id3_frame *frame, char *text)
+ {
++	int charset;
++	char *tmp;
++
+ 	/* Type check */
+ 	if (frame->fr_desc->fd_idstr[0] != 'T')
+ 		return -1;
+@@ -257,16 +260,29 @@ int id3_set_text(struct id3_frame *frame
+ 	id3_frame_clear_data(frame);
+ 
+ 	/*
++	 * Convert to UTF-8 if needed.
++	 */
++	if (frame->fr_desc->fd_id == ID3_TYER ||
++		frame->fr_desc->fd_id == ID3_TRCK)
++	{
++		charset = ID3_ENCODING_ISO_8859_1;
++		tmp = text;
++	} else {
++		charset = ID3_ENCODING_UTF8;
++		tmp = xmms_charset_to_utf8(text);
++	}
++	
++	/*
+ 	 * Allocate memory for new data.
+ 	 */
+-	frame->fr_raw_size = strlen(text) + 1;
++	frame->fr_raw_size = strlen(tmp) + 1;
+ 	frame->fr_raw_data = g_malloc(frame->fr_raw_size + 1);
+ 
+ 	/*
+ 	 * Copy contents.
+ 	 */
+-	*(gint8 *) frame->fr_raw_data = ID3_ENCODING_ISO_8859_1;
+-	memcpy((char *) frame->fr_raw_data + 1, text, frame->fr_raw_size);
++	*(gint8 *) frame->fr_raw_data = charset;
++	memcpy((char *) frame->fr_raw_data + 1, tmp, frame->fr_raw_size);
+ 
+ 	frame->fr_altered = 1;
+ 	frame->fr_owner->id3_altered = 1;
+@@ -274,6 +290,9 @@ int id3_set_text(struct id3_frame *frame
+ 	frame->fr_data = frame->fr_raw_data;
+ 	frame->fr_size = frame->fr_raw_size;
+ 
++	if (charset == ID3_ENCODING_UTF8)
++		g_free(tmp);
++
+ 	return 0;
+ }
+ 
+@@ -389,7 +408,9 @@ char *id3_get_comment(struct id3_frame *
+  */
+ int id3_set_comment(struct id3_frame *frame, char *text)
+ {
+-	/* Type check */
++	char *tmp;
++
++ 	/* Type check */
+ 	if (frame->fr_desc->fd_id != ID3_COMM)
+ 		return -1;
+ 
+@@ -399,16 +420,21 @@ int id3_set_comment(struct id3_frame *fr
+ 	id3_frame_clear_data(frame);
+ 
+ 	/*
++	 * Convert to UTF-8.
++	 */
++	tmp = xmms_charset_to_utf8(text);
++
++	/*
+ 	 * Allocate memory for new data.
+ 	 */
+-	frame->fr_raw_size = 13 + strlen(text);
++	frame->fr_raw_size = 13 + strlen(tmp);
+ 	frame->fr_raw_data = g_malloc(frame->fr_raw_size + 1); /* <encode>XXXComments\0<comment><\0> */
+ 
+ 	/* Save time... we just need to zero out the start, not the whole
+ 	 * block, so don't waste time with a calloc()
+ 	 */
+ 
+-	((guint8 *)frame->fr_raw_data)[0] = ID3_ENCODING_ISO_8859_1;
++	((guint8 *)frame->fr_raw_data)[0] = ID3_ENCODING_UTF8;
+ 	((guint8 *)frame->fr_raw_data)[1] = 0x58;
+ 	((guint8 *)frame->fr_raw_data)[2] = 0x58;
+ 	((guint8 *)frame->fr_raw_data)[3] = 0x58;
+@@ -418,7 +444,7 @@ int id3_set_comment(struct id3_frame *fr
+ 	/*
+ 	 * Copy contents.
+ 	 */
+-	memcpy((char *) frame->fr_raw_data + 13, text, strlen(text) + 1);
++	memcpy((char *) frame->fr_raw_data + 13, tmp, strlen(tmp) + 1);
+ 
+ 	frame->fr_altered = 1;
+ 	frame->fr_owner->id3_altered = 1;
+@@ -426,5 +452,6 @@ int id3_set_comment(struct id3_frame *fr
+ 	frame->fr_data = frame->fr_raw_data;
+ 	frame->fr_size = frame->fr_raw_size;
+ 
++	g_free(tmp);
+ 	return 0;
+ }

@@ -1,0 +1,102 @@
+--- tgif-QPL-4.1.43.orig/tgif.Xdefaults	2003-08-19 03:35:39.000000000 +0900
++++ tgif-QPL-4.1.43/tgif.Xdefaults	2003-08-20 11:35:16.000000000 +0900
+@@ -354,7 +354,7 @@
+ !
+ ! DoubleByte related
+ !
+-!Tgif.DefaultSingleByteFont:	Helvetica
++Tgif.DefaultSingleByteFont:	Helvetica
+ !Tgif.SquareDoubleByteFonts:	\n\
+ ! -hku-fixed-medium-r-normal--%d-*-*-*-*-*-big5.hku-0,*,HKU\n\
+ ! -hku-fixed-medium-r-normal--%d-*-*-*-*-*-big5.hku-0,*,HKU\n\
+@@ -365,26 +365,26 @@
+ ! -isas-song ti-medium-r-normal--%d-*-*-*-*-*-gb2312.1980-0,*,GB-Song-Regular\n\
+ ! -isas-song ti-medium-r-normal--%d-*-*-*-*-*-gb2312.1980-0,*,GB-Song-Regular\n\
+ ! -isas-song ti-medium-r-normal--%d-*-*-*-*-*-gb2312.1980-0,*,GB-Song-Regular
+-!Tgif.SquareDoubleByteFonts: \n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,Ryumin-Light-EUC-H\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,Ryumin-Light-EUC-H\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,Ryumin-Light-EUC-H\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,Ryumin-Light-EUC-H\n\
+-!\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,GothicBBB-Medium-EUC-H\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,GothicBBB-Medium-EUC-H\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,GothicBBB-Medium-EUC-H\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,GothicBBB-Medium-EUC-H\n\
+-!\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,Ryumin-Light-EUC-V\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,Ryumin-Light-EUC-V\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,Ryumin-Light-EUC-V\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,Ryumin-Light-EUC-V\n\
+-!\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,GothicBBB-Medium-EUC-V\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,GothicBBB-Medium-EUC-V\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,GothicBBB-Medium-EUC-V\n\
+-!-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,GothicBBB-Medium-EUC-V
++Tgif.SquareDoubleByteFonts: \n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,Ryumin-Light-EUC-H\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,Ryumin-Light-EUC-H\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,Ryumin-Light-EUC-H\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,Ryumin-Light-EUC-H\n\
++\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,GothicBBB-Medium-EUC-H\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,GothicBBB-Medium-EUC-H\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,GothicBBB-Medium-EUC-H\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,H,GothicBBB-Medium-EUC-H\n\
++\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,Ryumin-Light-EUC-V\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,Ryumin-Light-EUC-V\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,Ryumin-Light-EUC-V\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,Ryumin-Light-EUC-V\n\
++\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,GothicBBB-Medium-EUC-V\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,GothicBBB-Medium-EUC-V\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,GothicBBB-Medium-EUC-V\n\
++-jis-fixed-medium-r-*--%d-*-*-*-*-*-jisx0208.1983-*,V,GothicBBB-Medium-EUC-V
+ Tgif.HKUShowFontChar:		\244\244
+ Tgif.GBShowFontChar:		\271\372
+ Tgif.RyuminShowFontChar:	\244\242
+@@ -394,7 +394,7 @@
+ !Tgif.DoubleByteInputMethod:	chinput
+ !Tgif.DoubleByteInputMethod:	kinput2
+ !Tgif.DoubleByteInputMethod:	tgtwb5,-taipei-fixed-medium-r-normal--16-150-75-75-c-160-big5-0
+-!Tgif.DoubleByteInputMethod:	xim
++Tgif.DoubleByteInputMethod:	xim
+ !
+ ! If Tgif.DoubleByteInputMethod is set to kinput2 or xim and you are mainly
+ !	operated in a Japanese environment, please try the following settings:
+@@ -404,12 +404,13 @@
+ !
+ Tgif.UseNKF:			true
+ Tgif.CopyAndPasteJIS:		true
+-Tgif.PreeditType:		root
+-!Tgif.PreeditType:		overthespot
++!Tgif.PreeditType:		root
++Tgif.PreeditType:		overthespot
+ !Tgif.Lang:			ja_JP.EUC
+ !Tgif.Lang:			ja_JP.ujis
+-!Tgif.Modifiers:		false
+-!Tgif.ConvSelection:		_JAPANESE_CONVERSION
++Tgif.Lang:			ja_JP.eucJP
++Tgif.Modifiers:			false
++Tgif.ConvSelection:		_JAPANESE_CONVERSION
+ !
+ ! After release 4.0
+ !
+@@ -426,11 +427,11 @@
+ ! Tgif.MenuFontSet and Tgif.LocaleDir are only useful if tgif is
+ !	compiled with the ENABLE_NLS compiler option.
+ !
+-!Tgif.MenuFontSet:		a14,k14,r14
+-!Tgif.MsgFontSet:		a14,k14,r14
+-!Tgif.BoldMsgFontSet:		a14,k14,r14
+-!Tgif.BoldMsgFontDoubleByte:	true
+-!Tgif.LocaleDir:		/usr/share/lib
++Tgif.MenuFontSet:		a14,k14,r14
++Tgif.MsgFontSet:		a14,k14,r14
++Tgif.BoldMsgFontSet:		a14,k14,r14
++Tgif.BoldMsgFontDoubleByte:	true
++Tgif.LocaleDir:			/usr/share/locale
+ !
+ ! Added in version 4.1.9
+ !

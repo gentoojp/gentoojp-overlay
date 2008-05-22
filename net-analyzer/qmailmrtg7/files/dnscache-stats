@@ -1,0 +1,3 @@
+#!/bin/sh
+
+/bin/grep stats /var/dnscache/log/main/current | /usr/bin/tail -n1 | /bin/awk '{ printf("%d\n%d\n%d\n%d\n",$3,$4,$5,$6); }'

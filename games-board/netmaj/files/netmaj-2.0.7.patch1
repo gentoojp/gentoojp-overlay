@@ -1,0 +1,39 @@
+diff -rc netmaj-org/global.c netmaj/global.c
+*** netmaj-org/global.c	Mon Oct 21 06:07:25 1996
+--- netmaj/global.c	Sat Nov 20 09:08:57 1999
+***************
+*** 433,438 ****
+--- 433,441 ----
+  if (plog) fprintf(plog,"MSG_ASK\n");
+  		ret = ACT_SEL;
+  	}
++ 	else if (!strcmp(buf,MSG_KILL)) {
++ 		/* do nothing */
++ 	}
+  	else if (!strcmp(buf,MSG_PLAYEND)) {
+  		ch_play = 1;
+  		for (i=0; i<4; i++) {
+diff -rc netmaj-org/server.c netmaj/server.c
+*** netmaj-org/server.c	Fri Sep  6 06:29:53 1996
+--- netmaj/server.c	Sat Nov 20 09:08:14 1999
+***************
+*** 323,330 ****
+  
+  	gp = gp_server;
+  
+! 	for (i=0; i<4; i++) if (player[i].sp)
+  		SockClose(player[i].sp);
+  	if (plog) fclose(plog);
+  	fclose(stdout);
+  	exit(1);
+--- 323,332 ----
+  
+  	gp = gp_server;
+  
+! 	for (i=0; i<4; i++) if (player[i].sp) {
+! 		msgWrites(gp,MSG_KILL,i);
+  		SockClose(player[i].sp);
++ 	}
+  	if (plog) fclose(plog);
+  	fclose(stdout);
+  	exit(1);

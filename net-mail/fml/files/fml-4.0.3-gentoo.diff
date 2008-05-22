@@ -1,0 +1,18 @@
+--- makefml.orig	2001-09-19 00:08:41.000000000 +0900
++++ makefml	2003-12-15 05:21:45.000000000 +0900
+@@ -1556,10 +1556,12 @@
+ 
+ sub InitTTY
+ {
+-    if (-e "/dev/tty") { $console = "/dev/tty";}
++    #if (-e "/dev/tty") { $console = "/dev/tty";}
+ 
+-    open(IN, "<$console") || open(IN,  "<&STDIN"); # so we don't dingle stdin
+-    open(OUT,">$console") || open(OUT, ">&STDOUT");# so we don't dongle stdout
++    #open(IN, "<$console") || open(IN,  "<&STDIN"); # so we don't dingle stdin
++    #open(OUT,">$console") || open(OUT, ">&STDOUT");# so we don't dongle stdout
++    open(IN,  "<&STDIN"); # we don't want prompt for building packages
++    open(OUT, ">&STDOUT");# we don't want prompt for building packages
+     select(OUT); $| = 1; #select(STDOUT); $| = 1;
+ }
+ 

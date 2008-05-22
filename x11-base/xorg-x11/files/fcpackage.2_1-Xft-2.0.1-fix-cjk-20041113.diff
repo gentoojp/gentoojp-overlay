@@ -1,0 +1,268 @@
+diff -u xc-org/lib/Xft/xftfreetype.c xc/lib/Xft/xftfreetype.c
+--- xc-org/lib/Xft/xftfreetype.c	Sat Oct 12 02:53:02 2002
++++ xc/lib/Xft/xftfreetype.c	Wed Apr  9 01:56:37 2003
+@@ -391,6 +391,7 @@
+     FcChar32	    hash, *hashp;
+     FT_Face	    face;
+     int		    nhash;
++    FcBool	    bitmap;
+ 
+     if (!info)
+ 	return FcFalse;
+@@ -523,6 +524,20 @@
+      */
+     fi->load_flags = FT_LOAD_DEFAULT;
+     
++#ifndef XFT_EMBEDDED_BITMAP
++#define XFT_EMBEDDED_BITMAP "embeddedbitmap"
++#endif
++
++    switch (FcPatternGetBool (pattern, XFT_EMBEDDED_BITMAP, 0, &bitmap)) {
++    case FcResultNoMatch:
++	bitmap = FcFalse;
++	break;
++    case FcResultMatch:
++	break;
++    default:
++	goto bail1;
++    }
++
+     /* disable bitmaps when anti-aliasing or transforming glyphs */
+     /* Generally, we want to prefer bitmaps when we have them,
+      * even when antialiasing, because they make Han characters
+@@ -685,6 +700,19 @@
+     default:
+ 	goto bail1;
+     }
++    
++    /*
++     * Check for weight
++     */
++    switch (FcPatternGetInteger (pattern, FC_WEIGHT, 0, &fi->weight_value)) {
++    case FcResultNoMatch:
++	fi->weight_value = FC_WEIGHT_MEDIUM;
++	break;
++    case FcResultMatch:
++	break;
++    default:
++	goto bail1;
++    }
+ 
+     /*
+      * Step over hash value in the structure
+@@ -996,6 +1024,54 @@
+     font->max_glyph_memory = max_glyph_memory;
+     font->use_free_glyphs = info->use_free_glyphs;
+     
++    /*
++     * Extra bitmap strokes
++     */
++    font->extra_strokes = 0;
++    font->extra_advanceX = 0;
++    if (fi->weight_value >= FC_WEIGHT_DEMIBOLD &&
++	(face->style_flags & FT_STYLE_FLAG_BOLD) == 0)
++    {
++	font->extra_strokes =
++	    32 + FT_MulDiv (fi->xsize, fi->weight_value - 160, 1600);
++
++	if (fi->weight_value >= FC_WEIGHT_BOLD)
++	    font->extra_advanceX =
++		(font->extra_strokes > 64)? font->extra_strokes : 64;
++    }
++    
++    /*
++     * CJK fixed widths fields
++     */
++    font->long_advance.x = 0;
++    font->long_advance.y = 0;
++    font->short_advance.x = 0;
++    font->short_advance.y = 0;
++    if (font->info.spacing == FC_MONO && fi->char_width == 0 &&
++	(fi->load_flags & FT_LOAD_VERTICAL_LAYOUT) == 0 &&
++	(fi->load_flags & FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH) != 0)
++    {
++	if (!FT_Select_Charmap (face, ft_encoding_unicode))
++	{
++	    font->long_advance.x =
++		face->size->metrics.max_advance + font->extra_advanceX;
++	    if (fi->transform)
++		FT_Vector_Transform (&font->long_advance, &fi->matrix);
++	    font->long_advance.x = (font->long_advance.x + 32) >> 6;
++	    font->long_advance.y = (font->long_advance.y + 32) >> 6;
++
++	    if (font->long_advance.x > 0)
++		font->short_advance.x = (font->long_advance.x + 1) >> 1;
++	    else
++		font->short_advance.x = font->long_advance.x >> 1;
++
++	    if (font->long_advance.y > 0)
++		font->short_advance.y = (font->long_advance.y + 1) >> 1;
++	    else
++		font->short_advance.y = font->long_advance.y >> 1;
++	}
++    }
++
+     _XftUnlockFile (fi->file);
+ 
+     return &font->public;
+diff -u Xft-orig/xftglyphs.c xc/lib/Xft/xftglyphs.c
+--- Xft-orig/xftglyphs.c	Sat Oct 12 02:53:02 2002
++++ xc/lib/Xft/xftglyphs.c	Mon Mar 31 11:27:02 2003
+@@ -215,6 +215,7 @@
+ 	    bottom = FLOOR( glyphslot->metrics.horiBearingY - glyphslot->metrics.height );
+ 	}
+ 
++	right += CEIL(font->extra_strokes);
+ 	width = TRUNC(right - left);
+ 	height = TRUNC( top - bottom );
+ 
+@@ -222,7 +223,8 @@
+ 	 * Try to keep monospace fonts ink-inside
+ 	 * XXX transformed?
+ 	 */
+-	if (font->info.spacing != FC_PROPORTIONAL && !font->info.transform)
++	if (font->info.spacing != FC_PROPORTIONAL && !font->info.transform &&
++	    font->long_advance.x == 0 && font->long_advance.y == 0)
+ 	{
+ 	    if (font->info.load_flags & FT_LOAD_VERTICAL_LAYOUT)
+ 	    {
+@@ -263,12 +265,26 @@
+ 
+ 	xftg->metrics.width = width;
+ 	xftg->metrics.height = height;
+-	xftg->metrics.x = -TRUNC(left);
++	xftg->metrics.x = -TRUNC(left) + TRUNC((font->extra_strokes +32) * 1/2);
+ 	xftg->metrics.y = TRUNC(top);
+ 
+ 	if (font->info.spacing != FC_PROPORTIONAL)
+ 	{
+-	    if (font->info.transform)
++	    if (font->long_advance.x != 0 || font->long_advance.y != 0)
++	    {
++		if (glyphslot->metrics.horiAdvance >
++		    face->size->metrics.max_advance * 3/4)
++		{
++		    xftg->metrics.xOff = font->long_advance.x;
++		    xftg->metrics.yOff = -font->long_advance.y;
++		}
++		else
++		{
++		    xftg->metrics.xOff = font->short_advance.x;
++		    xftg->metrics.yOff = -font->short_advance.y;
++		}
++	    }
++	    else if (font->info.transform)
+ 	    {
+ 		if (font->info.load_flags & FT_LOAD_VERTICAL_LAYOUT)
+ 		{
+@@ -300,6 +316,15 @@
+ 	}
+ 	else
+ 	{
++	    if (font->extra_advanceX > 0 &&
++		(font->info.load_flags & FT_LOAD_VERTICAL_LAYOUT) == 0)
++	    {
++		glyphslot->advance.x =
++		    glyphslot->metrics.horiAdvance + font->extra_advanceX;
++		glyphslot->advance.y = 0;
++		if (font->info.transform)
++		    FT_Vector_Transform (&glyphslot->advance, &font->info.matrix);
++	    }
+ 	    xftg->metrics.xOff = TRUNC(ROUND(glyphslot->advance.x));
+ 	    xftg->metrics.yOff = -TRUNC(ROUND(glyphslot->advance.y));
+ 	}
+@@ -402,6 +427,53 @@
+ 	    continue;
+ 	}
+ 	
++	if (font->extra_strokes > 0)
++	{
++	    int extra = font->extra_strokes;
++	    int degree;
++	    int i, h, g, d, k;
++
++	    if (glyphslot->format == ft_glyph_format_bitmap)
++		extra += 8;
++	    extra *= hmul;
++	    degree = TRUNC(CEIL(extra));
++
++	    for (i = 0; i < degree; i++)
++	    {
++		d = (i == 0)? (extra % 64) : 64;
++		if (d == 0)
++		    d = 64;
++		for (h = 0; h < height; h++)
++		{
++		    unsigned char *pos = bufBitmap + h * pitch;
++		    k = pitch;
++		    if (font->info.antialias)
++		    {
++			if (i > 0)
++			    while (--k > 0)
++				pos[k] = (pos[k] > pos[k - 1])? pos[k] : pos[k - 1];
++			else
++			{
++			    while (--k > 0)
++			    {
++				g = pos[k];
++				g += d * ((pos[k - 1] > 0)? pos[k - 1]/64 : g/128);
++				pos[k] = (g > 0xff)? 0xff : g;
++			    }
++			    g = pos[0] + pos[0] * d / 128;
++			    pos[0] = (g > 0xff)? 0xff : g;
++			}
++		    }
++		    else
++		    {
++			while (--k > 0)
++			    pos[k] = pos[k] | (pos[k] >> 1) | (pos[k - 1] << 7);
++			pos[0] = pos[0] | (pos[0] >> 1);
++		    }
++		}
++	    }
++        }
++
+ 	if (XftDebug() & XFT_DBG_GLYPH)
+ 	{
+ 	    printf ("glyph %d:\n", (int) glyphindex);
+diff -u Xft-orig/xftint.h xc/lib/Xft/xftint.h
+--- Xft-orig/xftint.h	Sat Oct 12 02:53:02 2002
++++ xc/lib/Xft/xftint.h	Wed Apr  9 01:04:38 2003
+@@ -129,6 +129,7 @@
+     int			spacing;
+     FcBool		minspace;
+     int			char_width;
++    int			weight_value;
+ };
+ 
+ /*
+@@ -165,6 +166,16 @@
+     unsigned long	glyph_memory;
+     unsigned long	max_glyph_memory;
+     FcBool		use_free_glyphs;   /* Use XRenderFreeGlyphs */
++    /*
++     * CJK fixed widths infomation
++     */
++    FT_Vector		long_advance;
++    FT_Vector		short_advance;
++    /*
++     * Extra bitmap strokes
++     */
++    int			extra_strokes;
++    int			extra_advanceX;
+ } XftFontInt;
+ 
+ typedef enum _XftClipType {
+Only in xc/lib/Xft/: xftlist.o
+diff -u xc/lib/Xft/xftname.c.cjk xc/lib/Xft/xftname.c
+--- xc/lib/Xft/xftname.c.cjk	2004-04-24 03:43:42.000000000 +0900
++++ xc/lib/Xft/xftname.c	2004-11-13 03:57:52.000000000 +0900
+@@ -32,7 +32,7 @@
+ 
+ #define NUM_OBJECT_TYPES    (sizeof _XftObjectTypes / sizeof _XftObjectTypes[0])
+ 
+-FcBool	_XftNameInitialized;
++FcBool	_XftNameInitialized = False;
+ 
+ void 
+ _XftNameInit (void)

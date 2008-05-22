@@ -1,0 +1,30 @@
+--- ../sj3-2.0.1.20.orig/server/main.c	1998-03-23 19:48:03.000000000 +0900
++++ server/main.c	2004-12-03 18:49:50.634709816 +0900
+@@ -156,7 +156,7 @@
+ 			fprintf(stderr, "Can't fork child process\r\n");
+ 			fflush(stderr);
+ 		}
+-		else {
++		if (tmp == 0) {
+ 			signal(SIGCHLD, _exit);
+ 			signal(SIGHUP , SIG_IGN);
+ 			signal(SIGINT , SIG_IGN);
+@@ -166,6 +166,9 @@
+ 			wait(0);
+ 			_exit(0);
+ 		}
++		else {
++		  _exit(0);
++		}
+ 	}
+ 
+ 	signal(SIGHUP,  (void (*)())signal_handler);
+@@ -188,7 +191,7 @@
+ 	tmp  = open_error();
+ 	tmp |= open_log();
+ 	tmp |= open_debug();
+-	kill(getppid(), SIGTERM);
++	/* kill(getppid(), SIGTERM); */
+ 	fclose(stdin);
+ 	fclose(stdout);
+ 	if (!tmp) fclose(stderr);

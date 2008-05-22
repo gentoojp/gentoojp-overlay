@@ -1,0 +1,12 @@
+# Copyright 1999-2005 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+PORT='8080'
+CACHE='no'
+PERMIT="http:*:localhost" ## protoList:dstHostList:srcHostList
+SERVER='http'
+RESOLV='dns,nis,file'
+CHARCODE=''
+RELAY=''
+FTOCL=''
+OTHER_OPT=''

@@ -1,0 +1,195 @@
+diff -ur netmaj/Makefile netmaj.new/Makefile
+--- netmaj/Makefile	Tue Oct 31 17:22:21 2000
++++ netmaj.new/Makefile	Tue Oct 31 17:21:51 2000
+@@ -46,7 +46,7 @@
+ OS_CFLAGS= -O -DUSE_TERMIOS -DUSE_TERMCAP -DDEF_OPTARG -DHAVE_GETTIMEOFDAY
+ RANLIB=ranlib
+ LIBS = 
+-CURSES= lib/libcurses.a -ltermcap
++CURSES= ./lib/libcurses/libcurses.a -ltermcap
+ LDFLAGS =  -Llib 
+ 
+ # for nec ews
+diff -ur netmaj/cui.c netmaj.new/cui.c
+--- netmaj/cui.c	Tue Oct 31 17:22:21 2000
++++ netmaj.new/cui.c	Tue Oct 31 17:21:51 2000
+@@ -21,7 +21,7 @@
+  */
+ 
+ /* $Id: cui.c,v 1.25 1996/08/06 17:24:30 suz Exp $ */
+-#include <curses.h>
++#include <lib/libcurses/curses.h>
+ #define QUICK_LOG "netmaj.ql"
+ 
+ #define xaddstr(s)	xwaddstr(stdscr,s)
+diff -ur netmaj/global.h netmaj.new/global.h
+--- netmaj/global.h	Tue Oct 31 17:22:21 2000
++++ netmaj.new/global.h	Tue Oct 31 17:21:51 2000
+@@ -32,9 +32,11 @@
+ #endif
+ 
+ #ifndef USE_BCOPY
++#if 0
+ #define bcopy(s,d,n)	memcpy(d,s,n)
+ #define bzero(d,n)	memset(d,0,n)
+ #endif
++#endif
+ 
+ #ifdef SYSV
+ #define index 	strchr
+@@ -72,7 +74,7 @@
+ typedef struct river {
+ 	pai_t in;		/* get pai */
+ 	pai_t out;		/* put pai */
+-	attr_t attr;		/* attr (how get, how put, how ...)*/
++	paiattr_t attr;		/* attr (how get, how put, how ...)*/
+ 	struct river *prev;
+ 	struct river *next;
+ } river_t;
+diff -ur netmaj/kui/xui.c netmaj.new/kui/xui.c
+--- netmaj/kui/xui.c	Sat Jun 14 15:16:32 1997
++++ netmaj.new/kui/xui.c	Tue Oct 31 17:22:49 2000
+@@ -505,20 +505,13 @@
+ 
+   fd = callback_fd(gp);
+   fd2 = callback_fd2(gp);
+-  if (fd < 0 || readable_socket) {
+-      while (win_have_event ()) {
+-	  win_handle_event ();
+-      }
+-      return;
+-  }
+-
+   xfd = get_connection_number();
+   FD_ZERO (&fds);
+   FD_SET (0, &fds);
+-  FD_SET (fd, &fds);
++  if (fd >= 0) FD_SET (fd, &fds);
+   FD_SET (xfd, &fds);
+   if (fd2 >= 0) FD_SET(fd2, &fds);
+-  if (time_out >= 0) {
++  if (time_out > 0) {
+     to.tv_sec = time_out / 10;
+     to.tv_usec = (time_out % 10) * 100000;
+     top = &to;
+diff -ur netmaj/lib/libcurses/Makefile netmaj.new/lib/libcurses/Makefile
+--- netmaj/lib/libcurses/Makefile	Wed Dec 28 21:03:10 1994
++++ netmaj.new/lib/libcurses/Makefile	Tue Oct 31 17:21:51 2000
+@@ -11,9 +11,9 @@
+ OBJS=$(SRCS:.c=.o)
+ 
+ CC=gcc
+-CFLAGS=-O -I. -DSVR4 -DBSD_COMP
++#CFLAGS=-O -I. -DSVR4 -DBSD_COMP
+ #CFLAGS=-O -I. -DUSE_SGTTY		# for 4.[23]BSD
+-#CFLAGS=-O -I. -DUSE_TERMIOS		# for 4.4BSD (and Linux?)
++CFLAGS=-O -I. -DUSE_TERMIOS		# for 4.4BSD (and Linux?)
+ #CFLAGS=-O -I. -DSVR4 -DUSE_TERMIO	# for SVR3
+ #CFLAGS=-O -I. -DSVR4 -DUSE_TERMIOS	# for SVR4
+ RANLIB=echo
+diff -ur netmaj/lib/libcurses/printw.c netmaj.new/lib/libcurses/printw.c
+--- netmaj/lib/libcurses/printw.c	Wed Dec 28 21:03:08 1994
++++ netmaj.new/lib/libcurses/printw.c	Tue Oct 31 17:21:51 2000
+@@ -43,7 +43,6 @@
+  */
+ 
+ #ifdef __GNUC__
+-#undef __STDC__
+ #endif
+ 
+ #if __STDC__
+diff -ur netmaj/log.c netmaj.new/log.c
+--- netmaj/log.c	Wed Jul 31 17:06:02 1996
++++ netmaj.new/log.c	Tue Oct 31 17:21:51 2000
+@@ -31,7 +31,7 @@
+ 	return pai_strings[n];
+ }
+ 
+-char *attr2str(n) attr_t n; {
++char *attr2str(n) paiattr_t n; {
+ 	static char buf[4];
+ 	buf[0] = F_CHARS[F_GET(n)>>F_SHFT];
+ 	buf[1] = T_CHARS[T_GET(n)>>T_SHFT];
+diff -ur netmaj/pai.h netmaj.new/pai.h
+--- netmaj/pai.h	Wed Jun  7 06:11:34 1995
++++ netmaj.new/pai.h	Tue Oct 31 17:21:51 2000
+@@ -122,7 +122,7 @@
+ 		    ||(K_SOU_2 <= (p) && (p) <= K_SOU_9) )?((p)-1):0)
+ 
+ 
+-typedef int attr_t;
++typedef int paiattr_t;
+ 
+ #define R_MASK		0007
+ #define F_MASK		0070
+diff -ur netmaj/xui/src/xui/Makefile netmaj.new/xui/src/xui/Makefile
+--- netmaj/xui/src/xui/Makefile	Sun Oct 27 02:04:02 1996
++++ netmaj.new/xui/src/xui/Makefile	Tue Oct 31 17:21:51 2000
+@@ -7,7 +7,7 @@
+ .SUFFIXES: .c .o 
+ 
+ CC=cc
+-CCFLAGS=-ansi -DTEXTYAKU -DSMALL -DXNETMAJ -DX11=1 -DANSIC -DNETMAJ_LIB=\"$(LIBDIR)\" 
++CCFLAGS=-DTEXTYAKU -DSMALL -DXNETMAJ -DX11=1 -DANSIC -DNETMAJ_LIB=\"$(LIBDIR)\" 
+ G=-O -g
+ X11INC=/usr/X11R6/include
+ X11LIB=/usr/X11R6/lib
+diff -ur netmaj/xui/src/xui/attr.c netmaj.new/xui/src/xui/attr.c
+--- netmaj/xui/src/xui/attr.c	Thu Aug  1 07:49:29 1996
++++ netmaj.new/xui/src/xui/attr.c	Tue Oct 31 17:21:51 2000
+@@ -82,7 +82,7 @@
+ 
+ gpixmap2_t
+ attr2pix (n, kind)
+-     attr_t n;
++     paiattr_t n;
+      integer_t kind;
+ {
+   if (kind == 't')
+diff -ur netmaj/xui/src/xui/decl.h netmaj.new/xui/src/xui/decl.h
+--- netmaj/xui/src/xui/decl.h	Thu Aug  1 07:49:39 1996
++++ netmaj.new/xui/src/xui/decl.h	Tue Oct 31 17:21:51 2000
+@@ -84,7 +84,7 @@
+ 
+ /* attr.c */
+ void attr_init P_((void));
+-gpixmap2_t attr2pix P_((attr_t n, integer_t kind));
++gpixmap2_t attr2pix P_((paiattr_t n, integer_t kind));
+ 
+ #undef P_
+ #if __STDC__ || ANSIC
+diff -ur netmaj/xui/src/xui/itime.c netmaj.new/xui/src/xui/itime.c
+--- netmaj/xui/src/xui/itime.c	Thu Aug  1 07:49:53 1996
++++ netmaj.new/xui/src/xui/itime.c	Tue Oct 31 17:21:51 2000
+@@ -34,6 +34,7 @@
+  *  Copyright (C) 1995,1996 Todo Software All rights reserved
+  */
+ 
++#include <unistd.h>
+ #include <signal.h>
+ 
+ static int (*handler) ();
+@@ -46,8 +47,10 @@
+     (*handler) ();
+ 
+ #if SYSV || defined(linux)
++#if 0
+   signal (SIGALRM, (void *) timer_handler_invoke);
+ #endif
++#endif
+   alarm (timer_interval);
+ }
+ 
+@@ -60,8 +63,11 @@
+ set_timer_handler (func, interval)
+      int (*func) ();
+ {
++  struct sigaction act;
+   handler = func;
+-  signal (SIGALRM, (void *) timer_handler_invoke);
++  act.sa_handler = handler;
++  act.sa_flags = SA_RESTART;
++  sigaction(SIGALRM, &act, NULL);
+   alarm (timer_interval = interval);
+ }
+ 

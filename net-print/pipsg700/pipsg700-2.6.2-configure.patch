@@ -1,0 +1,24 @@
+diff -ur pipsg700-2.6.2/configure pipsg700-2.6.2-gentoo/configure
+--- pipsg700-2.6.2/configure	Wed Mar 30 11:00:00 2005
++++ pipsg700-2.6.2-gentoo/configure	Wed Nov  9 10:45:40 2005
+@@ -7467,7 +7467,7 @@
+ echo "${ECHO_T}no" >&6
+ fi
+ 
+-if test $have_cups_config = yes; then
++if test "$have_cups_config" = "yes"; then
+    CUPS_CFLAGS=`cups-config --cflags`
+    CUPS_LDFLAGS=`cups-config --ldflags`
+    CUPS_LIBS=`cups-config --libs | sed -e 's,-lssl,,;s,-lcrypto,,;s,-lcrypt,,'`
+diff -ur pipsg700-2.6.2/ekpstm/inkbox.h pipsg700-2.6.2-gentoo/ekpstm/inkbox.h
+--- pipsg700-2.6.2/ekpstm/inkbox.h	Thu Oct 28 20:11:33 2004
++++ pipsg700-2.6.2-gentoo/ekpstm/inkbox.h	Mon Mar 13 20:22:58 2006
+@@ -49,7 +49,7 @@
+ 
+ char ** inkbox_xpm_new (void);
+ void inkbox_xpm_ref (char **);
+-enum Inkset_Id inkbox_get_inkid( unsigned long id );
++enum Inkbox_Id inkbox_get_inkid( unsigned long id );
+ void inkbox_chenge_volume (char * [], unsigned long, int);
+ void inkbox_chenge_table (int);
+ 

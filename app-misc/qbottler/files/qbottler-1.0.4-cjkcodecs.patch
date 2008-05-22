@@ -1,0 +1,80 @@
+diff -Naur QBottler/QBottler.py QBottler-gentoo/QBottler.py
+--- QBottler/QBottler.py	2004-06-12 13:33:54.000000000 +0900
++++ QBottler-gentoo/QBottler.py	2004-06-15 08:29:09.718104112 +0900
+@@ -174,23 +174,23 @@
+ def u2e(s): ### unicode => euc
+     #return str(QTextCodec.codecForName("eucJP").fromUnicode(s))
+     u = unicode(str(s.utf8()), "utf8", "replace")
+-    return u.encode("japanese.euc_jp", "replace")
++    return u.encode("euc_jp", "replace")
+ 
+ def u2s(s): ### unicode => sjis
+     #return str(QTextCodec.codecForName("SJIS").fromUnicode(s))
+     u = unicode(str(s.utf8()), "utf8", "replace")
+-    return u.encode("japanese.shift_jis", "replace")
++    return u.encode("shift_jis", "replace")
+ 
+ def u2u(s): ### unicode => (utf8) => unicode
+     return QTextCodec.codecForName("utf8").toUnicode(s.encode("utf8"))
+ 
+ def e2s(s): ### euc => sjis
+-    u = unicode(s, "japanese.euc_jp", "replace")
+-    return u.encode("japanese.shift_jis", "replace")
++    u = unicode(s, "euc_jp", "replace")
++    return u.encode("shift_jis", "replace")
+ 
+ def s2e(s): ### sjis => euc
+-    u = unicode(s, "japanese.shift_jis", "replace")
+-    return u.encode("japanese.euc_jp", "replace")
++    u = unicode(s, "shift_jis", "replace")
++    return u.encode("euc_jp", "replace")
+ 
+ 
+ class Bottler(BottleClient):
+@@ -2583,7 +2583,7 @@
+             pos1 = pos1 + 8
+             pos2 = string.find(data[pos1:], "\r\n")
+             if pos2 > -1 and string.strip(data[pos1:pos1+pos2]) == "UTF-8":
+-                name = unicode(name, "utf8").encode("japanese.sjis")
++                name = unicode(name, "utf8").encode("sjis")
+             else:
+                 return
+         #
+@@ -2614,7 +2614,7 @@
+         self.xmltlb.CharacterDataHandler = self.tlb_char_data
+         self.xmltlb.returns_unicode      = 1
+         #
+-        phrases = unicode(phrases, "japanese.euc_jp").encode("utf8")
++        phrases = unicode(phrases, "euc_jp").encode("utf8")
+         self.xmltlb.Parse(phrases)
+ 
+     def tlb_start_element(self, name, attrs):
+@@ -3042,7 +3042,7 @@
+         self.xmlp.XmlDeclHandler       = self.xml_decl
+         self.xmlp.returns_unicode      = 1
+ 
+-        phrases = unicode(phrases, "japanese.euc_jp").encode("utf8")
++        phrases = unicode(phrases, "euc_jp").encode("utf8")
+         self.xmlp.Parse(phrases)
+ 
+     def xml_decl(self, version, encoding, standalone):
+diff -Naur QBottler/bottlelib.py QBottler-gentoo/bottlelib.py
+--- QBottler/bottlelib.py	2004-04-24 01:48:31.000000000 +0900
++++ QBottler-gentoo/bottlelib.py	2004-06-15 08:29:24.225898592 +0900
+@@ -43,12 +43,12 @@
+ 
+     ###   Kanji Converter   ###
+     def ctos(self, s): ### euc => sjis
+-        u = unicode(s, "japanese.euc_jp", "replace")
+-        return u.encode("japanese.shift_jis", "replace")
++        u = unicode(s, "euc_jp", "replace")
++        return u.encode("shift_jis", "replace")
+ 
+     def stoc(self, s): ### sjis => euc
+-        u = unicode(s, "japanese.shift_jis", "replace")
+-        return u.encode("japanese.euc_jp", "replace")
++        u = unicode(s, "shift_jis", "replace")
++        return u.encode("euc_jp", "replace")
+ 
+     ###   CGI   ###
+     def send_cgi_request(self, request, action="/bottle2.cgi", response=1):

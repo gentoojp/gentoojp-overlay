@@ -1,0 +1,12 @@
+diff -ur pipsg700-2.6.2/ekpstm/inkbox.h pipsg700-2.6.2-gentoo/ekpstm/inkbox.h
+--- pipsg700-2.6.2/ekpstm/inkbox.h	Thu Oct 28 20:11:33 2004
++++ pipsg700-2.6.2-gentoo/ekpstm/inkbox.h	Mon Mar 13 20:22:58 2006
+@@ -49,7 +49,7 @@
+ 
+ char ** inkbox_xpm_new (void);
+ void inkbox_xpm_ref (char **);
+-enum Inkset_Id inkbox_get_inkid( unsigned long id );
++enum Inkbox_Id inkbox_get_inkid( unsigned long id );
+ void inkbox_chenge_volume (char * [], unsigned long, int);
+ void inkbox_chenge_table (int);
+ 

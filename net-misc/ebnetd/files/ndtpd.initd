@@ -1,0 +1,30 @@
+#!/sbin/runscript
+# Copyright 1999-2004 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+opts="${opts} reload"
+
+depend() {
+	use net
+}
+
+start() {
+	ebegin "Starting NDTPD"
+	start-stop-daemon --start --quiet --exec /usr/sbin/ndtpd
+	result=$?
+	eend $result
+}
+
+stop() {
+	ebegin "Stopping NDTPD"
+	start-stop-daemon --start --quiet --exec /usr/sbin/ndtpcontrol terminate
+	result=$?
+	eend $result
+}
+
+reload() {
+	ebegin "Reloading NDTPD"
+	start-stop-daemon --start --quiet --exec /usr/sbin/ndtpcontrol restart
+	eend $result
+}

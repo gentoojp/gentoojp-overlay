@@ -1,0 +1,12 @@
+diff -burN Sledge-1.11.org/lib/Sledge/Pages/Apache.pm Sledge-1.11/lib/Sledge/Pages/Apache.pm
+--- Sledge-1.11.org/lib/Sledge/Pages/Apache.pm	2003-02-13 15:59:36.000000000 +0900
++++ Sledge-1.11/lib/Sledge/Pages/Apache.pm	2004-10-05 21:05:32.000000000 +0900
+@@ -8,7 +8,7 @@
+ use strict;
+ use base qw(Sledge::Pages::Base);
+ 
+-use Apache;
++use Apache2;
+ use Apache::Request;
+ 
+ sub create_request {

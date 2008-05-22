@@ -1,0 +1,23 @@
+
+--------------------------------------------------------------
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+for non native Japanese speakers,
+rename ${MY_INSTALLDIR}/wiki.en
+to ${MY_INSTALLDIR}/wiki
+by executing the folowing commands
+
+> cd ${MY_INSTALLDIR}
+> mv wiki wiki.old
+> mv wiki.en wiki
+
+this activates English interface.
+You can safely delete ${MY_INSTALLDIR}/wiki.old
+
+after configuring ${MY_INSTALLDIR}/pukiwiki.ini.php
+access the following URL
+
+http://${VHOST_HOSTNAME}${VHOST_APPDIR}/pukiwiki.php
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+--------------------------------------------------------------

@@ -1,0 +1,11 @@
+diff -ur NZMATH-0.4.1.orig/setup.py NZMATH-0.4.1/setup.py
+--- NZMATH-0.4.1.orig/setup.py	2005-10-28 19:36:08.000000000 +0900
++++ NZMATH-0.4.1/setup.py	2005-11-01 15:33:13.000000000 +0900
+@@ -1,6 +1,6 @@
+ from distutils.core import setup
+ 
+-doc_prefix = "/usr/local/share/doc/NZMATH-0.4.1/"
++doc_prefix = "share/doc/nzmath-0.4.1/"
+ 
+ setup (
+     name="NZMATH",

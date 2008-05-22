@@ -1,0 +1,19 @@
+diff -ur fontconfig-2.2.1-orig/src/fcfreetype.c fontconfig-2.2.1/src/fcfreetype.c
+--- fontconfig-2.2.1-orig/src/fcfreetype.c	Thu May  1 00:17:58 2003
++++ fontconfig-2.2.1/src/fcfreetype.c	Fri Sep  5 07:07:49 2003
+@@ -1072,6 +1072,7 @@
+     { 0x007C, 0x7C }, /* VERTICAL LINE */
+     { 0x007D, 0x7D }, /* RIGHT CURLY BRACKET */
+     { 0x007E, 0x7E }, /* TILDE */
++#if 0
+     { 0x00A0, 0xCA }, /* NO-BREAK SPACE */
+     { 0x00A1, 0xC1 }, /* INVERTED EXCLAMATION MARK */
+     { 0x00A2, 0xA2 }, /* CENT SIGN */
+@@ -1200,6 +1201,7 @@
+     { 0xF8FF, 0xF0 }, /* Apple logo */
+     { 0xFB01, 0xDE }, /* LATIN SMALL LIGATURE FI */
+     { 0xFB02, 0xDF }, /* LATIN SMALL LIGATURE FL */
++#endif
+ };
+ 
+ static const FcCharMap AppleRoman = {

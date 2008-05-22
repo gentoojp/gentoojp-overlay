@@ -1,0 +1,11 @@
+--- gnuboy-1.0.3.orig/sys/linux/joy.c	2001-09-24 03:01:18.000000000 +0900
++++ gnuboy-1.0.3/sys/linux/joy.c	2006-01-22 15:46:49.000000000 +0900
+@@ -35,7 +35,7 @@
+ void joy_init()
+ {
+ 	if (!usejoy) return;
+-	if (!joydev) joydev = strdup("/dev/js0");
++	if (!joydev) joydev = strdup("/dev/input/js0");
+ 	joyfd = open(joydev, O_RDONLY|O_NONBLOCK);
+ }
+ 

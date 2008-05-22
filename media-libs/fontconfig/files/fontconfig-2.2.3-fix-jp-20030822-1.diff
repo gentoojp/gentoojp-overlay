@@ -1,0 +1,1086 @@
+--- fontconfig-2.2.3/fonts.conf.in	2003-04-17 07:04:42.000000000 +0900
++++ fontconfig-2.2.3/fonts.conf.in.new	2004-11-16 17:40:00.000000000 +0900
+@@ -333,6 +333,25 @@
+ 		</edit>
+ 	</match>
+ 
++	<match target="font">
++		<test name="weight" compare="less_eq">
++			<const>medium</const>
++		</test>
++		<test target="pattern" name="weight" compare="more">
++			<const>medium</const>
++		</test>
++		<edit name="weight" mode="assign">
++			<if>
++				<more>
++					<name>spacing</name>
++					<const>proportional</const>
++				</more>
++				<const>demibold</const>	<!-- for monospace    -->
++				<const>bold</const>	<!-- for proportional -->
++			</if>
++		</edit>
++	</match>
++
+ 	<config>
+ <!--
+   These are the default Unicode chars that are expected to be blank
+diff -uNbr fontconfig-2.2.3/src/Makefile.am fontconfig-2.2.3/src.new/Makefile.am
+--- fontconfig-2.2.3/src/Makefile.am	2004-03-31 02:28:44.000000000 +0900
++++ fontconfig-2.2.3/src.new/Makefile.am	2004-11-16 17:40:00.000000000 +0900
+@@ -50,7 +50,7 @@
+ 
+ EXTRA_DIST = fontconfig.def.in
+ 
+-noinst_HEADERS=fcint.h
++noinst_HEADERS=fcint.h fcwidth.h
+ 
+ libfontconfig_la_SOURCES = \
+ 	fcatomic.c \
+diff -uNbr fontconfig-2.2.3/src/Makefile.in fontconfig-2.2.3/src.new/Makefile.in
+--- fontconfig-2.2.3/src/Makefile.in	2004-07-01 03:54:12.000000000 +0900
++++ fontconfig-2.2.3/src.new/Makefile.in	2004-11-16 17:43:28.000000000 +0900
+@@ -183,7 +183,7 @@
+ 
+ EXTRA_DIST = fontconfig.def.in
+ 
+-noinst_HEADERS = fcint.h
++noinst_HEADERS = fcint.h fcwidth.h
+ 
+ libfontconfig_la_SOURCES = \
+ 	fcatomic.c \
+diff -uNbr fontconfig-2.2.3/src/fcfreetype.c fontconfig-2.2.3/src.new/fcfreetype.c
+--- fontconfig-2.2.3/src/fcfreetype.c	2004-03-20 08:23:07.000000000 +0900
++++ fontconfig-2.2.3/src.new/fcfreetype.c	2004-11-16 17:40:00.000000000 +0900
+@@ -277,6 +277,116 @@
+ #endif
+ }
+ 
++typedef struct {
++    int		mode;
++    FcCharSet	charset;
++} FcWidthCharSet;
++
++#undef CHECK_AMBIGUOUS_SET
++#include "fcwidth.h"
++#define NUM_WIDTH_CHAR_SET \
++	(sizeof (fcEastAsianWidthSets) / sizeof (fcEastAsianWidthSets[0]))
++
++static int
++FcCheckWidthSet (FT_Face    face,
++		 int	    mode,
++		 int	    width1,
++		 int	    width2)
++{
++    const FcCharSet	*fcs;
++    FcChar32	ucs4, page, limit, next;
++    FcChar32    map[FC_CHARSET_MAP_SIZE];
++    FT_UInt	glyphindex;
++    int		w;
++    int		i;
++    FT_Int	flags = FT_LOAD_NO_SCALE |
++			FT_LOAD_NO_HINTING |
++			FT_LOAD_IGNORE_TRANSFORM |
++			FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH;
++
++
++    for (i = 0; i < NUM_WIDTH_CHAR_SET; i++)
++    {
++	if (mode != fcEastAsianWidthSets[i].mode)
++	    continue;
++
++	fcs = &fcEastAsianWidthSets[i].charset;
++	next = 0;
++
++	while ((page = FcCharSetNextPage (fcs, map, &next)) != FC_CHARSET_DONE)
++	{
++	    limit = page + 0xFF;
++	    for (ucs4 = page; ucs4 <= limit; ucs4++)
++	    {
++		if (!FcCharSetHasChar (fcs, ucs4))
++		    continue;
++
++		glyphindex = FT_Get_Char_Index (face, (FT_ULong)ucs4);
++		if (!glyphindex)
++		    continue;
++
++		if (FT_Load_Glyph (face, glyphindex, flags))
++		    continue;
++
++		w = face->glyph->metrics.horiAdvance;
++		if (w <= 0)
++		    continue;
++
++		if (width1 == 0)
++		    width1 = w;
++		else if (w != width1)
++		{
++		    if (width2 == 0 || w != width2)
++		    {
++			return -1;
++		    }
++		}
++	    }
++	}
++    }
++
++    return width1;
++}
++
++static FcBool
++FcLangSetHasCJK (FcLangSet*  ls)
++{
++    if (FcLangSetHasLang(ls, "ja") == FcLangEqual ||
++	FcLangSetHasLang(ls, "ko") == FcLangEqual ||
++	FcLangSetHasLang(ls, "zh") <= FcLangDifferentCountry)
++	return FcTrue;
++
++    return FcFalse;
++}
++
++static FcBool
++FcIsEastAsianFixedFont (FT_Face	face)
++{
++    FT_Pos  halfWidth, fullWidth;
++
++
++    if (FT_Select_Charmap (face, ft_encoding_unicode))
++	return FcFalse;
++
++    if (face->face_flags & FT_FACE_FLAG_FIXED_WIDTH)
++	return FcTrue;
++
++    halfWidth = FcCheckWidthSet (face, 1, 0, 0);
++    if (halfWidth <= 0)
++	return FcFalse;
++
++    fullWidth = FcCheckWidthSet (face, 2, 2 * halfWidth, 0);
++    if (fullWidth <= 0)
++	return FcFalse;
++
++#ifdef CHECK_AMBIGUOUS_SET
++    if (FcCheckWidthSet (face, 0, fullWidth, halfWidth) < 0)
++	return FcFalse;
++#endif /* CHECK_AMBIGUOUS_SET */
++
++    return FcTrue;
++}
++
+ FcPattern *
+ FcFreeTypeQuery (const FcChar8	*file,
+ 		 int		id,
+@@ -306,6 +416,10 @@
+     FcBool	    style_allocated = FcFalse;
+     int		    family_prio = 0;
+     int		    style_prio = 0;
++    char 	    *env_lang_id = getenv("FONTCONFIG_TT_MS_LANGID");
++    FT_UShort	    selected_lang_id = 0;
++    FcChar8	    *selected_lang_family = 0;
++    FcBool	    has_cjk = FcFalse;
+ 
+     if (FT_Init_FreeType (&ftLibrary))
+ 	return 0;
+@@ -359,6 +473,13 @@
+      * of them
+      */
+     snamec = FT_Get_Sfnt_Name_Count (face);
++    if (env_lang_id)
++    {
++	char *pos;
++	selected_lang_id = (FT_UShort) strtoul (env_lang_id, &pos, 0);
++	if (*pos)
++	    selected_lang_id = 0;
++    }
+     for (snamei = 0; snamei < snamec; snamei++)
+     {
+ 	FcChar8		*utf8;
+@@ -370,6 +491,7 @@
+ 	FcChar32	ucs4;
+ 	int		ilen, olen;
+ 	int		prio = 0;
++	FcBool		selected_lang = FcFalse;
+ 	
+ 	const FcCharMap	*map;
+ 	enum {
+@@ -437,6 +559,8 @@
+ 	    default:
+ 		break;
+ 	    }
++	    if (sname.language_id == selected_lang_id)
++		selected_lang = FcTrue;
+ 	    break;
+ 	case TT_PLATFORM_ISO:
+ 	    switch (sname.encoding_id) {
+@@ -561,6 +685,11 @@
+ 	switch (sname.name_id) {
+ 	case TT_NAME_ID_FONT_FAMILY:
+ 	case TT_NAME_ID_PS_NAME:
++	    if (!selected_lang_family && selected_lang)
++	    {
++		if ((prio & FC_NAME_PRIO_LANG) == FC_NAME_PRIO_LANG_NONE)
++		    selected_lang_family = FcStrCopy (utf8);
++	    }
+ 	    if (!family || prio > family_prio)
+ 	    {
+ 		if (family)
+@@ -593,6 +722,16 @@
+ 	    free (utf8);
+     }
+     
++    if (selected_lang_family)
++    {
++	if (!FcPatternAddString (pat, FC_FAMILY, selected_lang_family))
++	{
++	    FcStrFree (selected_lang_family);
++	    goto bail1;
++	}
++	FcStrFree (selected_lang_family);
++    }
++
+     if (!family)
+ 	family = (FcChar8 *) face->family_name;
+     
+@@ -709,6 +848,7 @@
+ 		    break;
+ 		}
+ 		exclusiveLang = FcCodePageRange[i].lang;
++		has_cjk = FcTrue;
+ 	    }
+ 	}
+     }
+@@ -915,6 +1055,18 @@
+     if (!FcPatternAddLangSet (pat, FC_LANG, ls))
+ 	goto bail2;
+ 
++    if (has_cjk || FcLangSetHasCJK (ls))
++    {
++	if (FcIsEastAsianFixedFont (face))
++	{
++	    if (!FcPatternAddBool (pat, FC_GLOBAL_ADVANCE, FcFalse))
++		goto bail1;
++	    spacing = FC_MONO;
++	}
++	else
++	    spacing = FC_PROPORTIONAL;
++    }
++
+     if (spacing != FC_PROPORTIONAL)
+ 	if (!FcPatternAddInteger (pat, FC_SPACING, spacing))
+ 	    goto bail2;
+@@ -1093,6 +1245,7 @@
+     { 0x007C, 0x7C }, /* VERTICAL LINE */
+     { 0x007D, 0x7D }, /* RIGHT CURLY BRACKET */
+     { 0x007E, 0x7E }, /* TILDE */
++#if 0
+     { 0x00A0, 0xCA }, /* NO-BREAK SPACE */
+     { 0x00A1, 0xC1 }, /* INVERTED EXCLAMATION MARK */
+     { 0x00A2, 0xA2 }, /* CENT SIGN */
+@@ -1221,6 +1374,7 @@
+     { 0xF8FF, 0xF0 }, /* Apple logo */
+     { 0xFB01, 0xDE }, /* LATIN SMALL LIGATURE FI */
+     { 0xFB02, 0xDF }, /* LATIN SMALL LIGATURE FL */
++#endif
+ };
+ 
+ static const FcCharMap AppleRoman = {
+@@ -1484,6 +1638,78 @@
+     return 0;
+ }
+ 
++static FcChar32 UcsSubstTableJp[][2] =
++{
++    /* Ucs */			/* JISX0208 */
++    /* { 0x005C	, 0xFF3C }, */	/* 2140 */
++    { 0x00A2	, 0xFFE0 },	/* 2171 */
++    { 0x00A3	, 0xFFE1 },	/* 2172 */
++    { 0x00AC	, 0xFFE2 },	/* 224C */
++    { 0x2015	, 0x2014 },	/* 213D */
++    { 0x2016	, 0x2225 },	/* 2142 */
++    { 0x2212	, 0xFF0D },	/* 215D */
++    { 0x301C	, 0xFF5E },	/* 2141 */
++    { 0xFFE3	, 0x203E },	/* 2131 */
++    { 0xFFE5	, 0x00A5 },	/* 216F */
++
++};
++
++#define UCS_SUBST_TABLE_JP_SIZE \
++    (sizeof (UcsSubstTableJp) / sizeof (UcsSubstTableJp[0]))
++
++static FcChar32
++FcJpSubstUcs (FcChar32 ucs4, FcBool *isblank)
++{
++    FcChar32	row = ucs4 >> 8;
++    int		j;
++
++    *isblank = FcFalse;
++    switch (row) {
++    case 0x0:
++	if (ucs4 == 0xA0)
++	{
++	    *isblank = FcTrue;
++	    return 0x20;
++	}
++    case 0x20:
++    case 0x22:
++    case 0x30:
++    case 0xFF:
++	for (j = 0; j < UCS_SUBST_TABLE_JP_SIZE; j++)
++	{
++	    if (ucs4 == UcsSubstTableJp[j][0])
++		return UcsSubstTableJp[j][1];
++	    if (ucs4 == UcsSubstTableJp[j][1])
++		return UcsSubstTableJp[j][0];
++	}
++    default:
++	break;
++    }
++    return 0;
++}
++
++static void
++FcJpCharSetAddSubst (FcCharSet *fcs)
++{
++    int j;
++
++    if (FcCharSetHasChar(fcs, 0x20))
++	FcCharSetAddChar(fcs, 0xA0);
++
++    for (j = 0; j < UCS_SUBST_TABLE_JP_SIZE; j++)
++    {
++	if (FcCharSetHasChar (fcs, UcsSubstTableJp[j][0]))
++	    FcCharSetAddChar (fcs, UcsSubstTableJp[j][1]);
++	else if (FcCharSetHasChar (fcs, UcsSubstTableJp[j][1]))
++	    FcCharSetAddChar (fcs, UcsSubstTableJp[j][0]);
++    }
++}
++
++static FcBool
++FcFreeTypeCheckGlyph (FT_Face face, FcChar32 ucs4,
++		      FT_UInt glyph, FcBlanks *blanks,
++		      FT_Pos *advance);
++
+ /*
+  * Map a UCS4 glyph to a glyph index.  Use all available encoding
+  * tables to try and find one that works.  This information is expected
+@@ -1496,6 +1722,8 @@
+     int		    initial, offset, decode;
+     FT_UInt	    glyphindex;
+     FcChar32	    charcode;
++    FcBool	    isblank;
++    FcChar32	    ucs4_ = FcJpSubstUcs (ucs4, &isblank);
+ 
+     initial = 0;
+     /*
+@@ -1512,8 +1740,19 @@
+     /*
+      * Check each encoding for the glyph, starting with the current one
+      */
+-    for (offset = 0; offset < NUM_DECODE; offset++)
++    for (offset = 0; offset <= NUM_DECODE; offset++)
++    {
++	if (offset == NUM_DECODE)
+     {
++	    if (ucs4_ && ucs4_ != ~0)
++	    {
++		ucs4 = ucs4_;
++		ucs4_ = ~0;
++		offset = 0;
++	    }
++	    else
++		break;
++	}
+ 	decode = (initial + offset) % NUM_DECODE;
+ 	if (!face->charmap || face->charmap->encoding != fcFontDecoders[decode].encoding)
+ 	    if (FT_Select_Charmap (face, fcFontDecoders[decode].encoding) != 0)
+@@ -1523,11 +1762,21 @@
+ 	    charcode = FcFreeTypeUcs4ToPrivate (ucs4, fcFontDecoders[decode].map);
+ 	    if (charcode == ~0)
+ 		continue;
++	    if (fcFontDecoders[decode].encoding == ft_encoding_symbol)
++		charcode += 0xF000;
+ 	}
+ 	else
+ 	    charcode = ucs4;
+ 	glyphindex = FT_Get_Char_Index (face, (FT_ULong) charcode);
+-	if (glyphindex)
++	if (glyphindex && ucs4_ && !isblank)
++	{
++	    FT_Pos	advance;
++	    FcBlanks	dummy = { 0, 0, 0 };
++
++	    if (FcFreeTypeCheckGlyph (face, 0, glyphindex, &dummy, &advance))
++		return glyphindex;
++	}
++	else if (glyphindex)
+ 	    return glyphindex;
+     }
+     return 0;
+@@ -1733,6 +1982,7 @@
+ 	*spacing = FC_MONO;
+     else
+ 	*spacing = FC_PROPORTIONAL;
++    FcJpCharSetAddSubst (fcs);
+     return fcs;
+ bail1:
+     FcCharSetDestroy (fcs);
+diff -uNbr fontconfig-2.2.3/src/fcwidth.h fontconfig-2.2.3/src.new/fcwidth.h
+--- fontconfig-2.2.3/src/fcwidth.h	1970-01-01 09:00:00.000000000 +0900
++++ fontconfig-2.2.3/src.new/fcwidth.h	2004-11-16 17:40:00.000000000 +0900
+@@ -0,0 +1,656 @@
++/* total size: 957 unique leaves: 88 */
++
++static const FcCharLeaf	leaves[88] = {
++    { { /* 0 */
++    0x00000001, 0x00000000, 0x00000000, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 1 */
++    0xfffffffe, 0xffffffff, 0xffffffff, 0x00000001,
++    0x00000000, 0x00000000, 0x00000000, 0x0000007f,
++    } },
++    { { /* 2 */
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    0x00000000, 0x00000200, 0x00000000, 0x00000000,
++    } },
++    { { /* 3 */
++    0x00000000, 0x00000000, 0x00000000, 0xfffffffe,
++    0xffffffff, 0x7fffffff, 0x1cfcfcfc, 0x00007f00,
++    } },
++    { { /* 4 */
++    0x00000000, 0xffffffff, 0xffffffff, 0x7fffffff,
++    0x00000000, 0x0000906c, 0x00000000, 0x00000000,
++    } },
++    { { /* 5 */
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000fc0,
++    } },
++    { { /* 6 */
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    0x00000060, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 7 */
++    0xffffffff, 0xffffffff, 0x83ffffff, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 8 */
++    0x00000000, 0x00000600, 0x00000000, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 9 */
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    0xfbffffff, 0xffffffff, 0xffffffff, 0x000fffff,
++    } },
++    { { /* 10 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0xffffffff, 0x003fffff, 0x0fff0000,
++    } },
++    { { /* 11 */
++    0xfffffffe, 0x7fffffff, 0xfffffffe, 0xffffffff,
++    0xfe7fffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    } },
++    { { /* 12 */
++    0xffffffe0, 0xfffe1fff, 0xffffffff, 0xffffffff,
++    0xffff7fff, 0x00ffffff, 0x00000000, 0xffff0000,
++    } },
++    { { /* 13 */
++    0x1fffffff, 0xffffffff, 0xfffe000f, 0x8fffffff,
++    0xffffffff, 0xffffffff, 0xffff0fff, 0x7fffffff,
++    } },
++    { { /* 14 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xf87fffff,
++    0xffffffff, 0xffffffff, 0x3fffffff, 0x7fffffff,
++    } },
++    { { /* 15 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    } },
++    { { /* 16 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0x003fffff, 0x00000000, 0x00000000,
++    } },
++    { { /* 17 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0x0000003f, 0x00000000, 0x00000000,
++    } },
++    { { /* 18 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffff1fff, 0xffffffff, 0x0000007f, 0x00000000,
++    } },
++    { { /* 19 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0x0000000f, 0x00000000, 0x00000000,
++    } },
++    { { /* 20 */
++    0xffffffff, 0xffff3fff, 0xffffffff, 0x000007ff,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 21 */
++    0x00000000, 0xffff0000, 0xfff7fe7f, 0x00000f7f,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 22 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0xffffffff, 0x007fffff, 0x00000000,
++    } },
++    { { /* 23 */
++    0x3fffffff, 0x00000000, 0x00000000, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 24 */
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    0x00000000, 0xf7df6592, 0xc1810040, 0x578d3743,
++    } },
++    { { /* 25 */
++    0x080a0002, 0x810e08c0, 0x000c2f17, 0x000008c0,
++    0x00000000, 0x00000000, 0x15554000, 0x00000000,
++    } },
++    { { /* 26 */
++    0x00000000, 0x00000000, 0x00020000, 0x00000002,
++    0x00000000, 0x00000000, 0xaf012e90, 0x00000000,
++    } },
++    { { /* 27 */
++    0xffffffff, 0xffffffff, 0x0000ffff, 0x0000ffff,
++    0xfffe0000, 0xfffe03fb, 0x000003fb, 0x00000000,
++    } },
++    { { /* 28 */
++    0xffff0002, 0xffffffff, 0x0002ffff, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 29 */
++    0x33790000, 0x482d00f7, 0x00000000, 0x80100000,
++    0x0000001e, 0x00001000, 0x00000000, 0x00000000,
++    } },
++    { { /* 30 */
++    0x00480228, 0x00000846, 0x78180000, 0x03ff0fff,
++    0x03ff0000, 0x03000000, 0x00140000, 0x00000080,
++    } },
++    { { /* 31 */
++    0xe422898d, 0x30f05fa9, 0x00041100, 0x0000ccf3,
++    0x022000cc, 0x80000020, 0x00000000, 0x00000000,
++    } },
++    { { /* 32 */
++    0x00040000, 0x00000000, 0x00000000, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 33 */
++    0x00000000, 0x00000000, 0x00000000, 0xffffffff,
++    0xffffffff, 0xffffffff, 0xffffffff, 0x7ffffbff,
++    } },
++    { { /* 34 */
++    0xffffffff, 0xffffffff, 0xffff0fff, 0x000fffff,
++    0x003cffff, 0x30cc03fb, 0x0003c9c3, 0x0000803c,
++    } },
++    { { /* 35 */
++    0x5000c260, 0x00000000, 0x00000005, 0x0000b7bb,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 36 */
++    0x00000000, 0x20000000, 0x00000000, 0xffc00000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 37 */
++    0x0000ffff, 0x00000000, 0x00000000, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 38 */
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x20000000,
++    } },
++    { { /* 39 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0xffffffff, 0xffffffff, 0x3fffffff,
++    } },
++    { { /* 40 */
++    0xffffffff, 0x00000000, 0x00000000, 0x80000000,
++    0xffffffff, 0x08200a01, 0x3e7effbf, 0xa872c8bc,
++    } },
++    { { /* 41 */
++    0xf7f5fffd, 0x7ef1f73f, 0xfff3d0e8, 0xfffff73f,
++    0xffffffff, 0xffffffff, 0xeaaabfff, 0xffffffff,
++    } },
++    { { /* 42 */
++    0xffffffff, 0x000ffffd, 0xfffd0000, 0xfffffffd,
++    0xffffffff, 0xffff3fff, 0x50fed16f, 0x00007fff,
++    } },
++    { { /* 43 */
++    0x00000000, 0x00000000, 0x00000000, 0x44300000,
++    0x0001d7f0, 0x0001fc00, 0xffff7c04, 0x007fffff,
++    } },
++    { { /* 44 */
++    0x0000fffd, 0x00000000, 0xfffd0000, 0xffffffff,
++    0xffffff7f, 0xffffffff, 0xffff7fff, 0x033fffff,
++    } },
++    { { /* 45 */
++    0x0000ffff, 0xfffe0000, 0xfe7fffff, 0xfffffffe,
++    0xfffe06ff, 0xfbfffffb, 0xffff001f, 0x001f07ff,
++    } },
++    { { /* 46 */
++    0x88001000, 0x07fffffe, 0x003fffff, 0xffffffff,
++    0xffffffff, 0xffffffff, 0xffffffff, 0x7fff3fff,
++    } },
++    { { /* 47 */
++    0xffffbfff, 0xffff1fff, 0x000007ff, 0x00000000,
++    0xffffffff, 0x0003ffff, 0x00000000, 0x00000000,
++    } },
++    { { /* 48 */
++    0xffffffee, 0xf3ffffff, 0xff1f3fff, 0x0001ffff,
++    0xfff99fee, 0xd3c5fdff, 0xb080399f, 0x07ffffcf,
++    } },
++    { { /* 49 */
++    0xfff987e4, 0xd36dfdff, 0x5e003987, 0x001fffc0,
++    0xfffbafee, 0xf3edfdff, 0x00013bbf, 0x0000ffc1,
++    } },
++    { { /* 50 */
++    0xfff99fee, 0xf3cdfdff, 0xb0c0398f, 0x0001ffc3,
++    0xd63dc7ec, 0xc3bfc718, 0x00803dc7, 0x0007ff80,
++    } },
++    { { /* 51 */
++    0xfffddfee, 0xc3effdff, 0x00603ddf, 0x0000ffc3,
++    0xfffddfec, 0xc3effdff, 0x40603ddf, 0x0000ffc3,
++    } },
++    { { /* 52 */
++    0xfffddfec, 0xc3fffdff, 0x00803dcf, 0x0000ffc3,
++    0xfc7fffec, 0x2ffbffff, 0xff5f847f, 0x001c0000,
++    } },
++    { { /* 53 */
++    0xfffffffe, 0x87ffffff, 0x0fffffff, 0x00000000,
++    0xfef02596, 0x3bffecae, 0x33ff3f5f, 0x00000000,
++    } },
++    { { /* 54 */
++    0xffffffff, 0xffffffff, 0xfffffeff, 0xfffe07ff,
++    0xfeff0fff, 0xdfffffff, 0x00009fff, 0x00000000,
++    } },
++    { { /* 55 */
++    0xffffffff, 0x03c7f6fb, 0x03ffffff, 0x00000000,
++    0x00000000, 0xffffffff, 0xffff003f, 0x09ffffff,
++    } },
++    { { /* 56 */
++    0x00000000, 0x00000000, 0x00000000, 0xffffffff,
++    0xffffffff, 0xffffff07, 0xffffffff, 0x03ffffff,
++    } },
++    { { /* 57 */
++    0xffffff7f, 0xffffffff, 0x3d7f3d7f, 0xffffffff,
++    0xffff3d7f, 0x7f3d7fff, 0xff7f7f3d, 0xffff7fff,
++    } },
++    { { /* 58 */
++    0x7f3d7fff, 0xffffffff, 0x07ffff7f, 0x1ffffffe,
++    0x00000000, 0xffffffff, 0xffffffff, 0x001fffff,
++    } },
++    { { /* 59 */
++    0xfffffffe, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    } },
++    { { /* 60 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0x007fffff,
++    0x1fffffff, 0xffffffff, 0xffffffff, 0x0001ffff,
++    } },
++    { { /* 61 */
++    0x001fdfff, 0x007fffff, 0x000fffff, 0x000ddfff,
++    0xffffffff, 0xffffffff, 0x1fffffff, 0x000003ff,
++    } },
++    { { /* 62 */
++    0x03ff7fff, 0xffffffff, 0xffffffff, 0x00ffffff,
++    0xffffffff, 0x000003ff, 0x00000000, 0x00000000,
++    } },
++    { { /* 63 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0x0fffffff, 0xffffffff, 0xffffffff, 0x03ffffff,
++    } },
++    { { /* 64 */
++    0x3f3fffff, 0xffffffff, 0xaaff3f3f, 0x3fffffff,
++    0xffffffff, 0xffdfffff, 0xefcfffdf, 0x7fdcffff,
++    } },
++    { { /* 65 */
++    0xcc86ffff, 0xb7d2ff08, 0x8087ffff, 0x7fe3fc0f,
++    0x00007fe1, 0x0003edff, 0xffff0000, 0x000007ff,
++    } },
++    { { /* 66 */
++    0xffb7fdd7, 0xe7fff7b9, 0x87e00fff, 0xfc00f000,
++    0xfc00000f, 0xfcffffff, 0xffebffff, 0xffffff7f,
++    } },
++    { { /* 67 */
++    0x1bdd7672, 0xcf0fa056, 0xfffbeeff, 0xffff330c,
++    0xfddfff33, 0x7fffffdf, 0xffffffff, 0xffffffff,
++    } },
++    { { /* 68 */
++    0xfffbffff, 0xfffff9ff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0xffffffff, 0x00007fff, 0x00000000,
++    } },
++    { { /* 69 */
++    0xffffffff, 0x0000007f, 0x000007ff, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000400,
++    } },
++    { { /* 70 */
++    0x00000000, 0x00000000, 0x0000f000, 0xfff00000,
++    0xffc30000, 0xcf33fc04, 0xfffc363c, 0xffff7fc3,
++    } },
++    { { /* 71 */
++    0xaecf3d9f, 0xffffffff, 0xfffffffa, 0x3fff4844,
++    0x000003ff, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 72 */
++    0xfffff3de, 0xdffffeff, 0x7f47afff, 0x003ffffe,
++    0xff1fffff, 0x7ffeffff, 0xffff0000, 0xffff003f,
++    } },
++    { { /* 73 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffff9f, 0xffffffff, 0xffffffff, 0xffffffff,
++    } },
++    { { /* 74 */
++    0x00000000, 0x80000000, 0x00000000, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 75 */
++    0xe0f8007f, 0x5f7fffff, 0xffffffdb, 0xffffffff,
++    0xffffffff, 0x0003ffff, 0xfff80000, 0xffffffff,
++    } },
++    { { /* 76 */
++    0xffffffff, 0xffffffff, 0xffff0000, 0xffffffff,
++    0xfffcffff, 0xffffffff, 0x000000ff, 0x1fff0000,
++    } },
++    { { /* 77 */
++    0x00000000, 0x0000000f, 0x00000000, 0xffdf0000,
++    0xffffffff, 0xffffffff, 0xffffffff, 0x9fffffff,
++    } },
++    { { /* 78 */
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x1e000000,
++    } },
++    { { /* 79 */
++    0x7fffffff, 0xffff000f, 0x000007ff, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 80 */
++    0xffffffff, 0xffffff3f, 0x00003fff, 0x00000000,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++    { { /* 81 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0xffffffff, 0xffffffff, 0x003fffff,
++    } },
++    { { /* 82 */
++    0xffffffff, 0xfffffc7f, 0xffffffff, 0xffffffff,
++    0xffffffff, 0xffffffff, 0x3fffffff, 0x00000000,
++    } },
++    { { /* 83 */
++    0xffffffff, 0xffffffff, 0xffdfffff, 0xffffffff,
++    0xdfffffff, 0xebffde64, 0xffffffed, 0xffffffff,
++    } },
++    { { /* 84 */
++    0xdfdfe7bf, 0x7bffffff, 0xfffdfc5f, 0xffffffff,
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    } },
++    { { /* 85 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0xffffff0f, 0xffffffff, 0xffffffff,
++    } },
++    { { /* 86 */
++    0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
++    0xffffffff, 0xffffffff, 0xffffc3ff, 0xffffffff,
++    } },
++    { { /* 87 */
++    0x00000002, 0xffffffff, 0xffffffff, 0xffffffff,
++    0x00000000, 0x00000000, 0x00000000, 0x00000000,
++    } },
++};
++
++#define L(n) ((FcCharLeaf *) &leaves[n])
++
++static const FcCharLeaf *leaves_full[2] = {
++    L(  0), L(  1),
++};
++
++static const FcChar16 numbers_full[2] = {
++    0x0030, 0x00ff,
++};
++
++static const FcCharLeaf *leaves_half[2] = {
++    L(  2), L(  3),
++};
++
++static const FcChar16 numbers_half[2] = {
++    0x0020, 0x00ff,
++};
++
++static const FcCharLeaf *leaves_narrow[3] = {
++    L(  4), L(  5), L(  6),
++};
++
++static const FcChar16 numbers_narrow[3] = {
++    0x0000, 0x0027, 0x0029,
++};
++
++static const FcCharLeaf *leaves_wide[338] = {
++    L(  7), L(  8), L(  9), L( 10), L( 11), L( 12), L( 13), L( 14),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 16), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 17), L( 15), L( 15), L( 15), L( 15),
++    L( 18), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 19), L( 15), L( 20), L( 21),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 22), L( 15),
++    L( 15), L( 23),
++};
++
++static const FcChar16 numbers_wide[338] = {
++    0x0011, 0x0023, 0x002e, 0x002f, 0x0030, 0x0031, 0x0032, 0x0033,
++    0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039, 0x003a, 0x003b,
++    0x003c, 0x003d, 0x003e, 0x003f, 0x0040, 0x0041, 0x0042, 0x0043,
++    0x0044, 0x0045, 0x0046, 0x0047, 0x0048, 0x0049, 0x004a, 0x004b,
++    0x004c, 0x004d, 0x004e, 0x004f, 0x0050, 0x0051, 0x0052, 0x0053,
++    0x0054, 0x0055, 0x0056, 0x0057, 0x0058, 0x0059, 0x005a, 0x005b,
++    0x005c, 0x005d, 0x005e, 0x005f, 0x0060, 0x0061, 0x0062, 0x0063,
++    0x0064, 0x0065, 0x0066, 0x0067, 0x0068, 0x0069, 0x006a, 0x006b,
++    0x006c, 0x006d, 0x006e, 0x006f, 0x0070, 0x0071, 0x0072, 0x0073,
++    0x0074, 0x0075, 0x0076, 0x0077, 0x0078, 0x0079, 0x007a, 0x007b,
++    0x007c, 0x007d, 0x007e, 0x007f, 0x0080, 0x0081, 0x0082, 0x0083,
++    0x0084, 0x0085, 0x0086, 0x0087, 0x0088, 0x0089, 0x008a, 0x008b,
++    0x008c, 0x008d, 0x008e, 0x008f, 0x0090, 0x0091, 0x0092, 0x0093,
++    0x0094, 0x0095, 0x0096, 0x0097, 0x0098, 0x0099, 0x009a, 0x009b,
++    0x009c, 0x009d, 0x009e, 0x009f, 0x00a0, 0x00a1, 0x00a2, 0x00a3,
++    0x00a4, 0x00ac, 0x00ad, 0x00ae, 0x00af, 0x00b0, 0x00b1, 0x00b2,
++    0x00b3, 0x00b4, 0x00b5, 0x00b6, 0x00b7, 0x00b8, 0x00b9, 0x00ba,
++    0x00bb, 0x00bc, 0x00bd, 0x00be, 0x00bf, 0x00c0, 0x00c1, 0x00c2,
++    0x00c3, 0x00c4, 0x00c5, 0x00c6, 0x00c7, 0x00c8, 0x00c9, 0x00ca,
++    0x00cb, 0x00cc, 0x00cd, 0x00ce, 0x00cf, 0x00d0, 0x00d1, 0x00d2,
++    0x00d3, 0x00d4, 0x00d5, 0x00d6, 0x00d7, 0x00f9, 0x00fa, 0x00fe,
++    0x0200, 0x0201, 0x0202, 0x0203, 0x0204, 0x0205, 0x0206, 0x0207,
++    0x0208, 0x0209, 0x020a, 0x020b, 0x020c, 0x020d, 0x020e, 0x020f,
++    0x0210, 0x0211, 0x0212, 0x0213, 0x0214, 0x0215, 0x0216, 0x0217,
++    0x0218, 0x0219, 0x021a, 0x021b, 0x021c, 0x021d, 0x021e, 0x021f,
++    0x0220, 0x0221, 0x0222, 0x0223, 0x0224, 0x0225, 0x0226, 0x0227,
++    0x0228, 0x0229, 0x022a, 0x022b, 0x022c, 0x022d, 0x022e, 0x022f,
++    0x0230, 0x0231, 0x0232, 0x0233, 0x0234, 0x0235, 0x0236, 0x0237,
++    0x0238, 0x0239, 0x023a, 0x023b, 0x023c, 0x023d, 0x023e, 0x023f,
++    0x0240, 0x0241, 0x0242, 0x0243, 0x0244, 0x0245, 0x0246, 0x0247,
++    0x0248, 0x0249, 0x024a, 0x024b, 0x024c, 0x024d, 0x024e, 0x024f,
++    0x0250, 0x0251, 0x0252, 0x0253, 0x0254, 0x0255, 0x0256, 0x0257,
++    0x0258, 0x0259, 0x025a, 0x025b, 0x025c, 0x025d, 0x025e, 0x025f,
++    0x0260, 0x0261, 0x0262, 0x0263, 0x0264, 0x0265, 0x0266, 0x0267,
++    0x0268, 0x0269, 0x026a, 0x026b, 0x026c, 0x026d, 0x026e, 0x026f,
++    0x0270, 0x0271, 0x0272, 0x0273, 0x0274, 0x0275, 0x0276, 0x0277,
++    0x0278, 0x0279, 0x027a, 0x027b, 0x027c, 0x027d, 0x027e, 0x027f,
++    0x0280, 0x0281, 0x0282, 0x0283, 0x0284, 0x0285, 0x0286, 0x0287,
++    0x0288, 0x0289, 0x028a, 0x028b, 0x028c, 0x028d, 0x028e, 0x028f,
++    0x0290, 0x0291, 0x0292, 0x0293, 0x0294, 0x0295, 0x0296, 0x0297,
++    0x0298, 0x0299, 0x029a, 0x029b, 0x029c, 0x029d, 0x029e, 0x029f,
++    0x02a0, 0x02a1, 0x02a2, 0x02a3, 0x02a4, 0x02a5, 0x02a6, 0x02f8,
++    0x02f9, 0x02fa,
++};
++
++#ifdef CHECK_AMBIGUOUS_SET
++static const FcCharLeaf *leaves_ambiguous[552] = {
++    L( 24), L( 25), L( 26), L( 27), L( 28), L( 29), L( 30), L( 31),
++    L( 32), L( 33), L( 34), L( 35), L( 36), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 37), L( 38),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 39),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 39),
++};
++
++static const FcChar16 numbers_ambiguous[552] = {
++    0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0020, 0x0021, 0x0022,
++    0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x00e0, 0x00e1, 0x00e2,
++    0x00e3, 0x00e4, 0x00e5, 0x00e6, 0x00e7, 0x00e8, 0x00e9, 0x00ea,
++    0x00eb, 0x00ec, 0x00ed, 0x00ee, 0x00ef, 0x00f0, 0x00f1, 0x00f2,
++    0x00f3, 0x00f4, 0x00f5, 0x00f6, 0x00f7, 0x00f8, 0x00fe, 0x00ff,
++    0x0f00, 0x0f01, 0x0f02, 0x0f03, 0x0f04, 0x0f05, 0x0f06, 0x0f07,
++    0x0f08, 0x0f09, 0x0f0a, 0x0f0b, 0x0f0c, 0x0f0d, 0x0f0e, 0x0f0f,
++    0x0f10, 0x0f11, 0x0f12, 0x0f13, 0x0f14, 0x0f15, 0x0f16, 0x0f17,
++    0x0f18, 0x0f19, 0x0f1a, 0x0f1b, 0x0f1c, 0x0f1d, 0x0f1e, 0x0f1f,
++    0x0f20, 0x0f21, 0x0f22, 0x0f23, 0x0f24, 0x0f25, 0x0f26, 0x0f27,
++    0x0f28, 0x0f29, 0x0f2a, 0x0f2b, 0x0f2c, 0x0f2d, 0x0f2e, 0x0f2f,
++    0x0f30, 0x0f31, 0x0f32, 0x0f33, 0x0f34, 0x0f35, 0x0f36, 0x0f37,
++    0x0f38, 0x0f39, 0x0f3a, 0x0f3b, 0x0f3c, 0x0f3d, 0x0f3e, 0x0f3f,
++    0x0f40, 0x0f41, 0x0f42, 0x0f43, 0x0f44, 0x0f45, 0x0f46, 0x0f47,
++    0x0f48, 0x0f49, 0x0f4a, 0x0f4b, 0x0f4c, 0x0f4d, 0x0f4e, 0x0f4f,
++    0x0f50, 0x0f51, 0x0f52, 0x0f53, 0x0f54, 0x0f55, 0x0f56, 0x0f57,
++    0x0f58, 0x0f59, 0x0f5a, 0x0f5b, 0x0f5c, 0x0f5d, 0x0f5e, 0x0f5f,
++    0x0f60, 0x0f61, 0x0f62, 0x0f63, 0x0f64, 0x0f65, 0x0f66, 0x0f67,
++    0x0f68, 0x0f69, 0x0f6a, 0x0f6b, 0x0f6c, 0x0f6d, 0x0f6e, 0x0f6f,
++    0x0f70, 0x0f71, 0x0f72, 0x0f73, 0x0f74, 0x0f75, 0x0f76, 0x0f77,
++    0x0f78, 0x0f79, 0x0f7a, 0x0f7b, 0x0f7c, 0x0f7d, 0x0f7e, 0x0f7f,
++    0x0f80, 0x0f81, 0x0f82, 0x0f83, 0x0f84, 0x0f85, 0x0f86, 0x0f87,
++    0x0f88, 0x0f89, 0x0f8a, 0x0f8b, 0x0f8c, 0x0f8d, 0x0f8e, 0x0f8f,
++    0x0f90, 0x0f91, 0x0f92, 0x0f93, 0x0f94, 0x0f95, 0x0f96, 0x0f97,
++    0x0f98, 0x0f99, 0x0f9a, 0x0f9b, 0x0f9c, 0x0f9d, 0x0f9e, 0x0f9f,
++    0x0fa0, 0x0fa1, 0x0fa2, 0x0fa3, 0x0fa4, 0x0fa5, 0x0fa6, 0x0fa7,
++    0x0fa8, 0x0fa9, 0x0faa, 0x0fab, 0x0fac, 0x0fad, 0x0fae, 0x0faf,
++    0x0fb0, 0x0fb1, 0x0fb2, 0x0fb3, 0x0fb4, 0x0fb5, 0x0fb6, 0x0fb7,
++    0x0fb8, 0x0fb9, 0x0fba, 0x0fbb, 0x0fbc, 0x0fbd, 0x0fbe, 0x0fbf,
++    0x0fc0, 0x0fc1, 0x0fc2, 0x0fc3, 0x0fc4, 0x0fc5, 0x0fc6, 0x0fc7,
++    0x0fc8, 0x0fc9, 0x0fca, 0x0fcb, 0x0fcc, 0x0fcd, 0x0fce, 0x0fcf,
++    0x0fd0, 0x0fd1, 0x0fd2, 0x0fd3, 0x0fd4, 0x0fd5, 0x0fd6, 0x0fd7,
++    0x0fd8, 0x0fd9, 0x0fda, 0x0fdb, 0x0fdc, 0x0fdd, 0x0fde, 0x0fdf,
++    0x0fe0, 0x0fe1, 0x0fe2, 0x0fe3, 0x0fe4, 0x0fe5, 0x0fe6, 0x0fe7,
++    0x0fe8, 0x0fe9, 0x0fea, 0x0feb, 0x0fec, 0x0fed, 0x0fee, 0x0fef,
++    0x0ff0, 0x0ff1, 0x0ff2, 0x0ff3, 0x0ff4, 0x0ff5, 0x0ff6, 0x0ff7,
++    0x0ff8, 0x0ff9, 0x0ffa, 0x0ffb, 0x0ffc, 0x0ffd, 0x0ffe, 0x0fff,
++    0x1000, 0x1001, 0x1002, 0x1003, 0x1004, 0x1005, 0x1006, 0x1007,
++    0x1008, 0x1009, 0x100a, 0x100b, 0x100c, 0x100d, 0x100e, 0x100f,
++    0x1010, 0x1011, 0x1012, 0x1013, 0x1014, 0x1015, 0x1016, 0x1017,
++    0x1018, 0x1019, 0x101a, 0x101b, 0x101c, 0x101d, 0x101e, 0x101f,
++    0x1020, 0x1021, 0x1022, 0x1023, 0x1024, 0x1025, 0x1026, 0x1027,
++    0x1028, 0x1029, 0x102a, 0x102b, 0x102c, 0x102d, 0x102e, 0x102f,
++    0x1030, 0x1031, 0x1032, 0x1033, 0x1034, 0x1035, 0x1036, 0x1037,
++    0x1038, 0x1039, 0x103a, 0x103b, 0x103c, 0x103d, 0x103e, 0x103f,
++    0x1040, 0x1041, 0x1042, 0x1043, 0x1044, 0x1045, 0x1046, 0x1047,
++    0x1048, 0x1049, 0x104a, 0x104b, 0x104c, 0x104d, 0x104e, 0x104f,
++    0x1050, 0x1051, 0x1052, 0x1053, 0x1054, 0x1055, 0x1056, 0x1057,
++    0x1058, 0x1059, 0x105a, 0x105b, 0x105c, 0x105d, 0x105e, 0x105f,
++    0x1060, 0x1061, 0x1062, 0x1063, 0x1064, 0x1065, 0x1066, 0x1067,
++    0x1068, 0x1069, 0x106a, 0x106b, 0x106c, 0x106d, 0x106e, 0x106f,
++    0x1070, 0x1071, 0x1072, 0x1073, 0x1074, 0x1075, 0x1076, 0x1077,
++    0x1078, 0x1079, 0x107a, 0x107b, 0x107c, 0x107d, 0x107e, 0x107f,
++    0x1080, 0x1081, 0x1082, 0x1083, 0x1084, 0x1085, 0x1086, 0x1087,
++    0x1088, 0x1089, 0x108a, 0x108b, 0x108c, 0x108d, 0x108e, 0x108f,
++    0x1090, 0x1091, 0x1092, 0x1093, 0x1094, 0x1095, 0x1096, 0x1097,
++    0x1098, 0x1099, 0x109a, 0x109b, 0x109c, 0x109d, 0x109e, 0x109f,
++    0x10a0, 0x10a1, 0x10a2, 0x10a3, 0x10a4, 0x10a5, 0x10a6, 0x10a7,
++    0x10a8, 0x10a9, 0x10aa, 0x10ab, 0x10ac, 0x10ad, 0x10ae, 0x10af,
++    0x10b0, 0x10b1, 0x10b2, 0x10b3, 0x10b4, 0x10b5, 0x10b6, 0x10b7,
++    0x10b8, 0x10b9, 0x10ba, 0x10bb, 0x10bc, 0x10bd, 0x10be, 0x10bf,
++    0x10c0, 0x10c1, 0x10c2, 0x10c3, 0x10c4, 0x10c5, 0x10c6, 0x10c7,
++    0x10c8, 0x10c9, 0x10ca, 0x10cb, 0x10cc, 0x10cd, 0x10ce, 0x10cf,
++    0x10d0, 0x10d1, 0x10d2, 0x10d3, 0x10d4, 0x10d5, 0x10d6, 0x10d7,
++    0x10d8, 0x10d9, 0x10da, 0x10db, 0x10dc, 0x10dd, 0x10de, 0x10df,
++    0x10e0, 0x10e1, 0x10e2, 0x10e3, 0x10e4, 0x10e5, 0x10e6, 0x10e7,
++    0x10e8, 0x10e9, 0x10ea, 0x10eb, 0x10ec, 0x10ed, 0x10ee, 0x10ef,
++    0x10f0, 0x10f1, 0x10f2, 0x10f3, 0x10f4, 0x10f5, 0x10f6, 0x10f7,
++    0x10f8, 0x10f9, 0x10fa, 0x10fb, 0x10fc, 0x10fd, 0x10fe, 0x10ff,
++};
++
++static const FcCharLeaf *leaves_neutral[60] = {
++    L( 40), L( 41), L( 42), L( 43), L( 44), L( 45), L( 46), L( 47),
++    L( 48), L( 49), L( 50), L( 51), L( 52), L( 53), L( 54), L( 55),
++    L( 56), L( 57), L( 58), L( 59), L( 15), L( 60), L( 61), L( 62),
++    L( 63), L( 64), L( 65), L( 66), L( 67), L( 68), L( 69), L( 70),
++    L( 71), L( 72), L( 15), L( 73), L( 15), L( 74), L( 15), L( 15),
++    L( 15), L( 15), L( 15), L( 15), L( 15), L( 15), L( 75), L( 15),
++    L( 76), L( 77), L( 78), L( 79), L( 80), L( 81), L( 82), L( 83),
++    L( 84), L( 85), L( 86), L( 87),
++};
++
++static const FcChar16 numbers_neutral[60] = {
++    0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007,
++    0x0009, 0x000a, 0x000b, 0x000c, 0x000d, 0x000e, 0x000f, 0x0010,
++    0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018,
++    0x001e, 0x001f, 0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025,
++    0x0026, 0x0027, 0x0028, 0x0029, 0x002a, 0x0030, 0x00d8, 0x00d9,
++    0x00da, 0x00db, 0x00dc, 0x00dd, 0x00de, 0x00df, 0x00fb, 0x00fc,
++    0x00fd, 0x00fe, 0x00ff, 0x0103, 0x0104, 0x01d0, 0x01d1, 0x01d4,
++    0x01d5, 0x01d6, 0x01d7, 0x0e00,
++};
++#endif /* CHECK_AMBIGUOUS_SET */
++
++#undef L
++
++static const FcWidthCharSet  fcEastAsianWidthSets[] = {
++    { 2, { FC_REF_CONSTANT, 2, (FcCharLeaf **) leaves_full, (FcChar16 *) numbers_full } },
++    { 1, { FC_REF_CONSTANT, 2, (FcCharLeaf **) leaves_half, (FcChar16 *) numbers_half } },
++    { 1, { FC_REF_CONSTANT, 3, (FcCharLeaf **) leaves_narrow, (FcChar16 *) numbers_narrow } },
++    { 2, { FC_REF_CONSTANT, 338, (FcCharLeaf **) leaves_wide, (FcChar16 *) numbers_wide } },
++#ifdef CHECK_AMBIGUOUS_SET
++    { 0, { FC_REF_CONSTANT, 552, (FcCharLeaf **) leaves_ambiguous, (FcChar16 *) numbers_ambiguous } },
++    { 0, { FC_REF_CONSTANT, 60, (FcCharLeaf **) leaves_neutral, (FcChar16 *) numbers_neutral } },
++#endif /* CHECK_AMBIGUOUS_SET */
++};
++

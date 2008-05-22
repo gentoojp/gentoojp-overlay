@@ -1,0 +1,12 @@
+# default: off
+# description: The http server
+service http
+{
+	socket_type     = stream
+	wait            = no
+	user            = root
+	server          = /sbin/ebhttpd
+	server_args     = --inetd
+	log_on_failure  += USERID
+	disable         = yes
+}

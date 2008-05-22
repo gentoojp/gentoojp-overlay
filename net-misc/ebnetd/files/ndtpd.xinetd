@@ -1,0 +1,12 @@
+# default: off
+# description: The ndtp server
+service ndtp
+{
+	socket_type     = stream
+	wait            = no
+	user            = root
+	server          = /sbin/ndtpd
+	server_args     = --inetd
+	log_on_failure  += USERID
+	disable         = yes
+}

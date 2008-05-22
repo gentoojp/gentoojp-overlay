@@ -1,0 +1,37 @@
+diff -ruN im-sdk-trunk-svn2174.orig/iiimxcf/htt_xbe/src/main.cpp im-sdk-trunk-svn2174/iiimxcf/htt_xbe/src/main.cpp
+--- im-sdk-trunk-svn2174.orig/iiimxcf/htt_xbe/src/main.cpp	2005-01-31 15:31:50.000000000 +0900
++++ im-sdk-trunk-svn2174/iiimxcf/htt_xbe/src/main.cpp	2005-02-08 15:07:02.773579750 +0900
+@@ -146,20 +146,15 @@
+ 				      0, // fallback resources
+ 				      applicationShellWidgetClass,
+ 				      0, 0); // args and num_args
+-  int n;
+-
++  int n = 0;
+   ResourceDB *resource = new ResourceDB(toplevel);
+-
+-  char *trigger_keys = 0;
+-  IMTriggerKeyList key_list;
++  char *trigger_keys = NULL;
+   Bool disable_status_area;
+   Bool static_event_flow;
+-
+-  char *if_name = 0;
+-
+-  char *font_name = 0;
+-  n = 0;
++  char *if_name = NULL;
++  char *font_name = NULL;
+   IMArg res[5];
++
+   SetArg(res[n], ResourceDB::RDB_CONV_ON_KEY, &trigger_keys); n++;
+   SetArg(res[n], ResourceDB::RDB_IF_NAME, &if_name); n++;
+   SetArg(res[n], ResourceDB::RDB_FS_NAME, &font_name); n++;
+@@ -167,6 +162,7 @@
+   SetArg(res[n], ResourceDB::RDB_STATIC_EVENT_FLOW, &static_event_flow); n++;
+   resource->getValues(res, n);
+ 
++  IMTriggerKeyList key_list;
+   if (trigger_keys) {
+     if (!static_event_flow) {
+       key_list.add(trigger_keys);

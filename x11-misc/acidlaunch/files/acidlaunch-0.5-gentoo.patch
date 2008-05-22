@@ -1,0 +1,12 @@
+diff -urN acidlaunch-0.5.ORIG/configure acidlaunch-0.5/configure
+--- acidlaunch-0.5.ORIG/configure	2002-02-22 07:45:04.000000000 +0900
++++ acidlaunch-0.5/configure	2003-12-29 02:04:12.000000000 +0900
+@@ -1044,7 +1044,7 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
+-#include <xmlversion.h>
++#include <libxml/xmlversion.h>
+ 
+ int 
+ main()

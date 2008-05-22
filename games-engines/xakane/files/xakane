@@ -1,0 +1,3 @@
+#!/bin/sh
+[ -d ~/.xakane ] || mkdir ~/.xakane
+xakanesys -d /usr/share/games/xakane/list -a /usr/share/games/xakane -p ~/.xakane $* 2> /dev/null

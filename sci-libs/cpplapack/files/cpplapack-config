@@ -1,0 +1,83 @@
+#!/bin/bash
+# Copyright 1999-2005 Gentoo Technologies, Inc.
+# Distributed under the terms of the GNU General Public License v2
+
+PROFILE_PATH=/usr/@LIBDIR@/cpplapack
+CONFIG_FILE=${PROFILE_PATH}/config
+
+usage() {
+
+cat << "USAGE_END"
+Usage: lapack-config [Option]
+
+Options:
+
+      --cxxflags
+                         Print compilation flags for the given/current
+                         CPPLAPACK profile.
+
+      --cxxlibs
+                         Print flags to link with the BLAS/LAPACK library
+                         for the given/current CPPLAPACK profile.
+
+      --version
+                         Print the CPPLAPACK version.
+
+USAGE_END
+
+	exit 1
+}
+
+if [ "$#" -lt 1 ]
+then
+	usage
+fi
+
+list_cxxflags() {
+
+	if [ -f "${CONFIG_FILE}" ]
+	then
+		source ${CONFIG_FILE}
+		echo -n "${CXXFLAGS} "
+	else
+		echo " * No CPPLAPACK configuration file is active."
+	fi
+}	
+
+list_cxxlibs() {
+
+	if [ -f "${CONFIG_FILE}" ]
+	then
+		source ${CONFIG_FILE}
+		echo -n "${CXXLIBS} "
+	else
+		echo " * No CPPLAPACK configuration file is active."
+	fi
+}
+
+
+for x in $*
+do
+	case "${x}" in
+		--cxxflags)
+				list_cxxflags
+			;;
+		--cxxlibs)
+				list_cxxlibs
+			;;
+		--version)
+				echo -n "@VERSION@"
+			;;
+		-*)
+			echo " * ${0##*/}: Invalid switch!  Run ${0##*/} without parameters for help."
+			exit 1
+			;;
+		*)
+			usage
+			;;
+	esac
+done
+
+echo
+
+# vim:ts=8

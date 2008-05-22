@@ -1,0 +1,113 @@
+EPSON PM-G700のプリンタドライバの組み込みについて記述しています。
+また、ソースファイルには、バイナリファイルが含まれているため、このドライバは、たぶん"x86"専用です。
+詳しくは、http://www.avasys.jp/linux/index.htmlをご覧ください。
+(上記サイトの掲示板に投稿し、貴重な情報を提供してくださった皆様に感謝します。)
+
+動作確認	マシン環境		iBook G4 1GHz(Mac OS X　10.3.9)
+				+ VirtualPC 6.1.1 for Mac
+					[Pentium II相当 約270MHz]
+				+ Gentoo Linux 2005.1
+	プリンタ		EPSON PM-G700
+	portage		emerge --sync	(2005/11/4実施)
+	ユーザ		root
+
+0. 注意事項
+	このportageファイルを使用するにあたり、次の項目に注意してください。
+	(1) 再emergeについて
+		emergeした後、再度のemergeは、正しくインストールできません。
+		症状:(a)のファイルを.../image/下から/下へコピーする際、エラーになります。
+			(a) make時、mkfifo .../image/var/ekpd/ekplp0で作成
+		原因:emergeコマンド内の処理のようなので不明です。
+		対策:emerge --unmergeでアンインストール後、emergeでインストールし直してください。
+	(2) 印刷データについて
+		印刷データがプリンタから出力されないときがあります。
+		症状:スプール(/var/spool/lpd/pmg700)からekpdに印刷データが送られますが、プリンタには出力されません。
+		原因:マシン環境の性能が影響しているのか、否か、原因は不明です。
+		対策:ありません。(何度か試みてください。)
+	(3) LPR(LPRng)版について
+		/var/ekpd/ekplp0は、オーナ:root、グループ:lp、アクセス権限:660に設定しています。
+
+1. portageファイル
+	pipsg700-2.6.2.ebuild
+		プリンタドライバ用ebuildファイル
+	ekpd.initd
+		ekpd起動スクリプト
+	pipsg700-2.6.2-configure.patch
+		configureのバグ修正
+	pipsg700-2.6.2-gentoo.patch
+		不要なディレクトリの生成排除(３箇所:redhat,setup.ekpd/rc)
+		２つめのconfigureのパラメタでCFLAGSの展開抑止
+		libstdc++-3-libc6.2-2-2.10.0の追加
+	pipsg700-2.6.2-lpr.patch
+		CUPS依存部分の排除
+		ekplp0のアクセス権限設定
+
+2. CUPS版
+	CUPS経由で、PM-G700を利用する場合、お読みください。
+	(1) USEフラグ
+		USE="cups"
+	(2) 必要なソフトウェア
+		emerge =x11-libs/gtk+-1.2.10-r11
+		emerge lib-compat
+	(3) ドライバのインストール
+		ACCEPT_KEYWORDS="~x86" emerge pipsg700
+		etc-update	(/etc/servicesに35586を追加)
+		/etc/init.d/ekpd start
+		rc-update add ekpd default
+	(4) CUPSの再起動
+		pipsg700でPNG形式ファイルを印刷するために、以下の２つのファイルを変更します。
+		nano -w /etc/cups/mime.types
+			(変更:158 コメントをはずす)
+			application/octet-stream
+		nano -w /etc/cups/mime.convs
+			(変更:114 コメントをはずす)
+			application/octet-stream application/vnd.cups-raw 0 -
+		/etc/init.d/cupsd restart
+	(5) プリンタの登録
+		ebuild /var/db/pkg/net-print/pipsg700-2.6.2/pipsg700-2.6.2.ebuild config
+			(内容:プリンタの追加、用紙サイズの設定)
+			lpadmin -p pmg700 -E -v ekplp:/var/ekpd/ekplp0 -m ekpmg700.ppd
+			lpoptions -p pmg700 -o media=A4_AUTO
+		又は、Webブラウザから http://localhost:631/
+			[Manage Printers][Add Printer]
+				[Name:] pmg700	[Continue]
+				[Device:] EPSON Inkjet Printer #1 (Photo Image Print System)	[Continue]
+				[Make:] EPSON	[Continue]
+				[Model:] EPSON PM-G700 , Photo Image Print System (en)	[Continue]
+			[Manage Printers][Configure Printer]
+				[Media Size:] A4 210 x 297 mm	[Continue]
+	(6) ロケール設定(pipsg700)
+		pipsg700
+			[Save][Quit]
+	(7) テスト印刷(PNG形式ファイル)
+		lpr -P pmg700 PNG形式ファイル
+		pipsg700 PNG形式ファイル
+			[Print][Quit]
+
+3. LPR(LPRng)版
+	LPRng経由で、PM-G700を利用する場合、お読みください。
+	(1) USEフラグ
+		USE="-cups lprng"	(pipsg700で新規にlprngを使用)
+	(2) 必要なソフトウェア
+		emerge =x11-libs/gtk+-1.2.10-r11
+		emerge lib-compat
+		emerge ghostscript
+		emerge psutils
+		emerge lprng
+	(3) ドライバのインストール
+		ACCEPT_KEYWORDS="~x86" emerge pipsg700
+		etc-update	(/etc/servicesに35586を追加、/etc/lprng/printcapにpmg700の定義を追加)
+		/etc/init.d/ekpd start
+		rc-update add ekpd default
+	(4) LPRngの再起動、ファイルのアクセス権限確認
+		/etc/init.d/lprng restart
+		checkpc -f	(ekplp0,filterg700,pmg700について権限確認)
+	(5) ロケール設定(pipsg700)
+		pipsg700
+			[Save][Quit]
+	(6) テスト印刷(PNG形式ファイル)
+		lpr -P pmg700 PNG形式ファイル
+		pipsg700 PNG形式ファイル
+			[Print][Quit]
+
+

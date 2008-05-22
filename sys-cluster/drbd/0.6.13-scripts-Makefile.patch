@@ -1,0 +1,58 @@
+*** ../../drbd-0.6.13/scripts/Makefile	2004-04-01 16:35:14.000000000 +0900
+--- Makefile	2005-03-27 09:32:08.922700976 +0900
+***************
+*** 42,47 ****
+--- 42,51 ----
+    INITD=etc/rc.d/init.d/
+  endif
+  
++ ifeq ($(DIST),gentoo)
++   INITD=sbin/
++ endif
++ 
+  ifeq ($(INITD),)
+     INITD=etc/init.d/
+     $(warning Can not guess distribution INITD, please fix Makefile.vars)
+***************
+*** 49,68 ****
+  endif
+  
+  all:
+! 	ln -sf drbd datadisk
+  
+  install:
+- 	mkdir -p $(PREFIX)etc/ha.d/resource.d
+  	install -D -m 755 drbd $(PREFIX)$(INITD)drbd
+! 	@ if [ ! -e $(PREFIX)etc/drbd.conf ]; then \
+! 		install -D -m 644 drbd.conf $(PREFIX)etc/drbd.conf; \
+! 	fi
+  	ln -sf ../../../$(INITD)drbd $(PREFIX)etc/ha.d/resource.d/datadisk
+! ifeq ($(DIST),suse)
+! 	ln -sf ../$(INITD)drbd $(PREFIX)sbin/rcdrbd
+! endif
+! 	@ echo
+! 	@ echo "Don't forget to run update-rc.d or chkconfig"
+  
+  clean:
+  	rm -f *~
+--- 53,72 ----
+  endif
+  
+  all:
+! #	ln -sf drbd datadisk
+  
+  install:
+  	install -D -m 755 drbd $(PREFIX)$(INITD)drbd
+! #	@ if [ ! -e $(PREFIX)etc/drbd.conf ]; then \
+! #		install -D -m 644 drbd.conf $(PREFIX)etc/drbd.conf; \
+! #	fi
+! 	mkdir -p $(PREFIX)etc/ha.d/resource.d
+  	ln -sf ../../../$(INITD)drbd $(PREFIX)etc/ha.d/resource.d/datadisk
+! #ifeq ($(DIST),suse)
+! #	ln -sf ../$(INITD)drbd $(PREFIX)sbin/rcdrbd
+! #endif
+! #	@ echo
+! #	@ echo "Don't forget to run update-rc.d or chkconfig"
+  
+  clean:
+  	rm -f *~
