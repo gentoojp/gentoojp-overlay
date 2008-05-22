@@ -11,20 +11,18 @@ HOMEPAGE="http://sourceforge.jp/projects/jd4linux/"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="-*"
-IUSE="gnome migemo"
+KEYWORDS=""
+IUSE="gnome openssl"
 
-RDEPEND=">=dev-cpp/gtkmm-2.6
+RDEPEND=">=dev-cpp/gtkmm-2.8
 	media-libs/libpng
 	>=sys-libs/zlib-1.2
-	>=dev-libs/openssl-0.9.7
-	migemo? ( >=app-text/cmigemo-1.3c )"
+	openssl? ( >=dev-libs/openssl-0.9.7 )
+	!openssl? ( net-libs/gnutls )"
 DEPEND="${RDEPEND}
 	sys-devel/automake
 	sys-devel/autoconf
 	sys-devel/libtool"
-
-S="${WORKDIR}/${PN}"
 
 src_unpack() {
 	subversion_src_unpack
@@ -38,7 +36,10 @@ src_compile() {
 	# use gnomeui sm instead of Xorg SM/ICE
 	use gnome && myconf="${myconf} --with-sessionlib=gnomeui"
 
-	econf ${myconf} `use_with migemo` || die "econf failed"
+	econf \
+		$(use_with openssl) \
+		${myconf} \
+		|| die "econf failed"
 	emake || die "emake failed"
 }
 
