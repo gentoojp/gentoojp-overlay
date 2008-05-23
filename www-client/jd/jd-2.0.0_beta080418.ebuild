@@ -2,10 +2,11 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit eutils
+inherit eutils autotools
 
-MY_P=${P/_beta/-beta}
-SF_DLID="24596"
+MY_P=${P/_p/-}
+MY_P=${MY_P/_/-}
+SF_DLID="30621"
 
 DESCRIPTION="gtk2 based 2ch browser written in C++"
 HOMEPAGE="http://jd4linux.sourceforge.jp/"
@@ -13,17 +14,14 @@ SRC_URI="mirror://sourceforge.jp/jd4linux/${SF_DLID}/${MY_P}.tgz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~x86 ~amd64"
-IUSE=""
+KEYWORDS="~amd64 ~x86"
+IUSE="gnome openssl"
 
-RDEPEND=">=dev-cpp/gtkmm-2.6
-	>=dev-cpp/glibmm-2.6
-	>=dev-libs/libsigc++-2.0
-	>=x11-libs/gtk+-2.6
-	dev-libs/expat
+RDEPEND=">=dev-cpp/gtkmm-2.8
 	media-libs/libpng
 	>=sys-libs/zlib-1.2
-	>=dev-libs/openssl-0.9.7"
+	openssl? ( >=dev-libs/openssl-0.9.7 )
+	!openssl? ( net-libs/gnutls )"
 DEPEND="${RDEPEND}
 	sys-devel/automake
 	sys-devel/autoconf
@@ -34,8 +32,20 @@ S="${WORKDIR}/${MY_P}"
 src_unpack() {
 	unpack ${A}
 	cd "${S}"
-	sh autogen.sh || die "autogen.sh failed"
-	sed -i -e '/^CXXFLAGS/s:-ggdb::' configure || die "sed failed"
+	eautoreconf
+}
+
+src_compile() {
+	local myconf=""
+
+	# use gnomeui sm instead of Xorg SM/ICE
+	use gnome && myconf="${myconf} --with-sessionlib=gnomeui"
+
+	econf \
+		$(use_with openssl) \
+		${myconf} \
+		|| die "econf failed"
+	emake || die "emake failed"
 }
 
 src_install() {
