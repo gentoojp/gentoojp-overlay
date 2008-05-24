@@ -1,5 +1,4 @@
 app-arch
-app-cdr
 app-dicts
 app-editors
 app-emacs
@@ -29,12 +28,10 @@ games-engines
 games-puzzle
 games-roguelike
 games-rpg
-mail-client
 mail-filter
 media-fonts
 media-gfx
 media-libs
-media-plugins
 media-sound
 media-tv
 net-analyzer
@@ -61,8 +58,6 @@ www-apps
 www-client
 www-misc
 www-servers
-x11-base
 x11-libs
 x11-misc
 x11-plugins
-x11-wm
