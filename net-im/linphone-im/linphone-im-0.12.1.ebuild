@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/net-im/linphone-im/linphone-im-0.12.1.ebuild,v 1.1 2004/08/20 16:22:29 okayama Exp $
+# $Header: $
 
 DESCRIPTION="A modified version for Linphone to work with MSN Messenger voice and video conference modes"
 

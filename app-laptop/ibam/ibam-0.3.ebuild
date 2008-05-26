@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/app-laptop/ibam/ibam-0.3.ebuild,v 1.1 2004/05/08 10:14:07 okayama Exp $
+# $Header: $
 
 DESCRIPTION="IBAM is an advanced battery monitor for laptops"
 

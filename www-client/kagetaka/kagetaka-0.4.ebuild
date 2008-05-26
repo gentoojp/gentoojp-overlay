@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/www-client/kagetaka/kagetaka-0.4.ebuild,v 1.2 2004/11/28 16:47:34 okayama Exp $
+# $Header: $
 
 DESCRIPTION="KAGETAKA is a Web browser which displays text vertically."
 HOMEPAGE="http://www.kagetaka.org/"

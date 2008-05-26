@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/media-libs/libj2k/libj2k-0.0.9.ebuild,v 1.1 2004/08/20 16:20:58 okayama Exp $
+# $Header: $
 
 DESCRIPTION="A clean and simple implementation possible of the JPEG-2000 standard"
 

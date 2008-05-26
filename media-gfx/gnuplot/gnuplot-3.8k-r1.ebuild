@@ -1,6 +1,6 @@
-# Copyright 1999-2005 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/media-gfx/gnuplot/gnuplot-3.8k-r1.ebuild,v 1.1 2005/01/29 13:59:44 okayama Exp $
+# $Header: $
 
 inherit eutils elisp-common
 

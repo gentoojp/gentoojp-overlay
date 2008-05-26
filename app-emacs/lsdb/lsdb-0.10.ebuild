@@ -1,6 +1,6 @@
-# Copyright 1999-2003 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/app-emacs/lsdb/lsdb-0.10.ebuild,v 1.1 2003/12/01 05:36:12 usata Exp $
+# $Header: $
 
 inherit elisp
 

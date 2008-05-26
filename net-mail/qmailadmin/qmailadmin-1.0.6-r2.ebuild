@@ -1,6 +1,6 @@
-# Copyright 1999-2003 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/net-mail/qmailadmin/qmailadmin-1.0.6.ebuild,v 1.2 2004/01/05 08:49:44 robbat2 Exp $
+# $Header: $
 
 inherit gnuconfig
 

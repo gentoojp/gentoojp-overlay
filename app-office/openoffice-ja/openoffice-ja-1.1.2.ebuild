@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/app-office/openoffice-ja/openoffice-ja-1.1.2.ebuild,v 1.2 2004/08/28 00:15:26 okayama Exp $
+# $Header: $
 
 # IMPORTANT:  This is extremely alpha!!!
 

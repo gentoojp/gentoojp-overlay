@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/net-irc/fc-ircd/fc-ircd-2.10.3-r1.ebuild,v 1.2 2004/01/20 22:56:19 mholzer Exp $
+# $Header: $
 
 inherit eutils
 

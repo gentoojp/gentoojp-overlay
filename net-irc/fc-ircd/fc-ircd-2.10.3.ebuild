@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/net-irc/irc-server/irc-server-2.10.3_p3.ebuild,v 1.2 2004/01/20 22:56:19 mholzer Exp $
+# $Header: $
 
 PATCHVER="fc06"
 DESCRIPTION="A ircd with ipv6 support use by the Friend Chat network"

@@ -1,6 +1,6 @@
-# Copyright 1999-2005 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sci-libs/cpplapack/cpplapack-20050325.ebuild,v 1.11 2005/09/25 14:01:32 okayama Exp $
+# $Header: $
 
 MY_PV=${PV:0:4}_${PV:4:2}_${PV:6:2}
 MY_P=${PN}-${MY_PV}

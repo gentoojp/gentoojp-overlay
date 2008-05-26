@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/games-rpg/xu4/xu4-1.0.beta2.ebuild,v 1.4 2004/10/22 11:30:34 blubb Exp $
+# $Header: $
 
 inherit eutils games
 

@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/x11-plugins/wmapmload/wmapmload-0.3.3.ebuild,v 1.1 2004/05/08 04:31:22 okayama Exp $
+# $Header: $
 
 IUSE=""
 DESCRIPTION="dockapp that monitors your apm battery status."

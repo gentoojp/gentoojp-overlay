@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/x11-plugins/gkrellm-gtodo/gkrellm-gtodo-0.2.5a.ebuild,v 1.3 2004/05/08 17:07:20 okayama Exp $
+# $Header: $
 
 DESCRIPTION="A GkrellM2 plugin that lets you organize and track tasks and to-do items."
 

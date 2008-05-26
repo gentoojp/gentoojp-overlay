@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/app-office/openoffice-bin/openoffice-bin-1.1.0.ebuild,v 1.8 2004/01/24 13:54:07 suka Exp $
+# $Header: $
 
 IUSE="kde gnome"
 

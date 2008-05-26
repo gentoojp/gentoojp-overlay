@@ -1,6 +1,6 @@
-# Copyright 1999-2005 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-tex/jsclasses/jsclasses-050319.ebuild,v 1.2 2005/03/31 14:23:00 okayama Exp $
+# $Header: $
 
 inherit latex-package
 

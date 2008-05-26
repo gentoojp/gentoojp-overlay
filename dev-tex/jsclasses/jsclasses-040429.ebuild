@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/dev-tex/jsclasses/jsclasses-040429.ebuild,v 1.1 2004/07/17 13:58:52 okayama Exp $
+# $Header: $
 
 DESCRIPTION="Japanese document class files for pTeX made by Okumura"
 

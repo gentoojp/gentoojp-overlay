@@ -1,6 +1,6 @@
-# Copyright 1999-2005 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-dns/djbdns/djbdns-1.05-r14.ebuild,v 1.9 2005/04/13 17:18:37 ka0ttic Exp $
+# $Header: $
 
 IUSE="aliaschain cnamefix doc fwdzone ipv6 multipleip roundrobin semanticfixi
 srvnaptr static selinux"

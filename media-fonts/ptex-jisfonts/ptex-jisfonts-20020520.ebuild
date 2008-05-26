@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/media-fonts/ptex-jisfonts/ptex-jisfonts-20020520.ebuild,v 1.1 2004/07/17 13:58:11 okayama Exp $
+# $Header: $
 
 inherit latex-package
 

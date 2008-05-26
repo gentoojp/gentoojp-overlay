@@ -1,6 +1,6 @@
-# Copyright 1999-2003 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/net-mail/fml/fml-4.0.3.ebuild,v 1.2 2003/12/14 21:24:34 usata Exp $
+# $Header: $
 
 inherit eutils
 

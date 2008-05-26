@@ -1,6 +1,6 @@
-# Copyright 1999-2003 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/portage/net-irc/plum/plum-2.33.1.ebuild,v 1.2 2003/08/02 17:54:34 usata Exp $
+# $Header: $
 
 inherit eutils
 

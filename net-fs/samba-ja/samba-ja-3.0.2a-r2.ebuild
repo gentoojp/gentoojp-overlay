@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/net-fs/samba/samba-3.0.2a-r2.ebuild,v 1.9 2004/05/12 05:18:38 randy Exp $
+# $Header: $
 
 inherit eutils
 

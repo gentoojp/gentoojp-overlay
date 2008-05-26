@@ -1,6 +1,6 @@
-# Copyright 1999-2005 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-emacs/navi2ch/navi2ch-1.7.5.ebuild,v 1.4 2005/07/09 19:35:51 swegener Exp $
+# $Header: $
 
 inherit elisp
 

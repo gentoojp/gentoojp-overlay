@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/net-zope/zwiki/zwiki-0.22.0.ebuild,v 1.2 2004/02/24 08:46:50 mr_bones_ Exp $
+# $Header: $
 
 inherit zproduct
 

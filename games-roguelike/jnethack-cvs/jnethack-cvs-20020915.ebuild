@@ -1,6 +1,6 @@
-# Copyright 1999-2002 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header:$
+# $Header: $
 
 ECVS_BRANCH=""
 ECVS_SERVER="cvs.sourceforge.jp:/cvsroot/jnethack"
