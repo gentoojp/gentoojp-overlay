@@ -30,38 +30,38 @@ DEPEND="sys-devel/autoconf
 
 src_unpack() {
 	unpack ${A}
-	cd ${S}
+	cd "${S}"
 	epatch ../${DILLO_I18N_P}.diff || die
 	sh autogen.sh || die
 
 	if [ "${DILLO_ICONSET}" = "kde" ]
 	then
 		einfo "Using Konqueror style icon set"
-		cp ${S2}/pixmaps.konq.h ${S}/src/pixmaps.h
+		cp "${S2}"/pixmaps.konq.h "${S}"/src/pixmaps.h
 	elif [ "${DILLO_ICONSET}" = "gnome" ]
 	then
 		einfo "Using Ximian style icon set"
-		cp ${S2}/pixmaps.ximian.h ${S}/src/pixmaps.h
+		cp "${S2}"/pixmaps.ximian.h "${S}"/src/pixmaps.h
 	elif [ "${DILLO_ICONSET}" = "mozilla" ]
 	then
 		einfo "Using Netscape style icon set"
-		cp ${S2}/pixmaps.netscape.h ${S}/src/pixmaps.h
+		cp "${S2}"/pixmaps.netscape.h "${S}"/src/pixmaps.h
 	elif [ "${DILLO_ICONSET}" = "cobalt" ]
 	then
 		einfo "Using Cobalt style icon set"
-		cp ${S2}/pixmaps.cobalt.h ${S}/src/pixmaps.h
+		cp "${S2}"/pixmaps.cobalt.h "${S}"/src/pixmaps.h
 	elif [ "${DILLO_ICONSET}" = "bold" ]
 	then
 		einfo "Using bold style icon set"
-		cp ${S2}/pixmaps.bold.h ${S}/src/pixmaps.h
+		cp "${S2}"/pixmaps.bold.h "${S}"/src/pixmaps.h
 	elif [ "${DILLO_ICONSET}" = "trans" ]
 	then
 		einfo "Using transparent style icon set"
-		cp ${S2}/pixmaps.trans.h ${S}/src/pixmaps.h
+		cp "${S2}"/pixmaps.trans.h "${S}"/src/pixmaps.h
 	elif [ "${DILLO_ICONSET}" = "trad" ]
 	then
 		einfo "Using the traditional icon set"
-		cp ${S2}/pixmaps.trad.h ${S}/src/pixmaps.h
+		cp "${S2}"/pixmaps.trad.h "${S}"/src/pixmaps.h
 	else
 		einfo "Using default Dillo icon set"
 	fi
@@ -93,15 +93,15 @@ src_compile() {
 
 src_install() {
 	dodir /etc  /usr/share/icons/${PN}
-	make DESTDIR=${D} install || die
+	make DESTDIR="${D}" install || die
 
 	dosed /etc/dpidrc
 
-	dodoc AUTHORS COPYING ChangeLog* INSTALL README NEWS
+	dodoc AUTHORS ChangeLog* README NEWS
 	docinto doc
 	dodoc doc/*.txt doc/README
 
-	cp ${S2}/icons/*.png ${D}/usr/share/icons/${PN}
+	cp "${S2}"/icons/*.png "${D}"/usr/share/icons/"${PN}"
 }
 
 pkg_postinst() {
