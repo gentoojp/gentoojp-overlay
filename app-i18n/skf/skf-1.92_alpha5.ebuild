@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/app-i18n/nkf/nkf-2.0.4.ebuild,v 1.3 2004/03/05 17:28:58 nakano Exp $
+# $Header: $
 
 MY_P="${P/_alpha/a}"
 DESCRIPTION="skf is an i18n-capable kanji filter"

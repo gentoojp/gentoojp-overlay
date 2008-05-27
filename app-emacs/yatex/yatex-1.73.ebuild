@@ -1,6 +1,6 @@
-# Copyright 1999-2007 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-emacs/yatex/yatex-1.73.ebuild,v 1.1 2007/04/19 10:02:13 okayama Exp $
+# $Header: $
 
 inherit elisp eutils
 

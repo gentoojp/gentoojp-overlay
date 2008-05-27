@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/net-mail/squirrelmail/squirrelmail-1.4.2-r4.ebuild,v 1.2 2004/04/27 21:12:30 agriffis Exp $
+# $Header: $
 
 inherit webapp-apache eutils
 

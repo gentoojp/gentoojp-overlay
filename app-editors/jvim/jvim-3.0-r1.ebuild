@@ -1,6 +1,6 @@
-# Copyright 1999-2003 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/portage/app-editors/jvim/jvim-3.0.ebuild,v 1.1.1.1 2003/07/01 08:21:31 usata Exp $
+# $Header: $
 
 IUSE="X canna"
 

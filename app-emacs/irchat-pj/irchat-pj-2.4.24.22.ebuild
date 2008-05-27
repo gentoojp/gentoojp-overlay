@@ -1,6 +1,6 @@
-# Copyright 1999-2003 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/app-emacs/irchat-pj/irchat-pj-2.4.24.22.ebuild,v 1.2 2003/10/30 12:17:12 usata Exp $
+# $Header: $
 
 IUSE=""
 

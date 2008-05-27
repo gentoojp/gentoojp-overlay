@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header:
+# $Header: $
 
 DESCRIPTION="Esecanna behaves like a cannaserver instead of VJE-Delta, Wnn or ATOK."
 HOMEPAGE="http://esecanna.netfort.gr.jp/"

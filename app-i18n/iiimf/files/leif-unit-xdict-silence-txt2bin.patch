@@ -1,9 +1,0 @@
---- iiimf-r12_2-svn2578/leif/unit/Xdict/xdict.mak~	2005-04-14 00:30:34.000000000 +0900
-+++ iiimf-r12_2-svn2578/leif/unit/Xdict/xdict.mak	2005-04-27 17:06:18.000000000 +0900
-@@ -8,5 +8,5 @@
- 
- SUFFIXES = .utf .data
- .utf.data:
--	$(TXT2BIN) $< $@
-+	$(TXT2BIN) $< $@ > /dev/null
- 

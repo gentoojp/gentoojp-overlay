@@ -1,6 +1,6 @@
-# Copyright 1999-2007 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/media-sound/mt-daapd/mt-daapd-0.2.4.1.ebuild,v 1.8 2007/12/31 03:10:40 vapier Exp $
+# $Header: $
 
 inherit autotools eutils
 

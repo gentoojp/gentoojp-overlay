@@ -1,6 +1,6 @@
-# Copyright 1999-2005 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/ekinoco/sys-cluster/drbd/drbd-0.6.13.ebuild,v 1.4 2005/03/26 16:36:41 syuu-cvs Exp $
+# $Header: $
 
 inherit eutils linux-info
 

@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-misc/openvpn/openvpn-1.5.0-r1.ebuild,v 1.8 2004/10/02 16:29:24 kloeri Exp $
+# $Header: $
 
 IUSE="ssl pthreads"
 

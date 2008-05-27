@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-python/japanesecodecs/japanesecodecs-1.4.9.ebuild,v 1.2 2004/06/25 01:32:21 agriffis Exp $
+# $Header: $
 
 PYTHON_SLOT_VERSION=2.1
 

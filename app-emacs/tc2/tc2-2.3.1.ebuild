@@ -1,6 +1,6 @@
-# Copyright 1999-2002 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/app-emacs/tc2/tc2-2.3.1.ebuild,v 1.2 2003/12/01 13:24:30 usata Exp $
+# $Header: $
 
 inherit elisp
 

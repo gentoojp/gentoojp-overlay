@@ -1,6 +1,6 @@
-# Copyright 1999-2005 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-emacs/howm/howm-1.2-r1.ebuild,v 1.3 2005/07/01 18:36:56 mkennedy Exp $
+# $Header: $
 
 inherit elisp
 

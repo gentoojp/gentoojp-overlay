@@ -1,6 +1,6 @@
-# Copyright 2004 HOSONO Hidetomo
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/portage/app-emacs/mew-cvs/RCS/mew-cvs-4.3.ebuild,v 1.10 2005/02/18 10:58:46 h12o Exp $
+# $Header: $
 
 ECVS_AUTH="pserver"
 export CVS_RSH="ssh"

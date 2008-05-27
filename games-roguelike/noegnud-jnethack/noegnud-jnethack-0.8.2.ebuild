@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Technologies, Inc.
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /home/cvsroot/gentoo-x86/games-roguelike/noegnud-nethack/noegnud-nethack-0.8.2.ebuild,v 1.5 2004/03/21 18:15:07 jhuebel Exp $ 
+# $Header: $
 
 inherit games
 

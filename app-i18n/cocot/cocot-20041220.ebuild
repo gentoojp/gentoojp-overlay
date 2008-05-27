@@ -1,6 +1,6 @@
-# Copyright 1999-2006 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-i18n/cocot/cocot-20041220.ebuild,v 1.1 2006/08/28 14:46:09 okayama Exp $
+# $Header: $
 
 DESCRIPTION="COde COnverter on Tty"
 HOMEPAGE="http://iwa.ath.cx/software/cygwin/cocot.html"

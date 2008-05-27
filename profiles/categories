@@ -1,4 +1,5 @@
 app-arch
+app-backup
 app-dicts
 app-editors
 app-emacs
@@ -7,7 +8,6 @@ app-i18n
 app-laptop
 app-misc
 app-office
-app-portage
 app-text
 app-vim
 dev-cpp
@@ -51,13 +51,12 @@ sci-libs
 sci-mathematics
 sys-apps
 sys-cluster
-sys-devel
 sys-kernel
 sys-libs
 www-apps
 www-client
 www-misc
 www-servers
-x11-libs
+x11-apps
 x11-misc
 x11-plugins

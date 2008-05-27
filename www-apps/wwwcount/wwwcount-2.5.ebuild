@@ -1,6 +1,6 @@
-# Copyright 1999-2004 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/ekinoco/www-apps/wwwcount/wwwcount-2.5.ebuild,v 1.5 2005/05/15 07:33:29 syuu-cvs Exp $
+# $Header: $
 
 inherit eutils toolchain-funcs
 
