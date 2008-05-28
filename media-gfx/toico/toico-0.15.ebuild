@@ -16,7 +16,7 @@ KEYWORDS="~x86 ~alpha"
 
 IUSE="gif png tiff"
 
-DEPEND="virtual/glibc
+DEPEND="virtual/libc
 	gif? ( media-libs/libungif )
 	png? ( media-libs/libpng )
 	tiff? ( media-libs/tiff )"

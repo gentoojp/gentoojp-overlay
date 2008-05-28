@@ -16,7 +16,7 @@ LICENSE="Sleepycat"
 KEYWORDS="~x86 ~ppc ~sparc"
 
 PROVIDE="virtual/editor"
-DEPEND="virtual/glibc
+DEPEND="virtual/libc
 	canna? ( app-i18n/canna )"
 
 S="${WORKDIR}/${P}/build"

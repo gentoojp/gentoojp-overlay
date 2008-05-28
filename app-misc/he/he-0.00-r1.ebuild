@@ -14,7 +14,7 @@ SLOT="0"
 
 KEYWORDS="~x86"
 
-DEPEND="virtual/glibc virtual/x11 media-libs/libsdl"
+DEPEND="virtual/libc virtual/x11 media-libs/libsdl"
 
 src_compile() {
 

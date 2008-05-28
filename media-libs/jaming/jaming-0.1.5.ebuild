@@ -13,7 +13,7 @@ SLOT="0"
 LICENSE="LGPL-2.1"
 KEYWORDS="~x86"
 
-DEPEND="virtual/glibc
+DEPEND="virtual/libc
 	!media-libs/ming"
 
 src_unpack() {

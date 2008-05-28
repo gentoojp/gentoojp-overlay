@@ -10,7 +10,7 @@ LICENSE="as-is"
 SLOT="0"
 KEYWORDS="~x86 ~alpha ~ppc ~sparc"
 
-DEPEND="virtual/glibc
+DEPEND="virtual/libc
 	sys-libs/libtermcap-compat
 	X? ( virtual/x11 )
 	!X? ( sys-devel/imake )"

@@ -19,7 +19,7 @@ LICENSE="Sleepycat"
 KEYWORDS="~x86 ~ppc ~sparc"
 
 PROVIDE="virtual/editor"
-DEPEND="virtual/glibc
+DEPEND="virtual/libc
 	sys-libs/libtermcap-compat
 	tcltk? ( dev-lang/tk )
 	ncurses? ( sys-libs/ncurses )

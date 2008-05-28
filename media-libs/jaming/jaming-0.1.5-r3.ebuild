@@ -15,7 +15,7 @@ SLOT="0"
 LICENSE="LGPL-2.1"
 KEYWORDS="~x86"
 
-DEPEND="virtual/glibc
+DEPEND="virtual/libc
 	<=sys-devel/bison-1.35
 	!media-libs/ming"
 

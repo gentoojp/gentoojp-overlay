@@ -15,7 +15,7 @@ SLOT="0"
 KEYWORDS="~x86"
 IUSE="ssl nls java python tcltk perl libg++ pam readline zlib pg-hier cluster pgreplicate pglb"
 
-DEPEND="virtual/glibc
+DEPEND="virtual/libc
 	sys-devel/autoconf
 	app-admin/sudo
 	>=sys-libs/ncurses-5.2
@@ -30,7 +30,7 @@ DEPEND="virtual/glibc
 	nls? ( sys-devel/gettext )"
 # java dep workaround for portage bug
 # x86? ( java? ( =dev-java/sun-jdk-1.3* >=dev-java/ant-1.3 ) )
-RDEPEND="virtual/glibc
+RDEPEND="virtual/libc
 	zlib? ( >=sys-libs/zlib-1.1.3 )
 	tcltk? ( >=dev-lang/tcl-8 )
 	perl? ( >=dev-lang/perl-5.6.1-r2 )

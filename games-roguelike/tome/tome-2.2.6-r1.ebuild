@@ -15,7 +15,7 @@ SLOT="0"
 KEYWORDS="~x86 ~ppc ~amd64"
 IUSE=""
 
-RDEPEND="virtual/glibc
+RDEPEND="virtual/libc
 	dev-lang/lua
 	>=sys-libs/ncurses-5
 	virtual/x11"

@@ -22,7 +22,7 @@ KEYWORDS="~x86"
 DEPEND="X? ( virtual/x11 )
 	canna? ( app-i18n/canna )
 	sys-libs/ncurses
-	virtual/glibc"
+	virtual/libc"
 
 S=${WORKDIR}/vim
 

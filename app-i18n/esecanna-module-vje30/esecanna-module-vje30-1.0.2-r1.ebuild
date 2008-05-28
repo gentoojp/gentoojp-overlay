@@ -14,7 +14,7 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86"
 
-DEPEND="virtual/glibc
+DEPEND="virtual/libc
 app-i18n/esecanna"
 RDEPEND="app-i18n/esecanna"
 

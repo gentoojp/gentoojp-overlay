@@ -15,7 +15,7 @@ KEYWORDS="~x86 ~ppc ~sparc ~mips ~alpha ~hppa ~amd64 ~ia64 ~ppc64"
 
 IUSE="socks5"
 
-DEPEND="virtual/glibc
+DEPEND="virtual/libc
 	>=sys-libs/ncurses-5.1
 	>=sys-libs/zlib-1.1.4"
 

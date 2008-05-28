@@ -14,7 +14,7 @@ SLOT="0"
 
 KEYWORDS="~x86"
 
-DEPEND="virtual/glibc"
+DEPEND="virtual/libc"
 
 src_compile() {
 

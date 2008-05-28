@@ -16,7 +16,7 @@ KEYWORDS="~x86"
 
 IUSE=""
 
-DEPEND="virtual/glibc sys-devel/gcc-config"
+DEPEND="virtual/libc sys-devel/gcc-config"
 
 src_compile() {
 

@@ -12,11 +12,11 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86"
 IUSE="mmx doc"
-DEPEND="virtual/glibc
+DEPEND="virtual/libc
 	>=media-libs/libsdl-1.1.7
 	>=dev-lang/nasm-0.98.34"
 	#vloopback? (>=media-video/vloopback-0.90)
-RDEPEND="virtual/glibc
+RDEPEND="virtual/libc
 	>=media-libs/libsdl-1.1.7"
 
 S=${WORKDIR}/${P}
