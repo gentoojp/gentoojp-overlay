@@ -1,38 +1,37 @@
-#Copyright 2002 Gentoo Technologies, Inc.
-#Distributed under the terms of the GNU General Public License, v2 or later
-#Author MATSUU Takuto <matsuu@7501.net>
+# Copyright 1999-2008 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header$
 
-A=elisat10.tar.gz
+
+MY_P="elisat10.tar.gz"
 S=${WORKDIR}
 DESCRIPTION="ELISA 8x8 Japanese font"
-SRC_URI="http://www.tea.forus.or.jp/toshi/exhibition/${A}"
+SRC_URI="http://www.bsdbbq.org/~toshi/distfiles/${MY_P}"
 HOMEPAGE="http://hp.vector.co.jp/authors/VA002310/"
 SLOT=0
 KEYWORDS="~x86"
 LICENSE="freeware"
 
-DEPEND="virtual/x11"
+DEPEND=""
 RDEPEND=$DEPEND
 
 PREFIX="/usr/share/fonts/ja/elisa/"
 
 
 src_unpack() {
-	unpack ${A}
-	cd ${S}
+	unpack ${MY_P}
+	cd "${S}"
 	bdftopcf elisat10.bdf   | gzip > elisat10.pcf.gz
 	bdftopcf jpnhn4-iso.bdf | gzip > jpnhn4-iso.pcf.gz
 	bdftopcf jpnhn4-jis.bdf | gzip > jpnhn4-jis.pcf.gz
 }
 
 src_install() {
-	cd ${S}
-
 	# install fonts
 	insinto ${PREFIX}
 	doins *.pcf.gz
 	doins fonts.alias
-	newins ${FILESDIR}/fonts.dir.elisa fonts.dir
+	newins "${FILESDIR}"/fonts.dir.elisa fonts.dir
 
 	dodoc elisa100.doc elisat10.doc elisat10.html
 }
