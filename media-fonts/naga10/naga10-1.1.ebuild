@@ -22,7 +22,7 @@ src_unpack() {
 
 	unpack ${A}
 
-	cd ${S}
+	cd "${S}"
 	patch -o maru10.bdf < maru10.bdf.diff || die
 	patch -o min10.bdf < min10.bdf.diff || die
 }
