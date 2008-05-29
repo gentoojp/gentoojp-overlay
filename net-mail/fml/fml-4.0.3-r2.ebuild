@@ -8,7 +8,7 @@ DESCRIPTION="This is a sample skeleton ebuild file"
 
 HOMEPAGE="http://www.fml.org"
 SRC_URI="ftp://ftp.fml.org/pub/fml/release/${P}.tar.gz"
-LICENSE=""
+LICENSE="GPL-2"
 
 SLOT="0"
 KEYWORDS="~x86"
@@ -21,8 +21,8 @@ RDEPEND="${DEPEND}
 src_unpack() {
 
 	unpack ${A}
-	cd ${S}
-	epatch ${FILESDIR}/${P}-gentoo.diff
+	cd "${S}"
+	epatch "${FILESDIR}"/${P}-gentoo.diff
 }
 
 src_install() {
@@ -31,27 +31,27 @@ src_install() {
 
 	# Personal Use or ML-Admin-Group-Shared or fmlserv you use? 
 	# Personal, Group, Fmlserv (personal/group/fmlserv) [personal]
-	echo "personal" >> ${T}/makefml.conf
+	echo "personal" >> "${T}/makefml.conf"
 	# DOMAIN NAME [your domain name here]
-	echo "" >> ${T}/makefml.conf
+	echo "" >> "${T}/makefml.conf"
 	# FQDN [your FQDN here]
-	echo "" >> ${T}/makefml.conf
+	echo "" >> "${T}/makefml.conf"
 	# EXEC FILES DIRECTORY [/usr/local/fml]
-	echo "${D}/usr/share/fml" >> ${T}/makefml.conf
+	echo "${D}/usr/share/fml" >> "${T}/makefml.conf"
 	# TOP LEVEL ML DIRECTORY [/var/spool/ml]
-	echo "${D}/var/spool/ml" >> ${T}/makefml.conf
+	echo "${D}/var/spool/ml" >> "${T}/makefml.conf"
 	# Language (Japanese or English) [English]
-	echo "" >> ${T}/makefml.conf
+	echo "" >> "${T}/makefml.conf"
 	# TimeZone (TZ: e.g. +0900, -0300) [your TZ here]
-	echo "" >> ${T}/makefml.conf
+	echo "" >> "${T}/makefml.conf"
 	# Install the Fml system to ${D}usr/share/fml. (y/n) [n]
-	echo "y" >> ${T}/makefml.conf
+	echo "y" >> "${T}/makefml.conf"
 
-	make install < ${T}/makefml.conf || die
+	make install < "${T}/makefml.conf" || die
 
 	dodir /usr/bin
 	dosym /usr/share/fml/makefml /usr/bin/makefml
-	rm -f ${D}/usr/share/fml/Configurations
+	rm -f "${D}"/usr/share/fml/Configurations
 	dosym /usr/share/fml/.fml /usr/share/fml/Configurations
 	dosed /usr/share/fml/{,sbin/}makefml
 	dosed /usr/share/fml/.fml/{cgi.conf,system}
@@ -64,14 +64,14 @@ src_install() {
 		/usr/share/fml/doc/man/{fml.8,makefml.1}
 	dosed -e "s:/usr/share/fml/doc:/usr/share/doc/${P}:g" \
 		/usr/share/fml/doc/man/{fml.8,makefml.1}
-	doman ${D}/usr/share/fml/doc/man/{fml.8,makefml.1}
+	doman "${D}"/usr/share/fml/doc/man/{fml.8,makefml.1}
 
 	if [ "`use doc`" ] ; then
-		rm -rf ${D}/usr/share/fml/doc/man
-		mv ${D}/usr/share/fml/doc ${D}/usr/share/doc/${P}
+		rm -rf "${D}"/usr/share/fml/doc/man
+		mv "${D}"/usr/share/fml/doc "${D}"/usr/share/doc/${P}
 		dosym /usr/share/doc/${P} /usr/share/fml/doc
 	else
-		rm -rf ${D}/usr/share/fml/doc
+		rm -rf "${D}"/usr/share/fml/doc
 	fi
 }
 
