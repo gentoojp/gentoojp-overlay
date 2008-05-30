@@ -11,19 +11,19 @@ SLOT="0"
 KEYWORDS="~x86 ~amd64 ~ppc ~sparc"
 
 src_compile () {
-    cd ${WORKDIR}/ebutils-1.2pre || die
-    ./configure
-    emake
+	cd "${WORKDIR}"/ebutils-1.2pre || die
+	econf
+	emake
 }
 
 src_install() {
-    cd ${WORKDIR}/ebutils-1.2pre || die
-    
-    dobin bookinfo
-    dobin catdump
-    dobin squeeze
+	cd "${WORKDIR}"/ebutils-1.2pre || die
 
-    doman bookinfo.1
-    doman catdump.1
-    doman squeeze.1
+	dobin bookinfo
+	dobin catdump
+	dobin squeeze
+
+	doman bookinfo.1
+	doman catdump.1
+	doman squeeze.1
 }
