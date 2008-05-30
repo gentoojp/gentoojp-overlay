@@ -39,20 +39,20 @@ src_install() {
 	dosym /etc/esehttpd/conf /usr/lib/esehttpd/conf
 	dosym /var/log/esehttpd /usr/lib/esehttpd/log
 
-	exeinto /etc/init.d;  newexe ${FILESDIR}/esehttpd.initd esehttpd
-	insinto /etc/conf.d;  newins ${FILESDIR}/esehttpd.confd esehttpd
+	exeinto /etc/init.d;  newexe "${FILESDIR}"/esehttpd.initd esehttpd
+	insinto /etc/conf.d;  newins "${FILESDIR}"/esehttpd.confd esehttpd
 
 	exeinto /usr/sbin
-		doexe ${S}/src/esehttpd
-		doexe ${S}/src/eseconf
-		doexe ${S}/src/esepasswd
-		doexe ${S}/src/esetestclient
-		doexe ${S}/etc/esectl
+		doexe "${S}"/src/esehttpd
+		doexe "${S}"/src/eseconf
+		doexe "${S}"/src/esepasswd
+		doexe "${S}"/src/esetestclient
+		doexe "${S}"/etc/esectl
 	insinto /etc/esehttpd/conf
-		doins ${S}/etc/mime.types
-		doins ${FILESDIR}/esehttpd.conf
-	dodoc AUTHORS COPYING ChangeLog* MEMO* NEWS README TODO*
-	dohtml -r ${S}/doc/*
+		doins "${S}"/etc/mime.types
+		doins "${FILESDIR}"/esehttpd.conf
+	dodoc AUTHORS ChangeLog* MEMO* NEWS README TODO*
+	dohtml -r "${S}"/doc/*
 }
 
 pkg_postinst() {
