@@ -19,7 +19,7 @@ S="${WORKDIR}/${P}"
 
 src_compile() {
 	if use emacs; then
-		elisp-comp ${S}/elisp/rrb.el || die
+		elisp-comp "${S}"/elisp/rrb.el || die
 	fi
 }
 
@@ -27,7 +27,7 @@ src_install() {
 	einstall || die
 	erubydoc
 	if use emacs; then
-		elisp-install rrb ${S}/elisp/rrb.el ${S}/elisp/rrb.elc
+		elisp-install rrb "${S}"/elisp/rrb.el "${S}"/elisp/rrb.elc
 		elisp-site-file-install ${FILEDIR}/rrb.el
 	fi
 }
