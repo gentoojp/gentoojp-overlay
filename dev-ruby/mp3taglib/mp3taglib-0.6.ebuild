@@ -19,6 +19,6 @@ S="${WORKDIR}/${P}"
 
 src_unpack() {
 	unpack ${P}.tar.gz || die
-	cd ${S}
-	epatch ${FILESDIR}/${PF}.patch
+	cd "${S}"
+	epatch ${FILESDIR}/"${PF}".patch
 }
