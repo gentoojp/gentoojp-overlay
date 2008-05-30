@@ -12,8 +12,7 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86"
 
-DEPEND="virtual/x11
-	>=dev-lang/ruby-1.8.1
+DEPEND=" >=dev-lang/ruby-1.8.1
 	>=dev-ruby/ruby-mmap-0.2.2"
 
 S=${WORKDIR}/${P}
@@ -26,7 +25,7 @@ src_compile() {
 
 src_install() {
 
-	einstall DESTDIR=${D} || die
+	einstall DESTDIR="${D}" || die
 
 	keepdir /usr/share/dicts/EIJIRO
 
@@ -42,21 +41,21 @@ src_install() {
 
 pkg_postinst() {
 
-	einfo
+	einfo ""
 	einfo "Place your EIJIRO dictionary files (e.g. EIJIRO65.TXT, OTOJIRO.TXT,"
 	einfo "REIJI65.TXT, RYAKU65.TXT and WAEIJI65.TXT) to /usr/share/dicts/EIJIRO/"
 	einfo "and run"
 	einfo "\tebuild /var/db/pkg/app-dicts/rdic/${PF}.ebuild config"
 	einfo "to convert EIJIRO dictionary files into PDIC format."
-	einfo 
+	einfo ""
 }
 
 pkg_config() {
 
-	einfo
+	einfo ""
 	einfo "Now convert EIJIRO dictionary files to PDIC format."
 	einfo "It takes time for a while."
-	einfo 
+	einfo ""
 
 	for x in /usr/share/dicts/EIJIRO/*TXT ; do
 		ruby -Ke /usr/share/rdic/cnv2rdic.rb $x | sort -k1,1 -t: -f > ${x%.TXT}.euc
