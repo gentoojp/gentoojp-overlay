@@ -1,0 +1,10 @@
+# ChangeLog for x11-misc/lxpanel
+# Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*lxpanel-0.3.6.3 (31 May 2008)
+
+  31 May 2008; Ryoichiro Suzuki <rspace@rspace.org> +lxpanel-0.3.6.3.ebuild,
+  lxpanel-0.3.6.ebuild:
+  version bump
+
