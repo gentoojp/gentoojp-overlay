@@ -4,6 +4,6 @@ case "$1" in
 		echo "options:"
 		echo "   -h or --help   print help"
 		echo "   -m or --moe    launch moe version" ;;
-	-m | --moe ) cd /usr/lib/heSDL ; ./moe_sdl ;;
-	* ) cd /usr/lib/heSDL ; ./he_sdl
+	-m | --moe ) cd /usr/lib/heSDL ; exec ./moe_sdl ;;
+	* ) cd /usr/lib/heSDL ; exec ./he_sdl
 esac
