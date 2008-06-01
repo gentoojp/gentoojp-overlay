@@ -1,0 +1,11 @@
+# ChangeLog for media-gfx/tgif
+# Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*tgif-4.1.45 (01 Jun 2008)
+
+  01 Jun 2008; Ryoichiro Suzuki <rspace@rspace.org>
+  +files/tgif-4.1.45-gentoo.patch, +files/tgif-4.1.45-japanese.patch,
+  +files/tgif-4.1.45-kprinter.patch, +tgif-4.1.45.ebuild:
+  sync with the official tree. remove old versions.
+
