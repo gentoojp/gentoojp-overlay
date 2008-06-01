@@ -6,42 +6,42 @@ inherit eutils games
 
 MY_PV=${PV//./}
 DESCRIPTION="Japanized Tales of Middle Earth"
-HOMEPAGE="http://t-o-m-e.net/ http://ironhell.sakura.ne.jp/angband/tome/"
+HOMEPAGE="http://t-o-m-e.net/
+	http://ironhell.sakura.ne.jp/angband/tome/"
 SRC_URI="http://t-o-m-e.net/dl/src/tome-${MY_PV}-src.tar.bz2
         http://ironhell.sakura.ne.jp/angband/tome/tome-${MY_PV}-j075-src.lzh"
 
 LICENSE="Moria"
 SLOT="0"
-KEYWORDS="~x86 ~ppc ~amd64"
+KEYWORDS="~amd64 ~x86 ~ppc"
 IUSE=""
 
-RDEPEND="virtual/libc
-	dev-lang/lua
+RDEPEND="dev-lang/lua
 	>=sys-libs/ncurses-5
 	x11-libs/libX11"
 DEPEND="${RDEPEND}
     app-arch/lha
-	>=sys-apps/sed-4"
+	x11-misc/makedepend"
 
-S=${WORKDIR}/tome-${MY_PV}-src
+S="${WORKDIR}"/tome-${MY_PV}-src
 
 src_unpack() {
-#	unpack ${A}
-        unpack tome-${MY_PV}-src.tar.bz2
-        mv tome-${MY_PV}-src tome-${MY_PV}-j075-src
-		# unpack JP patches with conv sjis->euc
-        lha -xte ${DISTDIR}/tome-${MY_PV}-j075-src.lzh
-        mv tome-${MY_PV}-j075-src tome-${MY_PV}-src
+	#unpack ${A}
+	unpack tome-${MY_PV}-src.tar.bz2
+	mv tome-${MY_PV}-src tome-${MY_PV}-j075-src
+	# unpack JP patches with conv sjis->euc
+	lha -xte ${DISTDIR}/tome-${MY_PV}-j075-src.lzh
+	mv tome-${MY_PV}-j075-src tome-${MY_PV}-src
 
-	cd ${S}/src
-        # apply JP patch
-        epatch "${S}/t231j075.dif"
+	cd "${S}"/src
+	# apply JP patch
+	epatch "${S}/t231j075.dif"
 	epatch "${FILESDIR}/${PV}-j075-display.patch"
 	mv makefile.std makefile
 	epatch "${FILESDIR}/${PV}-gentoo-paths.patch"
 	sed -i \
 		-e "s:GENTOO_DIR:${GAMES_STATEDIR}:" files.c init2.c \
-			|| die "sed failed"
+		|| die "sed failed"
 }
 
 src_compile() {
@@ -51,7 +51,7 @@ src_compile() {
 		COPTS="${CFLAGS}" \
 		BINDIR=${GAMES_BINDIR} \
 		LIBDIR=${GAMES_DATADIR}/${PN} \
-			|| die "emake failed"
+		|| die "emake failed"
 }
 
 src_install() {
@@ -60,8 +60,8 @@ src_install() {
 		OWNER=${GAMES_USER} \
 		BINDIR=${D}/${GAMES_BINDIR} \
 		LIBDIR=${D}/${GAMES_DATADIR}/${PN} install \
-			|| die "make install failed"
-	cd ${S}
+		|| die "make install failed"
+	cd "${S}"
 	dodoc *.txt
 
 	dodir "${GAMES_STATEDIR}"
@@ -77,7 +77,7 @@ pkg_postinst() {
 	echo
 	ewarn "ToME ${PV} is not save-game compatible with previous versions."
 	echo
-	einfo "If you have older save files and you wish to continue those games,"
-	einfo "you'll need to remerge the version of ToME with which you started"
-	einfo "those save-games."
+	elog "If you have older save files and you wish to continue those games,"
+	elog "you'll need to remerge the version of ToME with which you started"
+	elog "those save-games."
 }
