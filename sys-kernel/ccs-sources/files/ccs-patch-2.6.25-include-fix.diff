@@ -1,0 +1,24 @@
+--- linux-2.6.25.orig/fs/compat.c       2008-06-04 00:38:10.619917964 +0900
++++ linux-2.6.25/fs/compat.c    2008-06-04 00:38:22.757918404 +0900
+@@ -55,6 +55,9 @@
+ #include <asm/mmu_context.h>
+ #include <asm/ioctls.h>
+ #include "internal.h"
++/***** TOMOYO Linux start. *****/
++#include <linux/tomoyo.h>
++/***** TOMOYO Linux end. *****/
+
+ int compat_log = 1;
+
+diff -ur linux-2.6.25.orig/fs/proc/proc_misc.c linux-2.6.25/fs/proc/proc_misc.c
+--- linux-2.6.25.orig/fs/proc/proc_misc.c       2008-06-04 00:38:10.633917844 +0900
++++ linux-2.6.25/fs/proc/proc_misc.c    2008-06-04 00:38:22.770917804 +0900
+@@ -909,7 +909,7 @@
+ #endif
+ 	/***** CCS start. *****/
+ #if defined(CONFIG_SAKURA) || defined(CONFIG_TOMOYO)
+-	printk(KERN_INFO "Hook version: 2.6.25 2008/04/28\n");
++	printk(KERN_INFO "Hook version: 2.6.25 2008/05/17\n");
+ #endif
+ 	/***** CCS end. *****/
+ }

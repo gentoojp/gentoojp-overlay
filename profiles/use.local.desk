@@ -1,0 +1,1 @@
+sys-kernel/ccs-sources:lsm - pick out LSM implementation (aka tomoyo 2.x) rather than tomoyo 1.x.
