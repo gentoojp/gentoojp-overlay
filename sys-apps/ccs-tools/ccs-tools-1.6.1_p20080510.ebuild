@@ -20,6 +20,13 @@ DEPEND="sys-libs/ncurses
 
 S="${WORKDIR}/ccstools/"
 
+src_unpack() {
+	unpack ${A}
+	cd "${S}"
+
+	sed -i -e "s:/lib/:/$(get_libdir)/:g" Makefile || die "sed failed"
+}
+
 src_compile() {
 	CFLAGS="${CFLAGS} -Wall -Wno-pointer-sign"
 	strip-unsupported-flags
@@ -28,5 +35,4 @@ src_compile() {
 
 src_install() {
 	emake INSTALLDIR="${D}" install || die "emake install failed"
-	dodoc README.ccs
 }
