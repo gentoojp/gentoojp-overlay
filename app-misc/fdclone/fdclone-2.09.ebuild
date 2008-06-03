@@ -6,10 +6,10 @@ inherit eutils toolchain-funcs
 
 DESCRIPTION="FDClone: Console Filer"
 HOMEPAGE="http://hp.vector.co.jp/authors/VA012337/soft/fd/"
-SRC_URI="${HOMEPAGE}FD-${PV}.tar.gz"
+SRC_URI="ftp://ftp.unixusers.net/src/fdclone/FD-${PV}.tar.gz"
 PATCHES="${FILESDIR}/FD-2.08d-mswavedash.patch"
 
-LICENSE=""	# 独自ライセンス
+LICENSE="FDCLONE"	# 独自ライセンス
 SLOT="0"
 KEYWORDS="~x86"
 IUSE="unicode"
@@ -20,7 +20,7 @@ DEPEND="${RDEPEND}"
 S=${S%/*}/FD-${PV}
 src_unpack(){
 	unpack ${A}
-	cd ${S}
+	cd "${S}"
 	epatch ${PATCHES}
 }
 
