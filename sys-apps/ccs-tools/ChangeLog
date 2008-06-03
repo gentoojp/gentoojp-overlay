@@ -1,0 +1,11 @@
+# ChangeLog for sys-apps/ccs-tools
+# Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*ccs-tools-1.6.1_p20080510 (03 Jun 2008)
+
+  03 Jun 2008; Ryoichiro Suzuki <rspace@rspace.org>
+  -ccs-tools-1.0_p20051111.ebuild, -ccs-tools-1.5.3_p20080131-r1.ebuild,
+  -ccs-tools-1.5.3_p20080131.ebuild, +ccs-tools-1.6.1_p20080510.ebuild:
+  version bump. remove old versions.
+
