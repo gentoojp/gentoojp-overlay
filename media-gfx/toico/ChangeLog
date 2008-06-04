@@ -1,0 +1,8 @@
+# ChangeLog for media-gfx/toico
+# Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+  04 Jun 2008; Ryoichiro Suzuki <rspace@rspace.org>
+  toico-0.18.ebuild:
+  fix ebuild so that your {C,LD}FLAGS will be applied.
+
