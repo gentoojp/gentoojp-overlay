@@ -3,46 +3,44 @@
 inherit eutils gnuconfig
 
 DESCRIPTION="A client-server based Kana-Kanji conversion system"
-HOMEPAGE=""
-SRC_URI="ftp://ftp.freebsd.org/pub/FreeBSD/ports/distfiles/sj3-2.0.1.20.tar.gz"
+HOMEPAGE="http://code.google.com/p/sj3/"
+SRC_URI="ftp://ftp.freebsd.org/pub/FreeBSD/ports/distfiles/${P}.tar.gz"
 
 LICENSE="as-is"
 SLOT="0"
 KEYWORDS="~x86 ~alpha ~ppc ~sparc"
 
-DEPEND="virtual/libc
-	sys-libs/libtermcap-compat
-	X? ( virtual/x11 )
-	!X? ( sys-devel/imake )"
-
-S="${WORKDIR}/${P}"
+RDEPEND="sys-libs/libtermcap-compat"
+DEPEND="${RDEPEND}
+	x11-misc/imake"
 
 src_unpack() {
 	unpack ${A}
-	cd ${S}
-# These patches do not work on Linux.
-# old one
-#	EPATCH_OPTS="-p0" epatch ${FILESDIR}/${PN}-patches-20040724.diff
-# new one
-#	EPATCH_OPTS="-p0" epatch ${FILESDIR}/${PN}-patches-20040916.diff
-# We need strlcpy() to the patches above on Linux.
-#	epatch ${FILESDIR}/${P}-strlcpy.diff
+	cd "${S}"
 
-# This patch is included in the file above.
-	epatch ${FILESDIR}/${P}-dict-Makefile.patch
-	epatch ${FILESDIR}/${P}-tmpl.patch
-        epatch ${FILESDIR}/${P}-server.patch
+	# These patches do not work on Linux.
+	# old one
+	#	EPATCH_OPTS="-p0" epatch "${FILESDIRR}"/${PN}-patches-20040724.diff
+	# new one
+	#	EPATCH_OPTS="-p0" epatch "${FILESDIRR}"/${PN}-patches-20040916.diff
+	# We need strlcpy() to the patches above on Linux.
+	#	epatch "${FILESDIRR}"/${P}-strlcpy.diff
+
+	# This patch is included in the file above.
+	epatch ""${FILESDIRR}"/${P}-dict-Makefile.patch"
+	epatch ""${FILESDIRR}"/${P}-tmpl.patch"
+	epatch ""${FILESDIRR}"/${P}-server.patch"
 	cd dict/dict
-	cp ${FILESDIR}/visual+.dic.gz .
+	cp ""${FILESDIRR}""/visual+.dic.gz .
 	gunzip visual+.dic.gz
 	mv visual.dic visual.dic.orig
 	mv visual+.dic visual.dic
 }
 
 src_compile() {
-	xmkmf || die
-	make Makefiles || die
-	make CDEBUGFLAGS="${CFLAGS}" || die
+	xmkmf || die "xmkmf failed"
+	make Makefiles || die "make Makefiles failed"
+	make CDEBUGFLAGS="${CFLAGS}" || die "make failed"
 }
 
 src_install() {
@@ -58,18 +56,18 @@ src_install() {
 		doins ${T}/services
 	fi
 
-	make SJ3TOP=${D}/usr install || die
+	make SJ3TOP="${D}"/usr install || die
 
-	mv ${D}/usr/lib/sj3/sjrc ${D}/usr/lib/sj3/sjrc.orig
-	cp ${FILESDIR}/sjrc.kinput2  ${D}/usr/lib/sj3/sjrc
+	mv "${D}"/usr/lib/sj3/sjrc "${D}"/usr/lib/sj3/sjrc.orig
+	cp "${FILESDIRR}"/sjrc.kinput2  "${D}"/usr/lib/sj3/sjrc
  
-	mv ${D}/usr/lib/sj3/sjrk ${D}/usr/lib/sj3/sjrk.orig
-	cp ${FILESDIR}/sjrk  ${D}/usr/lib/sj3/
+	mv "${D}"/usr/lib/sj3/sjrk "${D}"/usr/lib/sj3/sjrk.orig
+	cp "${FILESDIRR}"/sjrk  "${D}"/usr/lib/sj3/
 
-	cp ${FILESDIR}/sjhk  ${D}/usr/lib/sj3/
+	cp "${FILESDIRR}"/sjhk  "${D}"/usr/lib/sj3/
 
 	dodoc CHANGES.eucJP README*
 
-	exeinto /etc/init.d ; newexe ${FILESDIR}/sj3.initd.new sj3 || die
+	exeinto /etc/init.d ; newexe "${FILESDIRR}"/sj3.initd.new sj3 || die
 }
 
