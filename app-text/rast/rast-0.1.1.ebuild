@@ -3,13 +3,12 @@
 # $Header: $
 
 DESCRIPTION="Rast is a full-text search system."
-HOMEPAGE="http://www.netlab.jp/rast/"
-SRC_URI="http://www.netlab.jp/rast/archives/${P}.tar.bz2"
+HOMEPAGE="http://projects.netlab.jp/rast/"
+SRC_URI="http://projects.netlab.jp/rast/archives/${P}.tar.bz2"
+
 LICENSE="GPL-2"
-
 SLOT="0"
-
-KEYWORDS="~x86"
+KEYWORDS="~amd64 ~x86"
 
 IUSE="mecab unicode ruby"
 
@@ -19,13 +18,6 @@ DEPEND=">=dev-libs/apr-0.9.5
 	unicode? ( >=dev-libs/icu-2.8 )
 	ruby? ( >=dev-lang/ruby-1.8.1 )"
 
-S=${WORKDIR}/${P}
-
-src_compile() {
-	econf || die "econf failed"
-	emake || die "emake failed"
-}
-
 src_install() {
-	make DESTDIR=${D} install || die
+	make DESTDIR="${D}" install || die "make install failed"
 }

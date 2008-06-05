@@ -12,7 +12,8 @@ DESCRIPTION="Pseudo AI module for 'Nanika' and other desktop agents for ninix"
 SRC_URI="mirror://sourceforge/${PN}/${MY_P}.zip"
 HOMEPAGE="http://kawari.sourceforge.net/"
 
-DEPEND="dev-lang/python"
+DEPEND="dev-lang/python
+	app-arch/unzip"
 RDEPEND="app-misc/ninix-aya"
 
 KEYWORDS="~x86 ~alpha"
@@ -27,7 +28,7 @@ pkg_setup(){
 
 src_unpack(){
 	unpack ${A}
-	cd ${S}/build/src
+	cd "${S}"/build/src
 	sed -e "s/^\(MACH_TYPE =\) mingw/\1 linux/" \
 		-e "s/^\(STLport =\) yes/\1 no/" \
 		-e "s/^\(UPX\)/#\1/" \
@@ -37,24 +38,24 @@ src_unpack(){
 }
 
 src_compile(){
-	cd ${S}/build/src
+	cd "${S}"/build/src
 	emake CFLAGS="${CFLAGS} -I. -I/usr/include/python${PYVER} -fPIC" \
 		../mach/linux/libshiori.so || die
 }
 
 src_install(){
-	cd ${S}/build/mach/linux
+	cd "${S}"/build/mach/linux
 	exeinto /usr/lib/python${PYVER}/site-packages/ninix-aya
 	newexe libshiori.so _kawari8.so
 
-	cd ${S}
+	cd "${S}"
 	dodoc license.txt readme.1st
 
 	if use doc; then
 		for dir in document document/images document/banners
 		do
 			(
-				cd ${S}/${dir}
+				cd "${S}"/${dir}
 				docinto ${dir}
 				dohtml *
 			)

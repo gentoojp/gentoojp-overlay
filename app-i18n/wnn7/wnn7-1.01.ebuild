@@ -14,27 +14,27 @@ wnn7-server-1.01-1.i386.rpm \
 wnn7-utils-1.00-1.i386.rpm \
 wnn7-xclients-1.03-1.i386.rpm \
 dpkeylist"
-SRC_URI=${SRC_RPMS}
+SRC_URI="${SRC_RPMS}"
 LICENSE=""
 SLOT="0"
-KEYWORDS="~x86 -ppc -alpha -sparc"
+KEYWORDS="-* ~x86"
 RESTRICT="fetch"
 DEPEND="app-arch/rpm2targz"
 
 pkg_nofetch() {
-    einfo "Please copy RPMs and dpkeylist:"
-    einfo "${SRC_RPMS}"
-    einfo "from CD-ROM or ${HOMEPAGE} and place them in ${DISTDIR}"
+	einfo "Please copy RPMs and dpkeylist:"
+	einfo "${SRC_RPMS}"
+	einfo "from CD-ROM or ${HOMEPAGE} and place them in ${DISTDIR}"
 }
 
 src_unpack() {
 	rpm_src_unpack
-	cd ${WORKDIR}
+	cd "${WORKDIR}"
 	rm -rf etc/rc.d
 }
 
 src_install() {
-	cp -a ${WORKDIR}/* ${D}
+	cp -a ${WORKDIR}/* "${D}"
 	exeinto /etc/init.d
 	doexe ${FILESDIR}/dpkey7
 	doexe ${FILESDIR}/wnn7

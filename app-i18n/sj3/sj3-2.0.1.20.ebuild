@@ -1,4 +1,6 @@
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
+# $Header: $
 
 inherit eutils gnuconfig
 
@@ -59,8 +61,8 @@ src_install() {
 	make SJ3TOP="${D}"/usr install || die
 
 	mv "${D}"/usr/lib/sj3/sjrc "${D}"/usr/lib/sj3/sjrc.orig
-	cp "${FILESDIRR}"/sjrc.kinput2  "${D}"/usr/lib/sj3/sjrc
- 
+	cp "${FILESDIRR}"/sjrc.kinput2 "${D}"/usr/lib/sj3/sjrc
+
 	mv "${D}"/usr/lib/sj3/sjrk "${D}"/usr/lib/sj3/sjrk.orig
 	cp "${FILESDIRR}"/sjrk  "${D}"/usr/lib/sj3/
 

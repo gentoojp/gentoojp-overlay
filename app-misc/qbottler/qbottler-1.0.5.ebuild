@@ -11,9 +11,11 @@ DESCRIPTION="Yet Another bottler.py using PyQt"
 SRC_URI="http://www13.plala.or.jp/lucier/qbottler/data/${MY_PN}-${PV}.zip"
 HOMEPAGE="http://www13.plala.or.jp/lucier/qbottler/"
 
-DEPEND="virtual/python
+RDEPEND="virtual/python
 	dev-python/PyQt
 	media-libs/libmng"
+DEPEND="${RDEPEND}
+	app-arch/unzip"
 
 KEYWORDS="~x86"
 LICENSE="GPL-2"

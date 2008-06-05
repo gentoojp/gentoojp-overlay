@@ -31,29 +31,29 @@ src_unpack(){
 	cd ${WORKDIR}
 	lha x ${DISTDIR}/${MY_P}.lzh
 
-	cd ${S}
+	cd "${S}"
 	epatch ${DISTDIR}/${MY_P}-py-module.patch || die
 }
 
 src_compile(){
-	cd ${S}/build/src
+	cd "${S}"/build/src
 	emake CFLAGS="${CFLAGS} -I. -I/usr/include/python${PYVER} -fPIC" \
 		-f gcc.mak ../mach/linux/libshiori.so \
 		|| die
 }
 
 src_install(){
-	cd ${S}/build/mach/linux
+	cd "${S}"/build/mach/linux
 	exeinto /usr/lib/python${PYVER}/site-packages/ninix-aya
 	newexe libshiori.so _kawari8.so
 
-	cd ${S}
+	cd "${S}"
 	dodoc license.txt readme.1st
 
 	for dir in document document/images document/banners
 	do
 	  (
-		  cd ${S}/${dir}
+		  cd "${S}"/${dir}
 		  docinto ${dir}
 		  dohtml *
 	  )

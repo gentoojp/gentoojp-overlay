@@ -20,25 +20,23 @@ KEYWORDS="~x86 ~alpha"
 LICENSE="GPL-2"
 SLOT="0"
 
-S="${WORKDIR}/${P}"
-
 pkg_setup(){
 	python_tkinter_exists
 }
 
 src_unpack(){
 	unpack ${A}
-	epatch ${FILESDIR}/${PF}.patch
+	epatch "${FILESDIR}/${PF}.patch"
 }
 
 src_install(){
 	python_version
 
-	emake DESTDIR=${D} \
+	emake DESTDIR="${D}" \
 		prefix=/usr \
 		exec_libdir=/usr/lib/python${PYVER}/site-packages/${PN}-1.0 \
-		docdir=${D}/usr/share/doc/${P} \
-		install
+		docdir="${D}"/usr/share/doc/${P} \
+		install || die "emake install failed"
 
 	prepalldocs
 }

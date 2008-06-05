@@ -3,6 +3,7 @@
 # $Header: $
 
 MY_P="${P/-bterm-/_}-1"
+
 DESCRIPTION="A terminal program for displaying Unicode on the console"
 HOMEPAGE="http://www.msu.edu/user/pfaffben/projects.html"
 SRC_URI="http://ftp.debian.org/debian/pool/main/b/bogl/${MY_P}.tar.gz"
@@ -14,14 +15,9 @@ IUSE=""
 
 DEPEND="virtual/libc"
 
-S=${WORKDIR}/${PN/-bterm}
-
-src_compile() {
-	emake || die
-}
+S="${WORKDIR}/${PN/-bterm}"
 
 src_install() {
-	make DESTDIR=${D} install || die
-
+	make DESTDIR="${D}" install || die "make install failed"
 	dodoc ChangeLog README*
 }

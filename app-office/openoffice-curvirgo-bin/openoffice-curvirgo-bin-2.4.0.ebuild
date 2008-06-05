@@ -38,7 +38,7 @@ DEPEND="${RDEPEND}
 	sys-apps/findutils"
 
 PROVIDE="virtual/ooo"
-RESTRICT="strip nomirror"
+RESTRICT="strip mirror"
 
 QA_EXECSTACK="usr/$(get_libdir)/openoffice/program/*"
 QA_TEXTRELS="usr/$(get_libdir)/openoffice/program/libvclplug_gen680li.so.1.1 \
