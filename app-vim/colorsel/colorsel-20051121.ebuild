@@ -6,16 +6,19 @@ inherit vim-plugin
 
 DESCRIPTION="vim plugin: RGB / HSV color selector"
 HOMEPAGE="http://www.vim.org/scripts/script.php?script_id=927"
+SRC_URI="http://trific.ath.cx/Ftp//vim/scripts/colorsel.vim"
+
 LICENSE="public-domain"
 KEYWORDS="~sparc ~x86 ~mips ~ppc ~amd64 ~alpha ~ia64"
 IUSE=""
+
 RDEPEND=">=app-editors/gvim-6.2"
-SRC_URI="http://trific.ath.cx/Ftp//vim/scripts/colorsel.vim"
+
 RESTRICT="nomirror"
 
-function src_unpack() {
-	mkdir -p ${S}/plugin
-	cp ${DISTDIR}/${A} ${S}/plugin/
+src_unpack() {
+	mkdir -p "${S}/plugin"
+	cp "${DISTDIR}/${A}" "${S}/plugin/"
 
 	# This plugin tests whether the GUI is present and barfs if not. We
 	# don't want this, since we don't have a gvim-specific plugins

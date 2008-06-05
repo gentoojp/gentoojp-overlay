@@ -4,12 +4,17 @@
 
 inherit vim-plugin
 
+MY_PN=${PN/-/_}
+
 DESCRIPTION="vim ports of howm( Hitoride Okigaru Wiki Modoki)"
-HOMEPAGE="http://www.aise.ics.saitama-u.ac.jp/~seven/howm_vim/"
+HOMEPAGE="http://sworddancer.funkyboy.jp/howm_vim/"
+SRC_URI="http://sworddancer.funkyboy.jp/howm_vim/${MY_PN}.tar.bz2"
+
 LICENSE="as-is"
-KEYWORDS="~x86 -*"
+KEYWORDS="~amd64 ~x86"
 IUSE=""
-SRC_URI="http://www.aise.ics.saitama-u.ac.jp/~seven/howm_vim/howm_vim.tar.bz2"
+
+RESTRICT="mirror"
 
 VIM_PLUGIN_HELPTEXT=\
 "This plugin provides Wiki like memo mode
@@ -21,19 +26,19 @@ VIM_PLUGIN_HELPTEXT=\
 
 for more information see /use/share/doc/${P}/readme.txt.gz"
 
-S="${WORKDIR}/`basename ${SRC_URI} .tar.bz2`"
+S="${WORKDIR}/${MY_PN}"
 
-# Almost same to vim-pugin_src_install, but one thing, only *.png should to be
+# Almost same as vim-pugin_src_install, but one thing, only *.png should be
 # installed doc/html without compressed.
 # line 33 of this ebuilds.
 src_install() {
 	local f
 
 	# Make sure perms are good
-	chmod -R a+rX ${S}
+	chmod -R a+rX "${S}"
 
 	# Install non-vim-help-docs
-	cd ${S}
+	cd "${S}"
 	for f in *; do
 		[[ -f "${f}" ]] || continue
 		if [[ "${f}" = *.html ]] || [[ "${f}" = *.png ]] ; then
@@ -45,8 +50,7 @@ src_install() {
 	done
 	
 	# Install remainder of plugin
-	cd ${WORKDIR}
+	cd "${WORKDIR}"
 	dodir /usr/share/vim
-	mv ${S} ${D}/usr/share/vim/vimfiles
+	mv ${S} "${D}"/usr/share/vim/vimfiles
 }
-
