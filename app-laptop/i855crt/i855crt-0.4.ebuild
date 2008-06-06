@@ -12,12 +12,7 @@ SLOT="0"
 KEYWORDS="-* ~x86"
 IUSE=""
 
-DEPEND="virtual/libc"
-RDEPEND="sys-apps/pciutils"
-
-src_compile() {
-	emake || die "compile failed"
-}
+DEPEND="sys-apps/pciutils"
 
 src_install() {
 	dobin i855crt

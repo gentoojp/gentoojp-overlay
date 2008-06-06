@@ -7,10 +7,12 @@ inherit elisp
 DESCRIPTION="calendar functions for the Japanese calendar"
 HOMEPAGE=""
 SRC_URI=""
-LICENSE="GPL"
+
+LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~x86"
+KEYWORDS="~amd64 ~x86"
 IUSE=""
+
 DEPEND="virtual/emacs"
 RDEPEND="${DEPEND}"
 

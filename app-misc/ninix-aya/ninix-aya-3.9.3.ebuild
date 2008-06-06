@@ -11,19 +11,17 @@ SRC_URI="mirror://sourceforge.jp/${PN}/23064/${P}.tgz"
 HOMEPAGE="http://www.geocities.co.jp/SiliconValley-Cupertino/7565/
 	http://ninix-aya.sourceforge.jp/"
 
+LICENSE="GPL-2"
+SLOT="0"
+KEYWORDS="~alpha ~amd64 ~x86"
+
 DEPEND=">=dev-lang/python-2.4
 	>=x11-libs/gtk+-2.8
-	dev-python/numeric
 	>=dev-python/pygtk-2.6
+	dev-python/numeric
 	app-arch/unzip
 	app-arch/lha
 	!app-misc/aya5"
-
-KEYWORDS="~x86 ~alpha"
-LICENSE="GPL-2"
-SLOT="0"
-
-S="${WORKDIR}/${P}"
 
 pkg_setup(){
 	python_version
@@ -47,7 +45,7 @@ src_unpack(){
 
 src_compile(){
 	emake prefix=/usr \
-		exec_libdir=/usr/lib/python${PYVER}/site-packages/${PN} \
+		exec_libdir=/usr/$(get_libdir)/python${PYVER}/site-packages/${PN} \
 		docdir=/usr/share/doc/${PF} \
 		NINIX=ninix \
 		NINIX_INSTALL=ninix-install \
@@ -57,10 +55,10 @@ src_compile(){
 }
 
 src_install(){
-	emake DESTDIR=${D} \
+	emake DESTDIR="${D}" \
 		prefix=/usr \
-		exec_libdir=/usr/lib/python${PYVER}/site-packages/${PN} \
-		docdir=${D}/usr/share/doc/${PF} \
+		exec_libdir=/usr/$(get_libdir)/python${PYVER}/site-packages/${PN} \
+		docdir="${D}"/usr/share/doc/${PF} \
 		NINIX=ninix \
 		NINIX_INSTALL=ninix-install \
 		NINIX_LOOKUP=ninix-lookup \

@@ -13,7 +13,7 @@ RPM_P=${PV::5}-${RPM_V}
 RPM_P_M=${PV::3}-${RPM_V}
 SFN="25813"
 SRC_URI="mirror://sourceforge.jp/waooo/${SFN}/OOo_${PV}_LinuxX86_install_ja_curvirgo_rpm.tar.bz2"
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 HOMEPAGE="http://waooo.sourceforge.jp/"
 
