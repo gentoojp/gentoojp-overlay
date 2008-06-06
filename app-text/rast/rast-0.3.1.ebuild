@@ -3,8 +3,8 @@
 # $Header: $
 
 DESCRIPTION="Rast is a full-text search system."
-HOMEPAGE="http://www.netlab.jp/rast/"
-SRC_URI="http://www.netlab.jp/rast/archives/${P}.tar.bz2"
+HOMEPAGE="http://projects.netlab.jp/rast/"
+SRC_URI="http://projects.netlab.jp/rast/archives/${P}.tar.bz2"
 LICENSE="GPL-2"
 
 SLOT="0"
@@ -27,5 +27,5 @@ src_compile() {
 }
 
 src_install() {
-	make DESTDIR=${D} install || die
+	make DESTDIR="${D}" install || die
 }
