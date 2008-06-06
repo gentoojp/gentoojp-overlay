@@ -12,7 +12,7 @@ SRC_URI="http://oss.linbit.com/drbd/0.6/drbd-${PV}.tar.gz"
 HOMEPAGE="http://www.drbd.org"
 
 IUSE=""
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 DEPEND="virtual/linux-sources"
 RDEPEND=">=sys-cluster/heartbeat-1.0.4"

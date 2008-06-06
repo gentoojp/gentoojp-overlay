@@ -12,7 +12,7 @@ DESCRIPTION="equerybts -- command line bugzilla query tool"
 HOMEPAGE="http://dev.gentoo.org/~hattya/equerybts/"
 SRC_URI="http://dev.gentoo.org/~hattya/${PN}/${MY_P}.tar.bz2"
 
-RESTRICT="nomirror"
+RESTRICT="mirror"
 LICENSE="MIT"
 KEYWORDS="~x86"
 SLOT="0"

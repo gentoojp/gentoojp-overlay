@@ -11,7 +11,7 @@ SRC_URI="http://distro.ibiblio.org/pub/linux/distributions/debian/pool/non-free/
 LICENSE=""
 SLOT="0"
 KEYWORDS="~x86 ~ppc ~sparc ~alpha ~amd64 ~ppc64 ~ia64"
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 src_unpack() {
 	unpack ${A}

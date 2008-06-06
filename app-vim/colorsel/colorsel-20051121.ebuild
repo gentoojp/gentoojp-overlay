@@ -14,7 +14,7 @@ IUSE=""
 
 RDEPEND=">=app-editors/gvim-6.2"
 
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 src_unpack() {
 	mkdir -p "${S}/plugin"

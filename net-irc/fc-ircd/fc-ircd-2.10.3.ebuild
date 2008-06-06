@@ -8,7 +8,7 @@ HOMEPAGE="http://www.friend.td.nu/ircd-fc.html"
 SRC_URI="ftp://ftp.fan.gr.jp/pub/IRC/fc-ircd/irc${PV}-${PATCHVER}.tar.bz2"
 LICENSE="GPL-1"
 SLOT="0"
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 # The only architecture I can test
 KEYWORDS="~x86 ~ppc ~sparc"

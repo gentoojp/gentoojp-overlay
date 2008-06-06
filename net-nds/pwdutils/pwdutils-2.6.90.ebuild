@@ -9,7 +9,7 @@ SRC_URI="ftp://ftp.kernel.org/pub/linux/utils/net/NIS/${P}.tar.bz2"
 LICENSE=""
 SLOT="0"
 KEYWORDS="~x86 ~ppc ~sparc ~alpha ~amd64 ~ppc64 ~ia64"
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 DEPEND="virtual/libc
 net-nds/openldap"

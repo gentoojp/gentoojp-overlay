@@ -9,7 +9,7 @@ IUSE=""
 DESCRIPTION="An event-driven IRC client framework written in Python"
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 HOMEPAGE="http://python-irclib.sourceforge.net/"
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 SLOT="0"
 LICENSE="LGPL-2.1"

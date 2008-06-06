@@ -15,7 +15,7 @@ LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~x86"
 IUSE=""
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 DEPEND=">=dev-lang/python-2.3"
 

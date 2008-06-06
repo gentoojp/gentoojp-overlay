@@ -29,7 +29,7 @@ SRC_URI="http://www.yamaai-tech.com/~masato/Download/${P}-ja-${PATCHVER}.tar.gz
 	${PLUGINS_LOC}/ldapuserdata-${LDAP_VER}.tar.gz"
 
 HOMEPAGE="http://www.squirrelmail.jp/"
-RESTRICT="nomirror"
+RESTRICT="mirror"
 IUSE="crypt virus-scan ldap ssl"
 
 LICENSE="GPL-2"

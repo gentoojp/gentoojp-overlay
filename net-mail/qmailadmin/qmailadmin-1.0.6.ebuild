@@ -7,7 +7,7 @@ inherit gnuconfig
 DESCRIPTION="A web interface for managing a qmail system with virtual domains."
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 HOMEPAGE="http://www.inter7.com/${PN}.html"
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 KEYWORDS="~x86"
 LICENSE="GPL-2"

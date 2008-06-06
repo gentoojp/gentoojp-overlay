@@ -10,7 +10,7 @@ SRC_URI="http://ftp.kernel.org/pub/linux/utils/net/NIS/${P}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86 ~ppc ~sparc ~alpha ~amd64 ~ppc64 ~ia64"
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 DEPEND="virtual/libc
 dev-libs/openssl

@@ -5,7 +5,7 @@
 DESCRIPTION="p2; 2ch browser written by php"
 HOMEPAGE="http://akid.s17.xrea.com/"
 SRC_URI="http://akid.s17.xrea.com/archive/p2_v1_5_19.zip"
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 LICENSE="X11"
 SLOT="0"

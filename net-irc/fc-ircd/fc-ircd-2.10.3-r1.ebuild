@@ -10,7 +10,7 @@ HOMEPAGE="http://www.friend.td.nu/ircd-fc.html"
 SRC_URI="http://www.friend.td.nu/ircd/irc${PV}-${PATCHVER}.tar.gz"
 LICENSE="GPL-1"
 SLOT="0"
-RESTRICT="nomirror"
+RESTRICT="mirror"
 
 # The only architecture I can test
 KEYWORDS="~x86 ~ppc ~sparc"
