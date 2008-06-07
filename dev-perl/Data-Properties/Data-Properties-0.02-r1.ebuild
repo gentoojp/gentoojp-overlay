@@ -5,12 +5,12 @@
 inherit perl-module
 
 DESCRIPTION="Data::Properties - persistent properties"
+HOMEPAGE="http://cpan.org/modules/by-module/Data/"
 SRC_URI="http://cpan.org/modules/by-module/Data/${P}.tar.gz"
-HOMEPAGE="http://cpan.org/modules/by-module/Data/${P}.readme"
 
+LICENSE="|| ( Artistic GPL-2 )"
 SLOT="0"
-LICENSE="Artistic | GPL-2"
-SRC_TEST="do"
 KEYWORDS="~x86 ~amd64 ~ppc ~sparc ~alpha"
 IUSE=""
 
+SRC_TEST="do"

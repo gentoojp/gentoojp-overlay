@@ -2,18 +2,14 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-IUSE=""
-
 inherit perl-module
 
 DESCRIPTION="Lingua::JA::Regular - Regularize of the Japanese character."
+HOMEPAGE="http://cpan.org/modules/by-authors/id/T/TA/TAKEFUMI/"
 SRC_URI="http://cpan.org/modules/by-authors/id/T/TA/TAKEFUMI/${P}.tar.gz"
-HOMEPAGE="http://cpan.org/modules/by-authors/id/T/TA/TAKEFUMI/${P}.readme"
 
+LICENSE="|| ( Artistic GPL-2 )"
 SLOT="0"
 KEYWORDS="~x86 ~amd64 ~ppc ~sparc ~alpha"
-LICENSE="|| ( Artistic GPL-2 )"
 
 SRC_TEST="do"
-
-DEPEND="${DEPEND}"

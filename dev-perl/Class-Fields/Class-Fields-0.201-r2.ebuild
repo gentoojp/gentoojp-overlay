@@ -5,12 +5,11 @@
 inherit perl-module
 
 DESCRIPTION="Class::Fields - Inspect the fields of a class."
+HOMEPAGE="http://cpan.org/modules/by-module/Class/"
 SRC_URI="http://cpan.org/modules/by-module/Class/${P}.tar.gz"
-HOMEPAGE="http://cpan.org/modules/by-module/Class/${P}.readme"
 
+LICENSE="|| ( Artistic GPL-2 )"
 SLOT="0"
-LICENSE="Artistic | GPL-2"
-SRC_TEST="do"
 KEYWORDS="~x86 ~amd64 ~ppc ~sparc ~alpha"
 IUSE=""
 
