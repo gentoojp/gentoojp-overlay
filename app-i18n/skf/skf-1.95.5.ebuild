@@ -11,8 +11,7 @@ SLOT="0"
 KEYWORDS="~x86 ~amd64"
 IUSE="nls"
 
-DEPEND="sys-devel/bison
-	nls? ( sys-devel/gettext )"
+DEPEND="nls? ( sys-devel/gettext )"
 
 # truncate last part of version
 # skf-1.95.4 -> skf-1.95
