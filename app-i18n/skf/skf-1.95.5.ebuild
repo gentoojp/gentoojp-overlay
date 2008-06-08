@@ -4,7 +4,7 @@
 
 DESCRIPTION="skf is an i18n-capable kanji filter"
 HOMEPAGE="http://www.sourceforge.jp/projects/skf/"
-SRC_URI="mirror://sourceforge.jp/${PN}/29384/${P/-/_}.tar.gz"
+SRC_URI="mirror://sourceforge.jp/${PN}/31371/${P/-/_}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
