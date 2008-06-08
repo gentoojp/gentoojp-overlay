@@ -30,8 +30,7 @@ src_unpack(){
 	unpack ${A}
 	cd "${S}"
 
-	local flags libs target extobjs
-
+	local flags libs
 	flags="${CXXFLAGS} -Wall -Wpointer-arith -pipe -c"
 	target='onscripter sardec nsadec sarconv nsaconv'
 
@@ -39,13 +38,6 @@ src_unpack(){
 	flags="${flags} "'`sdl-config --cflags` `smpeg-config --cflags` -DLINUX'
 	libs='`sdl-config --libs` `smpeg-config --libs` -lSDL_ttf -lSDL_image -lSDL_mixer -lbz2 -ljpeg -lm'
 	
-#	if use avi; then
-#		flags="${flags} "'`avifile-config --cflags` -DUSE_AVIFILE'
-#		libs="${libs} "'`avifile-config --libs`'
-#		target="${target} simple_aviplay"
-#		extobjs="AVIWrapper"
-#	fi
-		
 	if use vorbis; then
 		flags="${flags} -DUSE_OGG_VORBIS"
 		libs="${libs} -logg -lvorbis -lvorbisfile"
@@ -64,8 +56,8 @@ src_unpack(){
 		CFLAGS = ${flags}
 		LIBS = ${libs}
 
-		TARGET = ${target}
-		EXT_OBJS = ${extobjs}
+		TARGET = onscripter sardec nsadec sarconv nsaconv
+		EXT_OBJS =
 
 		include Makefile.onscripter
 	EOF
@@ -73,7 +65,6 @@ src_unpack(){
 
 src_install(){
 	dogamesbin nsaconv nsadec onscripter sarconv sardec
-#	use avi && dogamesbin simple_aviplay
 
 	dodoc COPYING README
 	docinto www
