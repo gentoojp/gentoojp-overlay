@@ -29,7 +29,7 @@ src_compile() {
 		--with-lispdir=${SITELISP}/${PN} \
 		--with-dictdir=/usr/share/dict \
 		|| die "econf failed"
-	
+
 	make || die "make failed"
 	make info || die "make info failed"
 }

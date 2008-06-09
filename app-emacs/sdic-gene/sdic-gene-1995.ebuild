@@ -93,7 +93,7 @@ src_install() {
 	# Install documents
 	newins "${S}"/readme.txt gene_readme.txt
 	gzip -9 -f "${D}/${DICTDIR}/gene_readme.txt"
-	
+
 	# Install GENE configuration emacs lisp
-	elisp-site-file-install ${FILESDIR}/${SITEFILE} || die	
+	elisp-site-file-install ${FILESDIR}/${SITEFILE} || die
 }

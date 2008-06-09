@@ -12,28 +12,25 @@ DESCRIPTION="equerybts -- command line bugzilla query tool"
 HOMEPAGE="http://dev.gentoo.org/~hattya/equerybts/"
 SRC_URI="http://dev.gentoo.org/~hattya/${PN}/${MY_P}.tar.bz2"
 
-RESTRICT="mirror"
 LICENSE="MIT"
-KEYWORDS="~x86"
 SLOT="0"
+KEYWORDS="~x86"
+RESTRICT="mirror"
+
 S="${WORKDIR}/${MY_P}"
 
 DEPEND=">=dev-lang/python-2.1"
 
 src_compile() {
-
 	sed -i -e '32,33d' ${PN}
-
 }
 
 src_install() {
-
 	dobin ${PN}
 
 	python_version
 	PYM_DIR="/usr/lib/python${PYVER}/site-packages"
 
 	dodir ${PYM_DIR}
-	mv lib/${PN} ${D}/${PYM_DIR}
-
+	mv lib/${PN} "${D}"/${PYM_DIR}
 }

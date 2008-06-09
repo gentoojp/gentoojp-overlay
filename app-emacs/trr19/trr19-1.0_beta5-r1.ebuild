@@ -21,7 +21,7 @@ S="${WORKDIR}/${PN}"
 SITEFILE=50trr19-gentoo.el
 
 src_compile() {
-	mv trr_format.c  trr_format.c.old 
+	mv trr_format.c  trr_format.c.old
 	sed 's/tmpnam/mkstemp/g' trr_format.c.old > trr_format.c
 
 	make trrdir=${SITELISP}/${PN} \

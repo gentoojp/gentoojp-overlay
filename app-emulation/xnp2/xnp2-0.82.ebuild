@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-# TODO 	内蔵ベルモントの timidity音色ファイル リンク 
+# TODO 	内蔵ベルモントの timidity音色ファイル リンク
 
 inherit eutils
 
@@ -71,14 +71,14 @@ src_compile(){
 }
 
 src_install(){
-	emake DESTDIR=${D} install || die
-	emake DESTDIR=${D} install.man || die
+	emake DESTDIR="${D}" install || die
+	emake DESTDIR="${D}" install.man || die
 
 	dodoc README.ja
 
 	if use doc ; then
 		dodir /usr/share/doc/${PF}
-		cp -r ${WORKDIR}/html ${D}/usr/share/doc/${PF}
+		cp -r ${WORKDIR}/html "${D}"/usr/share/doc/${PF}
 	fi
 }
 
@@ -89,6 +89,6 @@ pkg_postinst(){
 		#einfo "   ln -fs /usr/share/timidity/eawpatches/timidity.cfg ~/.np2/"
 		einfo "   ln -fs ~/.timidity/current/timidity.cfg ~/.np2/"
 		einfo "した後に、xnp2 上メニューから Device -> Midi Option... で"
-		einfo "ダイアログから MIDI-OUT : VERMOUSE にして下さい。" 
+		einfo "ダイアログから MIDI-OUT : VERMOUSE にして下さい。"
 	fi
 }

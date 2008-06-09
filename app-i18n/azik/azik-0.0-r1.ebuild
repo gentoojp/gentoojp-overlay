@@ -5,25 +5,18 @@ inherit elisp
 SITEFILE="50azik-gentoo.el"
 
 DESCRIPTION="Japanese romaji easy input method for Canna and Tamago"
-HOMEPAGE="
-	http://hp.vector.co.jp/authors/VA002116/azik/azikindx.htm
-	http://www.apm.dnsalias.net/azik/
-	http://air.zive.net/d/20030318.html
-"
-SRC_URI="http://mannequeen.net/~rock/linux/gentoo/portage-dist/${PN}-${PV}.tar.gz"
+HOMEPAGE="http://hp.vector.co.jp/authors/VA002116/azik/azikindx.htm"
+SRC_URI="http://mannequeen.net/~rock/linux/gentoo/portage-dist/${P}.tar.gz"
+
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86 ~ppc ~sparc ~alpha ~amd64 ~mips ~arm ~hppa"
 IUSE="doc emacs"
 
-DEPEND="
-	app-i18n/canna
+DEPEND="app-i18n/canna
 	emacs? (
 		virtual/emacs
-		app-emacs/tamago
-	)
-"
-RDEPEND="${DEPEND}"
+		app-emacs/tamago )"
 
 src_compile(){
 	/usr/bin/mkromdic azik.cbpdef

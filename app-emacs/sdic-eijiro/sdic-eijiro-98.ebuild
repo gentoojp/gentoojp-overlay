@@ -46,7 +46,7 @@ src_compile() {
 		nkf -S -e  | \
 		perl ${contribdir}/eijirou.perl > ${S}/${EIJIRODIC}.sdic \
 		|| die "failed to convert ${EIJIRODIC}.dic"
-	
+
 	perl -I${PDICCONV}/lib ${PDICCONV}/pdic-dump.pl ${S}/${WAEIJIDIC}.dic | \
 		nkf -S -e | \
 		perl ${contribdir}/eijirou.perl --waei > ${S}/${WAEIJIDIC}.sdic \
@@ -59,4 +59,3 @@ src_install() {
 
 	elisp-site-file-install ${FILESDIR}/${SITEFILE} || die
 }
-

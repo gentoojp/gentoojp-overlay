@@ -4,8 +4,7 @@
 
 DESCRIPTION="A utility for switching the LCD and external VGA displays on and off"
 HOMEPAGE="http://sourceforge.net/projects/i855crt"
-SRC_URI="http://umn.dl.sourceforge.net/sourceforge/i855crt/i855crt-0.4.tar.gz
-          http://keihanna.dl.sourceforge.net/sourceforge/i855crt/${P}.tar.gz"
+SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"

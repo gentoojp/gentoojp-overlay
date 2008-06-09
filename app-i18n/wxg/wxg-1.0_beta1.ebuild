@@ -18,19 +18,14 @@ KEYWORDS="~x86"
 DEPEND=""
 RDEPEND="app-i18n/canna"
 
-S=${WORKDIR}/${MY_P}
+S="${WORKDIR}/${MY_P}"
 
 src_unpack() {
 
 	unpack ${MY_P}.tar.gz
 
-	cd ${S}
+	cd "${S}"
 	epatch ${FILESDIR}/${P}-gentoo.diff
-}
-
-src_compile() {
-
-	einfo "Nothing to compile."
 }
 
 src_install() {
@@ -43,7 +38,7 @@ src_install() {
 	dodir /usr/share/doc/${PF}/html
 
 	make linux -s \
-		DESTDIR=${D} \
+		DESTDIR="${D}" \
 		SBINDIR=/usr/sbin \
 		BINDIR=/usr/bin \
 		LIBDIR=/var/lib \

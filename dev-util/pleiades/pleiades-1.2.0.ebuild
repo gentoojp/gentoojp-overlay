@@ -21,7 +21,7 @@ src_install () {
 	eclipse-ext_create-ext-layout binary || die "Failed to create layout"
 	eclipse-ext_install-features ${WORKDIR}/features/* || die "Failed to install features"
 	eclipse-ext_install-plugins ${WORKDIR}/plugins/* || die "Failed to install plugins"
-	
+
 	LOG_DIR="${eclipse_ext_basedir}/configuration/jp.sourceforge.mergedoc.pleiades"
 	echo "" > ${WORKDIR}/${PN}.log
 	insinto ${LOG_DIR}
@@ -31,7 +31,7 @@ src_install () {
 pkg_postinst() {
 	chmod 774 ${ROOT}/${LOG_DIR}/${PN}.log
 	chgrp users ${ROOT}/${LOG_DIR}/${PN}.log
-	
+
 	JAR_PATH="-javaagent:${eclipse_ext_basedir}/plugins/jp.sourceforge.mergedoc.pleiades/pleiades.jar"
 	if [ -z `grep ${PN} ${eclipse_ext_platformdir}/eclipse.ini` ] ; then
 		einfo ""

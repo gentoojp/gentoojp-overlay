@@ -43,14 +43,14 @@ src_compile() {
 	perl ${LISPSDICDIR}/contrib/edict.perl \
 		${S}/edict > ${S}/jedict.sdic \
 		|| die "Failed to convert edict to jedict.sdic"
-	
+
 	# Convert EJ dictionary
 	use sdic-reverse && (
 		perl ${LISPSDICDIR}/contrib/edict.perl --reverse \
 			${S}/edict > ${S}/eedict.sdic \
 			|| die "Failed to convert edict to eedict.sdic"
 	)
-	
+
 	# EDICT configuration emacs lisp
 	if [ "`use sdic-reverse`" ]; then
 		cp ${FILESDIR}/${SITEFILE} ${S}
@@ -74,5 +74,5 @@ src_install() {
 	gzip -9 -f ${D}/${DICTDIR}/edict_doc.txt
 
 	# EDICT configuration emacs lisp
-	elisp-site-file-install ${FILESDIR}/${SITEFILE} || die	
+	elisp-site-file-install ${FILESDIR}/${SITEFILE} || die
 }

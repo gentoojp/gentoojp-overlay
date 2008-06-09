@@ -5,26 +5,23 @@ PYTHON_SLOT_VERSION=2.1
 
 inherit distutils
 
-P_NEW="${PN%-py21}-${PV/_pre/pre}"
+MY_P="${PN%-py21}-${PV/_pre/pre}"
 
-S=${WORKDIR}/${P_NEW}
-DESCRIPTION="Python Library to download the weather report 
- for a given station ID decodes it and the provides easy access to 
+DESCRIPTION="Python Library to download the weather report
+ for a given station ID decodes it and the provides easy access to
  all the data found in the report."
-SRC_URI="http://www.schwarzvogel.de/pkgs/${P_NEW}.tar.gz"
-HOMEPAGE="http://www.schwarzvogel.de/software-pymetar.shtml/"
+HOMEPAGE="http://www.schwarzvogel.de/software-pymetar.shtml"
+SRC_URI="http://www.schwarzvogel.de/pkgs/${MY_P}.tar.gz"
 
-IUSE=""
-SLOT="0"
 LICENSE="GPL-2"
+SLOT="0"
 KEYWORDS="~x86"
+
+S="${WORKDIR}/${MY_P}"
 
 src_install() {
 	distutils_src_install
-	insinto /usr/share/doc/${PF}
-	doins readme.sjis
-	insinto /usr/share/doc/${PF}/test
-	doins test/*
-	insinto /usr/share/doc/${PF}/misc
-	doins misc/*.txt
+	dodoc readme.sjis
+	docinto test; dodoc test/*
+	docinto misc; dodoc misc/*
 }
