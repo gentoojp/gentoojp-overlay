@@ -2,6 +2,10 @@
 # Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  09 Jun 2008; Ryoichiro Suzuki <rspace@rspace.org>
+  -onscripter-20051001.ebuild, onscripter-20080121.ebuild:
+  fix deps.
+
 *onscripter-20080121 (08 Jun 2008)
 
   08 Jun 2008; Ryoichiro Suzuki <rspace@rspace.org>

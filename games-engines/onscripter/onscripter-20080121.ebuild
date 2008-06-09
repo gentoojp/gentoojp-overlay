@@ -22,8 +22,8 @@ DEPEND="media-libs/libsdl
 	media-libs/jpeg
 	media-libs/freetype
 	app-arch/bzip2
-	vorbis? ( >=media-libs/libogg
-			>=media-libs/libvorbis )"
+	vorbis? ( media-libs/libogg
+			media-libs/libvorbis )"
 
 
 src_unpack(){
@@ -32,7 +32,6 @@ src_unpack(){
 
 	local flags libs
 	flags="${CXXFLAGS} -Wall -Wpointer-arith -pipe -c"
-	target='onscripter sardec nsadec sarconv nsaconv'
 
 	# sdl, smpeg stuff
 	flags="${flags} "'`sdl-config --cflags` `smpeg-config --cflags` -DLINUX'
