@@ -1,5 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
+# $Header: $
 
 DESCRIPTION="High Quality Reverb and Impulse Response Convolution library including XMMS/Audacious Effect plugins"
 HOMEPAGE="http://freeverb3.sourceforge.net/"
@@ -15,13 +16,16 @@ DEPEND=">=sci-libs/fftw-3.0.1
 		>=media-libs/libsndfile-1.0.11 )"
 
 src_compile() {
-	local myconf="--enable-release"
-	myconf="${myconf} $(use_enable audacious)
-	$(use_enable plugdouble)
-	$(use_enable sse) $(use_enable sse2)
-	$(use_enable 3dnow)
-	$(use_enable forcefpu)"
-	econf $myconf || die "econf failed"
+	econf \
+		--enable-release \
+		$(use_enable audacious) \
+		$(use_enable plugdouble) \
+		$(use_enable sse) \
+		$(use_enable sse2) \
+		$(use_enable 3dnow) \
+		$(use_enable forcefpu) \
+		|| die "econf failed"
+
 	emake || die "emake failed"
 }
 
