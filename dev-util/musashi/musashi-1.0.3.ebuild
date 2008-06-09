@@ -3,6 +3,7 @@
 # $Header: $
 
 MY_P="${PN}-core-${PV}"
+
 DESCRIPTION="Mining Utilities and System Architecture for Scalable processing of Historical data"
 HOMEPAGE="http://musashien.sourceforge.net/"
 SRC_URI="mirror://sourceforge.jp/musashi/8248/${MY_P}.tar.gz"
@@ -14,15 +15,10 @@ IUSE=""
 
 DEPEND="dev-libs/libxml2"
 
-S=${WORKDIR}/${MY_P}
-
-src_compile() {
-	econf || die
-	emake || die "emake failed"
-}
+S="${WORKDIR}/${MY_P}"
 
 src_install() {
-	make DESTDIR=${D} install || die
+	make DESTDIR="${D}" install || die "make install failed"
 
 	dodoc AUTHORS ChangeLog INSTALL NEWS README
 }
