@@ -11,16 +11,19 @@ inherit eutils kernel-2
 detect_version
 detect_arch
 
-CCS_TGP="ccs-patch-1.5.3-20080131"
-CCS_LSM_TGP="tomoyo-lsm-2.1.1-20071123"
-CCS_TGP_SRC="mirror://sourceforge.jp/tomoyo/27219/${CCS_TGP}.tar.gz "
-CCS_LSM_TGP_SRC="mirror://sourceforge.jp/tomoyo/28120/${CCS_LSM_TGP}.tar.gz"
-CCS_PATCH_VER="2.6.23"
+TOMOYO_TGP="ccs-patch-1.5.3-20080131"
+TOMOYO_LSM_TGP="tomoyo-lsm-2.1.1-20071123"
+TOMOYO_TGP_SRC="mirror://sourceforge.jp/tomoyo/27219/${TOMOYO_TGP}.tar.gz "
+TOMOYO_LSM_TGP_SRC="mirror://sourceforge.jp/tomoyo/28120/${TOMOYO_LSM_TGP}.tar.gz"
+TOMOYO_TARGET="2.6.23"
 
 DESCRIPTION="TOMOYO Linux sources for the ${KV_MAJOR}.${KV_MINOR} kernel tree"
-SRC_URI="${KERNEL_URI} ${GENPATCHES_URI} ${ARCH_URI} ${CCS_TGP_SRC} ${CCS_LSM_TGP_SRC}"
-KEYWORDS="~x86 ~arm ~sh ~ppc ~ia64 ~hppa"
+HOMEPAGE="http://tomoyo.sourceforge.jp/"
+SRC_URI="${KERNEL_URI} ${GENPATCHES_URI} ${ARCH_URI} ${TOMOYO_TGP_SRC} ${TOMOYO_LSM_TGP_SRC}"
+
+KEYWORDS="~amd64 ~x86"
 IUSE="lsm ${IUSE}"
+
 RDEPEND="sys-apps/ccs-tools"
 
 K_EXTRAEINFO="Before booting with TOMOYO enabled kernel, you need to
@@ -32,7 +35,7 @@ src_unpack() {
 
 	if use lsm;then
 		cd "${WORKDIR}"
-		unpack ${CCS_LSM_TGP}.tar.gz
+		unpack ${TOMOYO_LSM_TGP}.tar.gz
 
 		cd "${S}"
 		epatch "${WORKDIR}"/patches/*.diff
@@ -40,12 +43,13 @@ src_unpack() {
 		rm -r linux-${OKV} || die
 	else
 		cd "${WORKDIR}"
-		unpack ${CCS_TGP}.tar.gz
+		unpack ${TOMOYO_TGP}.tar.gz
 		cp -ax fs include "${S}" || die
-		sed -i -e '52,62d' patches/ccs-patch-${CCS_PATCH_VER}.diff || die
+		# delete a hunk modifying EXTRAVERSION of Makefile
+		sed -i -e '52,62d' patches/ccs-patch-${TOMOYO_TARGET}.diff || die
 
 		cd "${S}"
-		epatch "${WORKDIR}"/patches/ccs-patch-${CCS_PATCH_VER}.diff || die
+		epatch "${WORKDIR}"/patches/ccs-patch-${TOMOYO_TARGET}.diff || die
 	fi
 }
 
