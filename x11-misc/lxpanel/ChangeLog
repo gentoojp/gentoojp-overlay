@@ -2,6 +2,12 @@
 # Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*lxpanel-0.3.7 (09 Jun 2008)
+
+  09 Jun 2008; Ryoichiro Suzuki <rspace@rspace.org> -lxpanel-0.3.6.ebuild,
+  +lxpanel-0.3.7.ebuild:
+  version bump. ugh, still no release notes.
+
 *lxpanel-0.3.6.3 (31 May 2008)
 
   31 May 2008; Ryoichiro Suzuki <rspace@rspace.org> +lxpanel-0.3.6.3.ebuild,
