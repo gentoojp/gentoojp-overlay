@@ -53,5 +53,5 @@ src_install() {
 	make DESTDIR="${D}" install || die "install failed. :("
 
 	# Some documents are.
-	dodoc CHANGELOG COPYING README
+	dodoc CHANGELOG README
 }
