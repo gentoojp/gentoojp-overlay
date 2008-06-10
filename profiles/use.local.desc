@@ -1,1 +1,2 @@
-sys-kernel/ccs-sources:lsm - pick out LSM implementation (aka tomoyo 2.x) rather than tomoyo 1.x.
+sys-kernel/tomoyo-sources:lsm - pick out LSM implementation (aka tomoyo 2.x) rather than tomoyo 1.x
+media-sound/mt-daapd:cp932 - enable support for cp932 character encoding
