@@ -36,10 +36,8 @@ src_unpack() {
 	epatch "${FILESDIR}"/${PN}-0.2.3-sparc.patch
 	epatch "${FILESDIR}"/${P}-libsorder.patch
 	epatch "${FILESDIR}"/${P}-pidfile.patch
-	use cp932 && {
-		einfo "Enabling cp932 support"
-		epatch "${FILESDIR}"/${P}-cp932.patch
-	}
+	use cp932 && epatch "${FILESDIR}"/${P}-cp932.patch
+
 	eautoreconf
 
 	cp "${FILESDIR}"/${PN}.init.2 initd
