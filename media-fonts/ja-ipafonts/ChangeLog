@@ -1,0 +1,10 @@
+# ChangeLog for media-fonts/ja-ipafonts
+# Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*ja-ipafonts-0.0.20080201 (10 Jun 2008)
+
+  10 Jun 2008; Ryoichiro Suzuki <rspace@rspace.org>
+  +ja-ipafonts-0.0.20080201.ebuild:
+  babysit it here until matsuu manages to translate the license terms.
+
