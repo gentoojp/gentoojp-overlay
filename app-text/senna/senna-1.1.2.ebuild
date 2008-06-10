@@ -4,7 +4,7 @@
 
 DESCRIPTION="Full text search engine with support for various languages and DBs"
 HOMEPAGE="http://qwik.jp/senna/"
-SRC_URI="mirror://sourceforge.jp/${PN}/24191/${P}.tar.gz"
+SRC_URI="mirror://sourceforge.jp/${PN}/29884/${P}.tar.gz"
 
 LICENSE="LGPL-2"
 SLOT="0"

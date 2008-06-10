@@ -1,0 +1,9 @@
+# ChangeLog for app-text/senna
+# Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*senna-1.1.2 (10 Jun 2008)
+
+  10 Jun 2008; Ryoichiro Suzuki <rspace@rspace.org> +senna-1.1.2.ebuild:
+  version bump and add ruby USE flag.
+
