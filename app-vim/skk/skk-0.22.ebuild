@@ -9,7 +9,7 @@ HOMEPAGE="http://www.vim.org/scripts/script.php?script_id=1589"
 SRC_URI="http://www.vim.org/scripts/download_script.php?src_id=6283"
 
 LICENSE="as-is"
-KEYWORDS="~sparc x86 ~mips ~ppc amd64 ~alpha ~ia64"
+KEYWORDS="~alpha amd64 ~ppc ~sparc x86"
 IUSE=""
 
 RDEPEND="|| ( app-i18n/skk-jisyo virtual/skkserv )"
