@@ -3,17 +3,16 @@
 # $Header: $
 
 DESCRIPTION="Ming/Ruby is a Ruby extensional library for Ming"
-HOMEPAGE="http://madscientist.jp/~ikegami/ruby/ming/"
-SRC_URI="http://madscientist.jp/~ikegami/sources/ming-ruby-0.1.6.tar.gz"
+HOMEPAGE="http://mingruby.rubyforge.org"
+SRC_URI="http://rubyforge.org/frs/download.php/1765/${P}.tar.gz"
+
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="~x86"
-
-IUSE="cjk"
+KEYWORDS="~amd64 ~x86"
+IUSE=""
 
 DEPEND=">=dev-lang/ruby-1.6.7
-	cjk? ( media-libs/jaming )
-	!cjk? ( media-libs/ming )"
+	media-libs/ming"
 
 src_compile() {
 	ruby setup.rb config --prefix=/usr || die
@@ -23,5 +22,5 @@ src_compile() {
 src_install() {
 	ruby setup.rb install --prefix=${D} || die
 	dodoc ChangeLog README.en README.ja Usage_en.txt Usage_ja.txt \
-fonts.en fonts.ja
+	fonts.en fonts.ja
 }
