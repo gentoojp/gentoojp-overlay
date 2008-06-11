@@ -30,7 +30,7 @@ src_unpack() {
 src_install() {
 	cd ${MY_S}
 	webapp_src_preinst
-	cat ${FILESDIR}/en.txt >> README.en.txt
+	cat "${FILESDIR}"/en.txt >> README.en.txt
 	webapp_postinst_txt en README.en.txt
 	dodoc COPYING.txt README.txt README.en.txt UPDATING.txt UPDATING.en.txt
 	cp -R * "${D}${MY_HTDOCSDIR}"
