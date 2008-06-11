@@ -2,26 +2,23 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-inherit python cvs
-
-IUSE=""
-
-ECVS_SERVER="cvs.sourceforge.jp:/cvsroot/gbottler"
-ECVS_MODULE="gbottler"
+inherit python
 
 DESCRIPTION="yet another bottler.py using GTK+2"
 HOMEPAGE="http://gbottler.sourceforge.jp/"
+SRC_URI="mirror://sourceforge.jp/${PN}/31311/${P}.tar.gz"
 
-DEPEND="virtual/python
+LICENSE="GPL-2"
+SLOT="0"
+KEYWORDS="~amd64 ~x86"
+IUSE=""
+
+RDEPEND="virtual/python
 	>=x11-libs/gtk+-2.6
 	>=dev-python/pygtk-2.6
 	dev-python/pyxml"
-
-KEYWORDS="~x86"
-LICENSE="GPL-2"
-SLOT="0"
-
-S="${WORKDIR}/${ECVS_MODULE}"
+DEPEND="${RDEPEND}
+	sys-devel/gettext"
 
 pkg_setup(){
 	python_version
@@ -29,15 +26,15 @@ pkg_setup(){
 
 src_compile(){
 	emake prefix=/usr \
-		libdir=/usr/lib/python${PYVER}/site-packages/${ECVS_MODULE} \
+		libdir=/usr/$(get_libdir)/python${PYVER}/site-packages/${PN} \
 		docdir=/usr/share/doc/${PF} \
 		|| die "Compile failed."
 }
 
 src_install(){
-	emake prefix=${D}/usr \
-		libdir=${D}/usr/lib/python${PYVER}/site-packages/${ECVS_MODULE} \
-		docdir=${D}/usr/share/doc/${PF} \
+	emake prefix="${D}"/usr \
+		libdir="${D}"/usr/$(get_libdir)/python${PYVER}/site-packages/${PN} \
+		docdir="${D}"/usr/share/doc/${PF} \
 		install || die "Install failed."
 
 	prepalldocs
