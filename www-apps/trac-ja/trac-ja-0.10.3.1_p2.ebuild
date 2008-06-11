@@ -4,17 +4,18 @@
 
 inherit distutils webapp
 
+MY_P="trac-${PV%_p*}-ja-2"
+
 DESCRIPTION="Trac is a minimalistic web-based project management, wiki and bug/issue tracking system."
-#HOMEPAGE="http://trac.edgewall.com/"
-#SRC_URI="http://ftp.edgewall.com/pub/trac/${P}.tar.gz"
-HOMEPAGE="http://www.i-act.co.jp/project/products/products.html"
-myP="trac-${PV}-ja-1"
-SRC_URI="http://www.i-act.co.jp/project/products/downloads/${myP}.zip"
-S=${WORKDIR}/${myP}
+HOMEPAGE="http://www.i-act.co.jp/project/products/products.html
+	http://trac.edgewall.com/"
+SRC_URI="http://www.i-act.co.jp/project/products/downloads/${MY_P}.zip"
 
 LICENSE="trac"
-KEYWORDS="~amd64 ppc ~ppc64 ~sparc x86"
+KEYWORDS="amd64 ppc ~ppc64 ~sparc x86"
 IUSE="cgi fastcgi mysql postgres sqlite enscript silvercity"
+
+S="${WORKDIR}/${MY_P}"
 
 # doing so because utils (such as trac-admin), manpages... overlap
 SLOT="0"
@@ -25,6 +26,7 @@ WEBAPP_MANUAL_SLOT="yes"
 # we need to depend on virtual/httpd-python to pull mod_python/whatever in when USE python (python
 # is rather confusing here, as dev-lang/python is a required dependency, but httpd-python isn't)
 DEPEND="${DEPEND}
+	app-arch/unzip
 	>=dev-lang/python-2.3
 	app-text/pytextile
 	>=dev-python/docutils-0.3.9
