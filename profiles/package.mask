@@ -20,5 +20,3 @@
 ##   End example
 ##
 
-# dead upstream
-app-misc/quit
