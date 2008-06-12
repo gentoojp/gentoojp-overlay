@@ -4,21 +4,21 @@
 
 inherit python
 
-IUSE="doc"
-
 MY_P="${P//.}"
 
 DESCRIPTION="Pseudo AI module for 'Nanika' and other desktop agents for ninix"
-SRC_URI="mirror://sourceforge/${PN}/${MY_P}.zip"
 HOMEPAGE="http://kawari.sourceforge.net/"
+SRC_URI="mirror://sourceforge/${PN}/${MY_P}.zip"
 
-DEPEND="dev-lang/python
-	app-arch/unzip"
-RDEPEND="app-misc/ninix-aya"
-
-KEYWORDS="~x86 ~alpha"
 LICENSE="BSD"
 SLOT="0"
+KEYWORDS="~alpha ~amd64 ~x86"
+IUSE="doc"
+
+RDEPEND="app-misc/ninix-aya"
+DEPEND="${RDEPEND}
+	dev-lang/python
+	app-arch/unzip"
 
 S="${WORKDIR}/${MY_P}"
 
@@ -40,7 +40,7 @@ src_unpack(){
 src_compile(){
 	cd "${S}"/build/src
 	emake CFLAGS="${CFLAGS} -I. -I/usr/include/python${PYVER} -fPIC" \
-		../mach/linux/libshiori.so || die
+		../mach/linux/libshiori.so || die "emake failed"
 }
 
 src_install(){
