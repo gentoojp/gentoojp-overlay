@@ -21,4 +21,4 @@
 ##
 
 # new version. doesn't compile.
-=app-misc/kawari/kawari-8.2.8
+=app-misc/kawari-8.2.8
