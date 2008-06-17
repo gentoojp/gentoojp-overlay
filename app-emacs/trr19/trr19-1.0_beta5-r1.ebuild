@@ -4,7 +4,6 @@
 
 inherit elisp
 
-
 DESCRIPTION="TRR19 is a typing game on GNU Emacs"
 HOMEPAGE="http://web.yl.is.s.u-tokyo.ac.jp/~ymmt/mydist.shtml"
 SRC_URI="http://web.yl.is.s.u-tokyo.ac.jp/~ymmt/dist/${PN}.tar.gz"
@@ -21,8 +20,7 @@ S="${WORKDIR}/${PN}"
 SITEFILE=50trr19-gentoo.el
 
 src_compile() {
-	mv trr_format.c  trr_format.c.old
-	sed 's/tmpnam/mkstemp/g' trr_format.c.old > trr_format.c
+	sed -i -e 's/tmpnam/mkstemp/g' trr_format.c
 
 	make trrdir=${SITELISP}/${PN} \
 		infodir=/usr/share/info \
