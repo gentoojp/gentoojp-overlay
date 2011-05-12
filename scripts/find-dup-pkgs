@@ -1,0 +1,67 @@
+#!/bin/bash
+# vim: sw=4 noet
+
+diff="diff -u"
+#diff="colordiff -u"
+
+shopt -q nullglob
+red="[31m"
+green="[32m"
+RED="[1;31m"
+GREEN="[1;32m"
+NC="[0m"
+die() { echo "${RED}!${NC} $*"; exit 1; }
+puts() { [[ $opt_silent == yes ]] && : || echo "$@"; }
+usage() {
+	cat <<-END
+	Usage: ${0##*/} [-dh]
+	  -d      show diff
+	  -D      show only diff
+	  -C      no color output
+	  -h      show this help
+	END
+}
+
+# parse options
+opt_diff=''
+opt_silent=''
+while getopts ":dDCh" opt; do
+	case $opt in
+		d) opt_diff=yes;;
+		D) opt_diff=yes; opt_silent=yes;;
+		C) unset red green RED GREEN NC;;
+		h) usage; exit;;
+		\?) die "unknown option -${OPTARG}";;
+	esac
+done
+
+# get path of official 'gentoo' repo
+if [[ -r "/etc/paludis/repositories/gentoo.conf" ]]; then
+	repo_dir="$(sed -nr '/^[[:space:]]*location\>/ s/^.*=[[:space:]]*(.*)$/\1/p' \
+		"/etc/paludis/repositories/gentoo.conf")"
+else
+	[[ -r "/etc/make.conf" ]] && . /etc/make.conf
+	repo_dir="${PORTDIR:-/usr/portage}"
+fi
+[[ ! -d "$repo_dir" ]] && die "${repo_dir}: not a dir"
+
+# find packages already included in official 'gentoo' repo
+local_repo_dir="$(dirname "$(readlink -f "$0")")"/..
+cd "$local_repo_dir" || die "cd ${local_repo_dir} faild"
+for pkg in *-*/*; do
+	[[ ! -d "$pkg" ]] && continue
+	if [[ -d "${repo_dir}/${pkg}" ]]; then
+		puts "* $pkg"
+		puts "   there:"
+		for i in "${repo_dir}/${pkg}"/*.ebuild; do
+			puts "    ${GREEN}${i##*/}${NC}"
+		done
+		there_ebuild=$i
+		puts "   here:"
+		for i in "${pkg}"/*.ebuild; do
+			puts "    ${RED}${i##*/}${NC}"
+			[[ $opt_diff == yes ]] && $diff "$i" "$there_ebuild"
+		done
+		puts
+	fi
+done
