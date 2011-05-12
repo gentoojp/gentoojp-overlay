@@ -14,7 +14,7 @@ SLOT="0"
 LICENSE="MIT"
 IUSE=""
 
-RDEPEND="media-libs/jpeg
+RDEPEND="virtual/jpeg
 	sys-libs/zlib
 	>=dev-lang/python-2.2.2
 	>=dev-python/medusa-0.5.4

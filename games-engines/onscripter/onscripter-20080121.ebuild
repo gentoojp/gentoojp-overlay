@@ -19,7 +19,7 @@ DEPEND="media-libs/libsdl
 	media-libs/sdl-mixer
 	media-libs/sdl-ttf
 	media-libs/smpeg
-	media-libs/jpeg
+	virtual/jpeg
 	media-libs/freetype
 	app-arch/bzip2
 	vorbis? ( media-libs/libogg

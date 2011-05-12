@@ -13,7 +13,7 @@ HOMEPAGE="http://www.sokohiki.org/~nao/xakane/"
 
 DEPEND="=dev-cpp/gtkmm-1*
 	media-sound/mpg123
-	media-libs/jpeg
+	virtual/jpeg
 	truetype? ( =media-libs/freetype-1* )"
 
 KEYWORDS="~x86"

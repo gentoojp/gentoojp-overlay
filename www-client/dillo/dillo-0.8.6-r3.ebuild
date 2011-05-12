@@ -20,7 +20,7 @@ MISC_IUSE="nls truetype"
 IUSE="${MISC_IUSE} ipv6 ssl"
 
 RDEPEND="=x11-libs/gtk+-1.2*
-	>=media-libs/jpeg-6b
+	virtual/jpeg
 	>=sys-libs/zlib-1.1.3
 	>=media-libs/libpng-1.2.1
 	ssl? ( dev-libs/openssl )"
