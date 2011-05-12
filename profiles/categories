@@ -23,12 +23,10 @@ games-arcade
 games-emulation
 games-engines
 games-roguelike
-games-rpg
 mail-client
 mail-filter
 media-fonts
 media-gfx
-media-libs
 media-sound
 media-tv
 net-analyzer
@@ -41,12 +39,8 @@ net-proxy
 net-zope
 sci-libs
 sci-mathematics
-sys-apps
-sys-kernel
 sys-libs
 www-apps
 www-client
 www-servers
-x11-libs
 x11-plugins
-x11-terms
