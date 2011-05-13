@@ -26,7 +26,7 @@ src_prepare() {
 	if use ghal; then
 		# pkgdata_DATA in top Makefile defines docs.
 		# prevent doc files from being installed as data.
-		sed -i -e '/^pkgdata_DATA /d' Makefile.in || die "sed failed"
+		sed -i -e '/^pkgdata_DATA\>/d' Makefile.in || die "sed failed"
 	fi
 
 	if use canna-2ch; then
@@ -48,7 +48,7 @@ src_configure() {
 }
 
 src_install() {
-	emake DESTDIR="${D}" pkgdata_DATA="" install || die
+	emake DESTDIR="${D}" install || die
 
 	if use emacs ; then
 		elisp-site-file-install "${FILESDIR}"/50anthy-gentoo.el || die
