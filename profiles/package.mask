@@ -20,5 +20,14 @@
 ##   End example
 ##
 
+
+# quoted from p.mask of 'gentoo' repo:
+#  gtk+-1 is old and nasty.
+#  Start transitioning away from these packages.
+#  Read man 5 portage about package.unmask to unmask the package locally.
+games-engines/xkanon
+games-engines/xsystem35
+www-client/dillo
+
 # new version. doesn't compile.
 =app-misc/kawari-8.2.8
