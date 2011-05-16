@@ -1,67 +1,140 @@
 #!/bin/bash
-# vim: sw=4 noet
+# vim: sw=4 ts=4 noet
 
 diff="diff -u"
 #diff="colordiff -u"
+webspider="wget --quiet --spider --timeout 5"
 
-shopt -q nullglob
+shopt -s nullglob
+
 red="[31m"
 green="[32m"
 RED="[1;31m"
 GREEN="[1;32m"
 NC="[0m"
+
 die() { echo "${RED}!${NC} $*"; exit 1; }
 puts() { [[ $opt_silent == yes ]] && : || echo "$@"; }
 usage() {
 	cat <<-END
 	Usage: ${0##*/} [-dh]
-	  -d      show diff
-	  -D      show only diff
+	  -l      list dup packages
+	  -w      check if package homepage alive
+	  -d      show diff (with -l)
+	  -D      show only diff (with -l)
 	  -C      no color output
 	  -h      show this help
 	END
 }
+inherit() { :; }
+
+get_var_in_ebuild() {
+	( . "$2" && echo "${!1}" );
+	#sed -nre "/^[[:space:]]*${1}=/ s/^.*=['\"](.*)['\"].*/\1/p" "$2"
+}
+
+pkg_check_dup() {
+	local pkg=$1 ebuilds
+
+	[[ -d "${gentoo_repo_dir}/${pkg}" ]] || return 1
+
+	[[ $opt_diff == yes ]] && puts "diff --hoge"
+	puts "* $pkg"
+	puts "   there:"
+	for i in "${gentoo_repo_dir}/${pkg}"/*.ebuild; do
+		puts "    ${GREEN}${i##*/}${NC}"
+	done
+	there_ebuild=$i
+	puts "   here:"
+	for i in "${pkg}"/*.ebuild; do
+		puts "    ${RED}${i##*/}${NC}"
+		[[ $opt_diff == yes ]] && $diff "$i" "$there_ebuild"
+	done
+	puts
+}
+
+pkg_check_homepage() {
+	local pkg=$1 ebuilds uri fail
+
+	ebuilds=$(echo "$pkg"/*.ebuild)
+	puts "* $pkg"
+	[[ -z "$ebuilds" ]] && { puts "  no ebuilds"; return 1; }
+
+	for i in $ebuilds; do
+		uri+=" $(get_var_in_ebuild HOMEPAGE "$i")"
+	done
+	uri=$(echo "$uri" | sed -r 's/[[:space:]]+/\n/g' | sort | uniq)
+	set -o noglob
+	for i in $uri; do
+		$webspider "$i" \
+			&& echo -n "  ${GREEN}OK       ${NC}" \
+			|| { echo -n "  ${RED}Not Found${NC}"; fail=yes; }
+		echo " ${i}"
+	done
+	set +o noglob
+	puts
+	! [[ $fail == yes ]]
+}
+
 
 # parse options
+opt_action=''
 opt_diff=''
 opt_silent=''
-while getopts ":dDCh" opt; do
+#opt_njobs=8 # TODO para
+while getopts ":ldDwCh" opt; do
 	case $opt in
+		l) opt_action=listdups;;
 		d) opt_diff=yes;;
 		D) opt_diff=yes; opt_silent=yes;;
+		w) opt_action=homepage;;
 		C) unset red green RED GREEN NC;;
 		h) usage; exit;;
 		\?) die "unknown option -${OPTARG}";;
 	esac
 done
 
-# get path of official 'gentoo' repo
+# get path of gentoo, local repo
 if [[ -r "/etc/paludis/repositories/gentoo.conf" ]]; then
-	repo_dir="$(sed -nr '/^[[:space:]]*location\>/ s/^.*=[[:space:]]*(.*)$/\1/p' \
+	gentoo_repo_dir="$(sed -nr '/^[[:space:]]*location\>/ s/^.*=[[:space:]]*(.*)$/\1/p' \
 		"/etc/paludis/repositories/gentoo.conf")"
 else
 	[[ -r "/etc/make.conf" ]] && . /etc/make.conf
-	repo_dir="${PORTDIR:-/usr/portage}"
+	gentoo_repo_dir="${PORTDIR:-/usr/portage}"
 fi
-[[ ! -d "$repo_dir" ]] && die "${repo_dir}: not a dir"
-
-# find packages already included in official 'gentoo' repo
 local_repo_dir="$(dirname "$(readlink -f "$0")")"/..
-cd "$local_repo_dir" || die "cd ${local_repo_dir} faild"
-for pkg in *-*/*; do
-	[[ ! -d "$pkg" ]] && continue
-	if [[ -d "${repo_dir}/${pkg}" ]]; then
-		puts "* $pkg"
-		puts "   there:"
-		for i in "${repo_dir}/${pkg}"/*.ebuild; do
-			puts "    ${GREEN}${i##*/}${NC}"
+
+cd "${local_repo_dir}" || die "cd '${local_repo_dir}' faild"
+
+# do action
+case $opt_action in
+	listdups)
+		# find packages already included in official 'gentoo' repo
+		for pkg in *-*/*; do
+			[[ ! -d "$pkg" ]] && continue
+			pkg_check_dup "$pkg"
 		done
-		there_ebuild=$i
-		puts "   here:"
-		for i in "${pkg}"/*.ebuild; do
-			puts "    ${RED}${i##*/}${NC}"
-			[[ $opt_diff == yes ]] && $diff "$i" "$there_ebuild"
+		true
+		;;
+	homepage)
+		failed_pkgs=''
+		for pkg in *-*/*; do
+			[[ ! -d "$pkg" ]] && continue
+			# TODO parallel output
+			#until (( $(jobs | wc -l) < $opt_njobs )); do
+			#	sleep 0.1
+			#done
+			#(pkg_check_homepage "$pkg" || failed_pkgs+=" $pkg\n") &
+			pkg_check_homepage "$pkg" || failed_pkgs+=" $pkg\n"
 		done
-		puts
-	fi
-done
+		#wait $(jobs -p) # TODO para
+		if [[ -n "$failed_pkgs" ]]; then
+			echo "packages with missing homepage:"
+			echo -e "$failed_pkgs"
+		fi
+		;;
+	*)
+		die "-l or -w option required"
+		;;
+esac
+
