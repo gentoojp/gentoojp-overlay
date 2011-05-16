@@ -1,0 +1,56 @@
+--- a/catdump.c	2011-05-17 01:12:59.134282504 +0900
++++ b/catdump.c	2011-05-17 01:13:34.946367503 +0900
+@@ -284,7 +284,7 @@
+ void	outstr		PROTO((uchr *p, int len));
+ void	outjstr		PROTO((uchr *p, int len));
+ int	undump		PROTO((char *txtfile, char *catalog));
+-uchr	*getline	PROTO((uchr *buf, FILE *fp));
++uchr	*xgetline	PROTO((uchr *buf, FILE *fp));
+ uchr	*getvalue	PROTO((uchr *buf));
+ int	gethex		PROTO((uchr *buf, uchr *str, int len));
+ int	hexdigit	PROTO((int c));
+@@ -668,7 +668,7 @@
+     err = 0;
+     line = 0;
+ 
+-    if (getline(buf, fp) == NULL ||
++    if (xgetline(buf, fp) == NULL ||
+ 	strncmp((char *)buf, CAT_ENTRY, strlen(CAT_ENTRY))) {
+ 	xfprintf(stderr, "ERR: 項目 %s がありません\n", CAT_ENTRY);
+ 	fclose(fp);
+@@ -678,7 +678,7 @@
+     st = 0;
+     hdr = (HDR_T *)catbuf;
+     mask = 0L;
+-    while (getline(buf, fp) != NULL && *buf != '[') {
++    while (xgetline(buf, fp) != NULL && *buf != '[') {
+ 	if ((p = getvalue(buf)) == NULL) {
+ 	    xfprintf(stderr, "ERR: line %d: 構文に誤りがあります\n", line);
+ 	    err++;
+@@ -776,7 +776,7 @@
+ 	if (strncmp((char *)buf, BOOK_ENTRY, strlen(BOOK_ENTRY))) {
+ 	    xfprintf(stderr, "ERR: line %d: 不明な項目です (%s)\n", line, buf);
+ 	    err++;
+-	    while (getline(buf, fp) != NULL && *buf != '[')
++	    while (xgetline(buf, fp) != NULL && *buf != '[')
+ 		;
+ 	    if (*buf == '\0')
+ 		break;
+@@ -790,7 +790,7 @@
+ 	    break;
+ 	}
+ 	mask = 0;
+-	while (getline(buf, fp) != NULL && *buf != '[') {
++	while (xgetline(buf, fp) != NULL && *buf != '[') {
+ 	    if ((p = getvalue(buf)) == NULL) {
+ 		xfprintf(stderr, "ERR: line %d: 構文に誤りがあります\n", line);
+ 		err++;
+@@ -1051,7 +1051,7 @@
+ }
+ 
+ uchr *
+-getline(buf, fp)
++xgetline(buf, fp)
+      uchr	*buf;
+      FILE	*fp;
+ {
