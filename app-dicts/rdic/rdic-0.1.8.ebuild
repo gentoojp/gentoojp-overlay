@@ -2,7 +2,10 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-IUSE=""
+EAPI=3
+USE_RUBY="ruby18"
+
+inherit ruby-ng
 
 DESCRIPTION="EIJIRO dictionary search tool written in Ruby"
 HOMEPAGE="http://www.yasgursfarm.us/rdic/"
@@ -10,22 +13,18 @@ SRC_URI="http://www.yasgursfarm.us/download/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~x86"
+KEYWORDS="~x86 ~amd64"
+IUSE=""
 
-DEPEND=" >=dev-lang/ruby-1.8.1
-	>=dev-ruby/ruby-mmap-0.2.2"
+RDEPEND+=" dev-ruby/mmap"
+DEPEND="${RDEPEND}"
 
-S=${WORKDIR}/${P}
-
-src_compile() {
-
-	ruby extconf.rb || die
-	make || die
+each_ruby_configure() {
+	${RUBY} extconf.rb || die "extconf failed"
 }
 
-src_install() {
-
-	einstall DESTDIR="${D}" || die
+each_ruby_install() {
+	emake install DESTDIR="${D}" || die "emake install failed"
 
 	keepdir /usr/share/dicts/EIJIRO
 
@@ -40,18 +39,16 @@ src_install() {
 }
 
 pkg_postinst() {
-
-	einfo ""
-	einfo "Place your EIJIRO dictionary files (e.g. EIJIRO65.TXT, OTOJIRO.TXT,"
-	einfo "REIJI65.TXT, RYAKU65.TXT and WAEIJI65.TXT) to /usr/share/dicts/EIJIRO/"
-	einfo "and run"
-	einfo "\tebuild /var/db/pkg/app-dicts/rdic/${PF}.ebuild config"
-	einfo "to convert EIJIRO dictionary files into PDIC format."
-	einfo ""
+	elog ""
+	elog "Place your EIJIRO dictionary files (e.g. EIJIRO65.TXT, OTOJIRO.TXT,"
+	elog "REIJI65.TXT, RYAKU65.TXT and WAEIJI65.TXT) to /usr/share/dicts/EIJIRO/"
+	elog "and run"
+	elog "\tebuild /var/db/pkg/app-dicts/rdic/${PF}.ebuild config"
+	elog "to convert EIJIRO dictionary files into PDIC format."
+	elog ""
 }
 
 pkg_config() {
-
 	einfo ""
 	einfo "Now convert EIJIRO dictionary files to PDIC format."
 	einfo "It takes time for a while."
