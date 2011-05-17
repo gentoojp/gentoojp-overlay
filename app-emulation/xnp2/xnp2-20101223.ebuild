@@ -20,6 +20,8 @@ KEYWORDS="~x86 ~ppc64 ~amd64"
 IUSE="doc sound timidity linguas_ja"
 
 RDEPEND=">=x11-libs/gtk+-2.6:2
+	x11-libs/libX11
+	x11-libs/libXxf86vm
 	sound? ( media-libs/libsdl[audio]
 		media-libs/sdl-mixer )
 	timidity? ( media-sound/timidity++ )"
