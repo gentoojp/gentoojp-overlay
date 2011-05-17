@@ -64,7 +64,7 @@ src_compile() {
 
 src_install(){
 	use linguas_ja && mv -f xnp2.{j,}man
-	emake DESTDIR="${D}" install install.man || die "install failed"
+	emake DESTDIR="${ED}" install install.man || die "install failed"
 
 	dodoc README.ja
 	use doc && dohtml -r "${WORKDIR}/${MY_HELP}/"*
