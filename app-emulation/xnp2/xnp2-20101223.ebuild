@@ -2,39 +2,38 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-# TODO 	内蔵ベルモントの timidity音色ファイル リンク
+EAPI=3
 
-inherit eutils
+inherit toolchain-funcs
 
-IUSE="sdl timidity doc"
+MY_HELP="${PN}-help-20080403"
 
 DESCRIPTION="NEC PC-9801 Series emulator for X"
-SRC_URI="http://retropc.net/monaka/np2/release/${P}.tar.bz2
-	doc? ( http://retropc.net/monaka/np2/release/${PN}-html-0.80.tar.bz2 )"
-HOMEPAGE="http://retropc.net/monaka/np2/"
+HOMEPAGE="http://www.asahi-net.or.jp/~aw9k-nnk/np2/"
+SRC_URI="http://www.asahi-net.or.jp/~aw9k-nnk/np2/${P}.tar.bz2
+	doc? ( http://www.asahi-net.or.jp/~aw9k-nnk/np2/${MY_HELP}.tar.bz2 )"
+	# TODO 	内蔵ベルモントの timidity音色ファイル リンク (? 謎)
 
-RDEPEND=">=x11-libs/gtk+-2.6
-	sdl? ( media-libs/libsdl
+LICENSE="BSD"
+SLOT=0
+KEYWORDS="~x86 ~ppc64 ~amd64"
+IUSE="doc sound timidity linguas_ja"
+
+RDEPEND=">=x11-libs/gtk+-2.6:2
+	sound? ( media-libs/libsdl[audio]
 		media-libs/sdl-mixer )
 	timidity? ( media-sound/timidity++ )"
-
-DEPEND="${RDEPEND}"
-
-LICENSE="as-is"
-KEYWORDS="~x86 ~ppc64 ~amd64"
-SLOT=0
+DEPEND="${RDEPEND}
+	dev-util/pkgconfig
+	x11-misc/imake"
 
 S="${WORKDIR}/${P}/x11"
 
-src_unpack(){
-	unpack ${A}
-	cd ${S}
+src_configure() {
+	rm -f config.tmpl
 
-	mv config.tmpl config.tmpl.orig
-
-	# Start of Audio configuration.
-	if use sdl
-	then
+	# Audio/Video configuration
+	if use sound; then
 		echo 'SDL_CONFIG= sdl-config' >> config.tmpl
 	 	echo '#define  USE_SDLAUDIO'  >> config.tmpl
 	 	echo '#define  USE_SDLMIXER'  >> config.tmpl
@@ -42,44 +41,33 @@ src_unpack(){
 		echo '#undef   USE_SDLAUDIO'  >> config.tmpl
 	 	echo '#undef   USE_SDLMIXER'  >> config.tmpl
 	fi
-	# End of Audio configuration.
+	echo '#define  USE_XF86VIDMODE' >> config.tmpl
 
-	# Start arch configuration.
-	if use sparc || use ppc || use ppc64 || use sparc64
-	then
+	# arch configuration
+	if use sparc || use ppc || use ppc64 || use sparc64; then
 		echo '#define BIGENDIAN' >> config.tmpl
 	else
 		echo '#undef BIGENDIAN'  >> config.tmpl
 	fi
-	# End arch configuration.
-
 	echo '#define  CPUCORE_IA32'	>> config.tmpl
-	echo '#define  USE_XF86VIDMODE' >> config.tmpl
 
 	echo "CFLAGS+= ${CFLAGS}" >> config.tmpl
+
+	xmkmf || die "xmkmf failed"
+	sed -i -e 's/$(DESTDIR)[[:space:]]*/$(DESTDIR)/' Makefile
 }
 
-src_compile(){
-	xmkmf || die
-	mv Makefile Makefile.orig
-	sed -e "s/\$(DESTDIR)[[:space:]]*/\$(DESTDIR)/" \
-		Makefile.orig > Makefile
-	cp ${PN}.man ${PN}.man.orig
-	cp ${PN}.jman ${PN}.man
-
-	emake || die
+src_compile() {
+	emake CC="$(tc-getCC)" CCOPTIONS="${CFLAGS}" EXTRA_LDOPTIONS="${LDFLAGS}" \
+		CDEBUGFLAGS="" || die "emake failed"
 }
 
 src_install(){
-	emake DESTDIR="${D}" install || die
-	emake DESTDIR="${D}" install.man || die
+	use linguas_ja && mv -f xnp2.{j,}man
+	emake DESTDIR="${D}" install install.man || die "install failed"
 
 	dodoc README.ja
-
-	if use doc ; then
-		dodir /usr/share/doc/${PF}
-		cp -r ${WORKDIR}/html "${D}"/usr/share/doc/${PF}
-	fi
+	use doc && dohtml -r "${WORKDIR}/${MY_HELP}/"*
 }
 
 pkg_postinst(){
