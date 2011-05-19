@@ -1,0 +1,29 @@
+#!/sbin/runscript
+# Copyright 1999-2011 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License, v2 or later
+# $Header: $
+
+depend() {
+	after logger
+}
+
+checkconfig() {
+	if [[ ! -e /etc/sj3/sj3serv.lua ]]; then
+		eerror "You need an '/etc/sj3/sj3serv.lua' to run the daemon"
+		eerror "There is a sample file in /etc/sj3"
+		return 1
+	fi
+}
+
+start() {
+	checkconfig || return 1
+	ebegin "Starting sj3serv"
+	start-stop-daemon --start --quiet --exec /usr/sbin/sj3serv
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping sj3serv"
+	start-stop-daemon --stop --quiet --name sj3serv
+	eend $?
+}

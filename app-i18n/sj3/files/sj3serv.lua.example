@@ -1,0 +1,90 @@
+--[[ -- -*- lua -*-
+ Copyright (c) 2004 Iwata <iwata@quasiquote.org>
+
+ Permission to use, copy, modify, and distribute this software for any
+ purpose with or without fee is hereby granted, provided that the above
+ copyright notice and this permission notice appear in all copies.
+
+ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+--]]
+
+sj3.set_server {
+   -- max_client: Integer
+   --  client connect limit value
+   max_client = 512,
+
+   -- user: String
+   --  run as user name
+   --user = "sj3",
+
+   -- chroot: Boolean
+   --  sj3serv is chrooted or not
+   chroot = true,
+
+   -- chroot_dir: String
+   --  chrooted path
+   --chroot_dir = "/var/lib/sj3/dict",
+
+   -- dict_dir: String
+   --  dictionary name
+   --  Note: this directory is opened after chroot
+   dict_dir = "/",
+
+   -- strict_auth: Boolean
+   --  check always peer userid for security.
+   --  Note: if you want to run sj3serv with sj3proxy, set false
+   strict_auth = true,
+}
+
+sj3.set_domain {
+   -- socket_name: String
+   -- binding filename of unix domain socket
+   --socket_name = "/var/run/sj3/sj3serv.socket",
+}
+
+sj3.append_opendict {
+   -- file: String
+   --  main dictionaly name
+   -- Note: this file is opened after chroot
+   --file = "sj3main.dic",
+}
+
+sj3.set_log {
+   -- file: String
+   --  output filename of log output
+   --file = "/var/log/sj3",
+}
+
+sj3.set_debug {
+   -- file: String
+   --  output filename of debug output
+   file = nil,
+
+   -- debug_level: Integer
+   --  debug level
+   level = 0,
+}
+
+sj3.set_error {
+   -- file: String
+   --  output filename of error output
+   --file = "/var/log/sj3_error",
+}
+
+--[[
+sj3.append_allowuser {
+   -- file: String
+   --  allowed user name
+   user = "foo",
+
+   -- file: String
+   --  allowed host name
+   hostname = "bar",
+}
+--]]
