@@ -1,0 +1,42 @@
+--- Makefile.orig	2011-05-20 01:06:29.227643628 +0900
++++ Makefile	2011-05-20 01:49:28.675483776 +0900
+@@ -8,10 +8,10 @@
+ prefix=/usr/local
+ exec_libdir=$(prefix)/lib/$(PKG)-$(VER)
+ 
+-bindir=$(DESTDIR)$(prefix)/bin
+-docdir=$(DESTDIR)$(prefix)/share/doc/$(PKG)-$(VER)
+-libdir=$(DESTDIR)$(exec_libdir)
+-localedir=$(DESTDIR)$(prefix)/share/locale
++bindir:=$(prefix)/bin
++docdir:=$(prefix)/share/doc/$(PKG)-$(VER)
++libdir:=$(exec_libdir)
++localedir:=$(prefix)/share/locale
+ 
+ SRC=$(shell find src -name "*.py")
+ PYC=$(SRC:.py=.pyc)
+@@ -35,18 +35,18 @@
+ 	sed -e "s:@PYTHON:$(PYTHON):g" -e "s:@libdir:$(libdir):g" src/$(PKG).in > src/$(PKG)
+ 
+ install-doc:
+-	mkdir -p $(docdir)
+-	install -m644 COPYING ChangeLog README README.bottler TODO $(docdir)
++	mkdir -p $(DESTDIR)$(docdir)
++	install -m644 COPYING ChangeLog README README.bottler TODO $(DESTDIR)$(docdir)
+ 
+ install-mo:
+-	for mo in $(MO); do dir=$(localedir)/`basename $$mo .mo`/LC_MESSAGES; mkdir -p $$dir; mv $$mo $$dir/$(PKG).mo; done
++	for mo in $(MO); do dir=$(localedir)/`basename $$mo .mo`/LC_MESSAGES; mkdir -p $(DESTDIR)$$dir; mv $$mo $(DESTDIR)$$dir/$(PKG).mo; done
+ 
+ install-lib: all install-mo
+-	for ins in $(SRC) $(PYC) $(PYO); do base=`dirname $${ins#src\/}`; mkdir -p $(libdir)/$$base; install -m644 $$ins $(libdir)/$$base; done
++	for ins in $(SRC) $(PYC) $(PYO); do base=`dirname $${ins#src\/}`; mkdir -p $(DESTDIR)$(libdir)/$$base; install -m644 $$ins $(DESTDIR)$(libdir)/$$base; done
+ 
+ install-bin: install-lib
+-	mkdir -p $(bindir)
+-	install -m755 src/$(PKG) $(bindir)
++	mkdir -p $(DESTDIR)$(bindir)
++	install -m755 src/$(PKG) $(DESTDIR)$(bindir)
+ 
+ install: install-bin install-doc
+ 
