@@ -28,6 +28,3 @@
 games-engines/xkanon
 games-engines/xsystem35
 www-client/dillo
-
-# new version. doesn't compile.
-=app-misc/kawari-8.2.8
