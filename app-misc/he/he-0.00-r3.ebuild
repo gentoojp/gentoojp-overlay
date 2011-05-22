@@ -34,10 +34,10 @@ src_compile() {
 src_install() {
 	dobin "${FILESDIR}"/he
 
-	exeinto "${EPREFIX}"/usr/$(get_libdir)/heSDL
+	exeinto /usr/$(get_libdir)/heSDL
 	doexe he_sdl moe_sdl
 
-	insinto "${EPREFIX}"/usr/$(get_libdir)/heSDL
+	insinto /usr/$(get_libdir)/heSDL
 	doins *.bmp "${FILESDIR}"/moe.wav
 	newins he.WAV he.wav
 

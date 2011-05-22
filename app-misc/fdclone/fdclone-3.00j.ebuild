@@ -55,8 +55,8 @@ src_compile(){
 
 src_install(){
 	dobin fd
-	dosym fd "${EPREFIX}"/usr/bin/fdsh
-	insinto "${EPREFIX}"/usr/share/fd
+	dosym fd /usr/bin/fdsh
+	insinto /usr/share/fd
 	doins fd-dict.tbl fd-unicd.tbl
 	dodoc  FAQ* HISTORY* Install* LICENSES* README* TECHKNOW* ToAdmin*
 	doman fd.1; dosym fd.1 /usr/share/man/man1/fdsh.1

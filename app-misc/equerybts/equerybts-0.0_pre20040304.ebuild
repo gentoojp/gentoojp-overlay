@@ -30,6 +30,6 @@ src_prepare() {
 
 src_install() {
 	dobin ${PN} || die
-	insinto "${EPREFIX}/$(python_get_sitedir)"
+	insinto "$(python_get_sitedir)"
 	doins lib/${PN} || die
 }
