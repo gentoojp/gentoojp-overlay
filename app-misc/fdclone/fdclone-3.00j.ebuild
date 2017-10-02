@@ -9,7 +9,8 @@ MY_P="FD-${PV}"
 
 DESCRIPTION="FDClone: Console Filer"
 HOMEPAGE="http://hp.vector.co.jp/authors/VA012337/soft/fd/"
-SRC_URI="http://hp.vector.co.jp/authors/VA012337/soft/fd/${MY_P}.tar.gz"
+SRC_URI="http://hp.vector.co.jp/authors/VA012337/soft/fd/${MY_P}.tar.gz \
+         ftp://ftp.unixusers.net/src/fdclone/${MY_P}.tar.gz"
 
 LICENSE="FDCLONE"
 SLOT="0"

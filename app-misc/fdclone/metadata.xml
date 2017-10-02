@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>mi@2357.se</email>
+    <name>mi</name>
+  </maintainer>
+  <longdescription>FDclone is a file &amp; directory maintenance tool for the UNIX based OS (called as "UNIX" expediently below). It is a clone of "FD" for MS-DOS, made by Mr. A.Idei in 1989.</longdescription>
+  <use>
+    <flag name="ms-wavedash">Normally, wave-dash(SJIS 0x8160) converts to U+301c, but in case of this, converts to U+ff5e like Microsoft implementation.</flag>
+  </use>
+</pkgmetadata>
